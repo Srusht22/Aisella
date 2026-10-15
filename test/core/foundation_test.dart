@@ -183,6 +183,26 @@ void main() {
   });
 
   group('Dates', () {
+    test('day month year in English and Sorani', () {
+      final d = DateTime(2026, 10, 29);
+      expect(
+        Dates.dayMonthYear(
+          d,
+          locale: const Locale('en'),
+          digits: DigitStyle.western,
+        ),
+        '29 October 2026',
+      );
+      expect(
+        Dates.dayMonthYear(
+          d,
+          locale: const Locale('ckb'),
+          digits: DigitStyle.western,
+        ),
+        '29ی تشرینی یەکەمی 2026',
+      );
+    });
+
     test('English and Sorani weekday/day/month', () {
       final d = DateTime(2026, 10, 15); // Thursday
       expect(

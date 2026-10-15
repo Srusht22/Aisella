@@ -68,4 +68,18 @@ abstract final class Dates {
     }
     return '${_enWeekdays[date.weekday - 1]}, $day ${_enMonths[date.month - 1]}';
   }
+
+  /// "29 October 2026" / "29ی تشرینی یەکەمی 2026".
+  static String dayMonthYear(
+    DateTime date, {
+    required Locale locale,
+    required DigitStyle digits,
+  }) {
+    final day = Digits.display('${date.day}', digits);
+    final year = Digits.display('${date.year}', digits);
+    if (locale.languageCode == 'ckb') {
+      return '$dayی ${_ckbMonths[date.month - 1]}ی $year';
+    }
+    return '$day ${_enMonths[date.month - 1]} $year';
+  }
 }

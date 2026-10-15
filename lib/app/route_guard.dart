@@ -9,6 +9,7 @@ abstract final class Routes {
   static const language = '/language';
   static const starting = '/starting';
   static const unavailable = '/unavailable';
+  static const accountClosed = '/account-closed';
 
   // Public (signed out).
   static const welcome = '/welcome';
@@ -37,6 +38,7 @@ abstract final class Routes {
   static const storeZones = '/store/zones';
   static const storePayments = '/store/payments';
   static const storeAccount = '/store/account';
+  static const storeDeleteAccount = '/store/account/delete';
   static const storeLanguage = '/store/language';
   static const storeGallery = '/store/gallery';
   static const storeLegal = '/store/terms';
@@ -66,6 +68,7 @@ const _entryRoutes = {
   Routes.language,
   Routes.starting,
   Routes.unavailable,
+  Routes.accountClosed,
   Routes.newPassword,
 };
 
@@ -156,9 +159,7 @@ String homeFor(RouteGate gate) {
     SignedIn() => switch (gate.workspace) {
       GateLoading() => Routes.starting,
       GateUnavailable() => Routes.unavailable,
-      // Deletion requests arrive in milestone 4; until then a pending
-      // deletion cannot occur, and the seller is held on the start screen.
-      GateDeletionPending() => Routes.unavailable,
+      GateDeletionPending() => Routes.accountClosed,
       GateNoStore() => Routes.setupStore,
       GateOnboarding(step: OnboardingStep.payments) => Routes.setupPayments,
       GateOnboarding() => Routes.setupZones,
@@ -175,7 +176,8 @@ bool isAllowed(String path, RouteGate gate) {
     SignedOut() => publicRoutes.contains(path),
     SignedIn() => switch (gate.workspace) {
       GateLoading() => path == Routes.starting,
-      GateUnavailable() || GateDeletionPending() => path == Routes.unavailable,
+      GateUnavailable() => path == Routes.unavailable,
+      GateDeletionPending() => path == Routes.accountClosed,
       GateNoStore() => path == Routes.setupStore,
       GateOnboarding(step: OnboardingStep.payments) =>
         path == Routes.setupZones || path == Routes.setupPayments,

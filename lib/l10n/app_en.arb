@@ -1310,5 +1310,55 @@
   "signOutAllBody": "Aisellia will be signed out on every device, including this one.",
   "@signOutAllBody": {
     "description": "Confirm dialog body."
+  },
+  "deleteAccount": "Delete account",
+  "@deleteAccount": {
+    "description": "ST-07 danger row and ST-08 title/action."
+  },
+  "deleteAccountWhat": "Deleting your account removes your store, its settings and delivery zones, and your sign-in. This cannot be undone.",
+  "@deleteAccountWhat": {
+    "description": "ST-08 step 1: what will be deleted."
+  },
+  "deleteAccountGrace": "Access ends immediately. Your data is permanently deleted after 14 days.",
+  "@deleteAccountGrace": {
+    "description": "ST-08 step 1: grace period (D-13)."
+  },
+  "deleteAccountPassword": "Enter your password to confirm it's you",
+  "@deleteAccountPassword": {
+    "description": "ST-08 step 2."
+  },
+  "deleteAccountTypeName": "Type your store name to confirm: {name}",
+  "@deleteAccountTypeName": {
+    "description": "ST-08 step 3.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deletingAccount": "Deleting…",
+  "@deletingAccount": {
+    "description": "Delete busy."
+  },
+  "errStoreNameMismatch": "This doesn't match your store name",
+  "@errStoreNameMismatch": {
+    "description": "Validation."
+  },
+  "deleteFailedNothingDeleted": "Couldn't delete your account. Nothing was deleted.",
+  "@deleteFailedNothingDeleted": {
+    "description": "Failure; explicit that nothing changed (US-004)."
+  },
+  "accountClosedTitle": "Your account is being deleted",
+  "@accountClosedTitle": {
+    "description": "Account closed screen title."
+  },
+  "accountClosedBody": "Your store is no longer available. All its data will be permanently deleted on {date}. To stop this, contact Aisellia support before then.",
+  "@accountClosedBody": {
+    "description": "Account closed screen body.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }

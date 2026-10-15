@@ -1,4 +1,5 @@
 import 'package:aisellia/core/backend/api.dart';
+import 'package:aisellia/design_system/components/app_button.dart';
 import 'package:aisellia/features/store/domain/store.dart';
 import 'package:aisellia/features/today/presentation/today_screen.dart';
 import 'package:flutter/material.dart';
@@ -280,6 +281,81 @@ void main() {
       await tester.tap(find.text('Sign out').last);
       await tester.pumpAndSettle();
       expect(auth.calls, contains('signOut:global'));
+      expect(find.text('I have an account'), findsOneWidget);
+    });
+  });
+
+  group('Delete account (ST-08)', () {
+    Future<(FakeAuthRepository, FakeStoreRepository)> openDelete(
+      WidgetTester tester,
+    ) async {
+      setScreen(tester);
+      final auth = FakeAuthRepository(initialUser: testUser)
+        ..accounts[testUser.email] = 'correct-horse';
+      final backend = FakeStoreRepository(store: testStore());
+      await tester.pumpWidget(testApp(auth: auth, storeBackend: backend));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Store menu'));
+      await tester.pumpAndSettle();
+      await _tapVisible(tester, find.text('Account'));
+      await _tapVisible(tester, find.text('Delete account'));
+      return (auth, backend);
+    }
+
+    Finder deleteButton() => find.widgetWithText(AppButton, 'Delete account');
+
+    testWidgets('requires the password and the exact store name', (
+      tester,
+    ) async {
+      final (_, backend) = await openDelete(tester);
+      expect(find.textContaining('This cannot be undone'), findsOneWidget);
+      expect(find.textContaining('14 days'), findsOneWidget);
+      expect(tester.widget<AppButton>(deleteButton()).onPressed, isNull);
+      await tester.enterText(_field('Password'), 'correct-horse');
+      await tester.enterText(find.byType(TextField).last, 'Shilan');
+      await tester.pump();
+      expect(tester.widget<AppButton>(deleteButton()).onPressed, isNull);
+      expect(
+        backend.calls.where((c) => c.startsWith('requestDeletion')),
+        isEmpty,
+      );
+    });
+
+    testWidgets('a wrong password deletes nothing and says so', (tester) async {
+      final (_, backend) = await openDelete(tester);
+      await tester.enterText(_field('Password'), 'wrong-password');
+      await tester.enterText(find.byType(TextField).last, 'Shilan Boutique');
+      await tester.pump();
+      await tester.tap(deleteButton());
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Nothing was deleted.'), findsOneWidget);
+      expect(
+        backend.calls.where((c) => c.startsWith('requestDeletion')),
+        isEmpty,
+      );
+      expect(backend.store, isNotNull);
+    });
+
+    testWidgets('success closes the account and only sign-out remains', (
+      tester,
+    ) async {
+      final (auth, backend) = await openDelete(tester);
+      await tester.enterText(_field('Password'), 'correct-horse');
+      await tester.enterText(find.byType(TextField).last, 'Shilan Boutique');
+      await tester.pump();
+      await tester.tap(deleteButton());
+      await tester.pumpAndSettle();
+      expect(
+        auth.calls,
+        contains('signIn:${testUser.email}'),
+        reason: 're-authenticated',
+      );
+      expect(backend.calls, contains('requestDeletion:Shilan Boutique'));
+      expect(find.text('Your account is being deleted'), findsOneWidget);
+      expect(find.textContaining('29 October 2026'), findsOneWidget);
+      expect(find.byType(TodayScreen), findsNothing);
+      await tester.tap(find.text('Sign out'));
+      await tester.pumpAndSettle();
       expect(find.text('I have an account'), findsOneWidget);
     });
   });

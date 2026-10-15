@@ -104,6 +104,18 @@ class WorkspaceController extends AsyncNotifier<AccountContext?> {
     return updated;
   }
 
+  /// ST-08: re-authentication happens first (in the auth controller); then
+  /// the request, then the server state is read back so the router shows the
+  /// closed-account screen. Nothing is reported as deleted unless the server
+  /// accepted the request.
+  Future<DateTime> requestAccountDeletion(String confirmStoreName) async {
+    final executeAfter = await _guardAuth(
+      () => _repo.requestAccountDeletion(confirmStoreName: confirmStoreName),
+    );
+    await refresh();
+    return executeAfter;
+  }
+
   /// Applies a store returned by a zone operation's caller, or after reload.
   void _setStore(Store store) {
     final ctx = state.value;

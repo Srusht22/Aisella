@@ -3,8 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/formatting/dates.dart';
 import '../core/l10n/l10n.dart';
+import '../core/settings/app_settings.dart';
+import '../design_system/components/app_button.dart';
 import '../design_system/components/feedback.dart';
+import '../design_system/icons/app_icons.dart';
+import '../design_system/layout/responsive.dart';
 import '../design_system/theme/theme_ext.dart';
 import '../design_system/tokens/tokens.g.dart';
 import '../features/auth/application/auth_controller.dart';
@@ -105,6 +110,64 @@ class WorkspaceUnavailableScreen extends ConsumerWidget {
             ),
             const SizedBox(height: Space.s16),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown while an account deletion is pending (US-004): the store is no
+/// longer available; the only action is to sign out.
+class AccountClosedScreen extends ConsumerWidget {
+  const AccountClosedScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final p = context.palette;
+    final type = context.type;
+    final when = ref.watch(workspaceProvider).value?.deletionExecuteAfter;
+    final date = when == null
+        ? ''
+        : Dates.dayMonthYear(
+            when.toLocal(),
+            locale: Localizations.localeOf(context),
+            digits: ref.watch(settingsProvider).digits,
+          );
+    return Scaffold(
+      backgroundColor: p.bgCanvas,
+      body: SafeArea(
+        child: ContentWidth(
+          maxWidth: LayoutTokens.maxWidthForm,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Spacer(),
+              Icon(AppIcons.prohibit, size: 40, color: p.textSecondary),
+              const SizedBox(height: Space.s16),
+              Semantics(
+                header: true,
+                child: Text(
+                  l10n.accountClosedTitle,
+                  style: type.titleLarge.copyWith(color: p.textPrimary),
+                ),
+              ),
+              const SizedBox(height: Space.s8),
+              Text(
+                l10n.accountClosedBody(date),
+                style: type.bodyLarge.copyWith(color: p.textSecondary),
+              ),
+              const Spacer(flex: 2),
+              AppButton(
+                label: l10n.menuSignOut,
+                variant: AppButtonVariant.secondary,
+                expand: true,
+                onPressed: () =>
+                    ref.read(authControllerProvider.notifier).signOut(),
+              ),
+              const SizedBox(height: Space.s16),
+            ],
+          ),
         ),
       ),
     );

@@ -38,6 +38,10 @@ abstract interface class StoreRepository {
     required String zoneId,
     required int expectedVersion,
   });
+
+  /// ST-08. Needs a password sign-in within the last 5 minutes. Returns when
+  /// the data will be purged.
+  Future<DateTime> requestAccountDeletion({required String confirmStoreName});
 }
 
 class SupabaseStoreRepository implements StoreRepository {
@@ -155,5 +159,17 @@ class SupabaseStoreRepository implements StoreRepository {
         'p_expected_version': expectedVersion,
       },
     );
+  }
+
+  @override
+  Future<DateTime> requestAccountDeletion({
+    required String confirmStoreName,
+  }) async {
+    final data = await callApi(
+      _client,
+      'request_account_deletion',
+      params: {'p_confirm_store_name': confirmStoreName},
+    );
+    return DateTime.parse(data['execute_after'] as String);
   }
 }

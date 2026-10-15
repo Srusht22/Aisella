@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../app/route_guard.dart';
 
 import '../../core/backend/api.dart';
 import '../../core/backend/idempotency.dart';
@@ -560,6 +563,20 @@ class _AccountScreenState extends ConsumerState<AccountScreen> {
             ),
           ],
         ),
+        const SizedBox(height: Space.s24),
+        RowGroup(
+          children: [
+            NavRow(
+              label: l10n.deleteAccount,
+              icon: AppIcons.trash,
+              iconColor: p.dangerFg,
+              labelColor: p.dangerFg,
+              onTap: _busy
+                  ? null
+                  : () => context.push(Routes.storeDeleteAccount),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -573,5 +590,125 @@ Future<void> _refreshQuietly(WidgetRef ref) async {
     await ref.read(workspaceProvider.notifier).refresh();
   } on ApiException {
     // Keep what is on screen.
+  }
+}
+
+/// ST-08 Delete account: what will be deleted and the grace period, then the
+/// password (re-authentication) and the store name. Failure leaves everything
+/// intact and says so (US-004).
+class DeleteAccountScreen extends ConsumerStatefulWidget {
+  const DeleteAccountScreen({super.key});
+
+  @override
+  ConsumerState<DeleteAccountScreen> createState() =>
+      _DeleteAccountScreenState();
+}
+
+class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
+  final _password = TextEditingController();
+  final _name = TextEditingController();
+  bool _busy = false;
+  bool _submitted = false;
+  String? _message;
+
+  @override
+  void dispose() {
+    _password.dispose();
+    _name.dispose();
+    super.dispose();
+  }
+
+  Future<void> _delete(String? storeName) async {
+    if (_busy) return;
+    final l10n = context.l10n;
+    setState(() {
+      _submitted = true;
+      _message = null;
+    });
+    if (_password.text.isEmpty ||
+        (storeName != null && _name.text.trim() != storeName)) {
+      return;
+    }
+    setState(() => _busy = true);
+    try {
+      await ref
+          .read(authControllerProvider.notifier)
+          .reauthenticate(_password.text);
+      await ref
+          .read(workspaceProvider.notifier)
+          .requestAccountDeletion(_name.text.trim());
+      // The router now shows the closed-account screen.
+    } on AuthError catch (e) {
+      if (mounted) {
+        setState(
+          () => _message =
+              '${authFailureText(l10n, e.failure)} ${l10n.deleteFailedNothingDeleted}',
+        );
+      }
+    } on ApiException {
+      if (mounted) setState(() => _message = l10n.deleteFailedNothingDeleted);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final p = context.palette;
+    final type = context.type;
+    final storeName = ref.watch(workspaceProvider).value?.store?.name;
+    final nameMatches = storeName == null || _name.text.trim() == storeName;
+    return FormPage(
+      title: l10n.deleteAccount,
+      bottom: formActions(
+        primary: AppButton(
+          label: l10n.deleteAccount,
+          loadingLabel: l10n.deletingAccount,
+          variant: AppButtonVariant.danger,
+          loading: _busy,
+          expand: true,
+          onPressed: nameMatches && _password.text.isNotEmpty
+              ? () => _delete(storeName)
+              : null,
+        ),
+      ),
+      children: [
+        if (_message != null) FormErrorBanner(message: _message!),
+        AppBanner(
+          tone: Tone.danger,
+          icon: AppIcons.warning,
+          title: l10n.deleteAccountWhat,
+          body: l10n.deleteAccountGrace,
+        ),
+        const SizedBox(height: Space.s24),
+        Text(
+          l10n.deleteAccountPassword,
+          style: type.body.copyWith(color: p.textPrimary),
+        ),
+        const SizedBox(height: Space.s8),
+        PasswordField(
+          controller: _password,
+          label: l10n.fieldPassword,
+          enabled: !_busy,
+          error: _submitted && _password.text.isEmpty
+              ? l10n.errPasswordRequired
+              : null,
+          onChanged: (_) => setState(() {}),
+        ),
+        if (storeName != null) ...[
+          const SizedBox(height: Space.s24),
+          AppTextField(
+            label: l10n.deleteAccountTypeName(storeName),
+            controller: _name,
+            enabled: !_busy,
+            error: _submitted && !nameMatches
+                ? l10n.errStoreNameMismatch
+                : null,
+            onChanged: (_) => setState(() {}),
+          ),
+        ],
+      ],
+    );
   }
 }

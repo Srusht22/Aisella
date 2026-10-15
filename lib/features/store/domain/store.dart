@@ -140,6 +140,7 @@ class AccountContext {
     required this.emailVerified,
     required this.deletionPending,
     required this.store,
+    this.deletionExecuteAfter,
   });
 
   factory AccountContext.fromJson(Map<String, dynamic> json) => AccountContext(
@@ -147,6 +148,9 @@ class AccountContext {
     email: json['email'] as String? ?? '',
     emailVerified: json['email_verified'] as bool? ?? false,
     deletionPending: json['deletion_pending'] as bool? ?? false,
+    deletionExecuteAfter: DateTime.tryParse(
+      json['deletion_execute_after'] as String? ?? '',
+    ),
     store: json['store'] is Map
         ? Store.fromJson((json['store'] as Map).cast<String, dynamic>())
         : null,
@@ -158,6 +162,9 @@ class AccountContext {
 
   /// The seller asked to delete the account; the store is no longer usable.
   final bool deletionPending;
+
+  /// When the account's data is purged (pending deletions only).
+  final DateTime? deletionExecuteAfter;
   final Store? store;
 
   AccountContext withStore(Store store) => AccountContext(
@@ -165,6 +172,7 @@ class AccountContext {
     email: email,
     emailVerified: emailVerified,
     deletionPending: deletionPending,
+    deletionExecuteAfter: deletionExecuteAfter,
     store: store,
   );
 }

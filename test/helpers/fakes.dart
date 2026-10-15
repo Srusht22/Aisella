@@ -176,7 +176,8 @@ class FakeStoreRepository implements StoreRepository {
       userId: testUser.id,
       email: testUser.email,
       emailVerified: true,
-      deletionPending: false,
+      deletionPending: deletionScheduledFor != null,
+      deletionExecuteAfter: deletionScheduledFor,
       store: store,
     );
   }
@@ -310,5 +311,27 @@ class FakeStoreRepository implements StoreRepository {
   }) async {
     calls.add('deactivateZone:$zoneId');
     zones.removeWhere((z) => z.id == zoneId);
+  }
+
+  /// Set to the confirmation the fake expects (the store name); null rejects.
+  DateTime? deletionScheduledFor;
+
+  @override
+  Future<DateTime> requestAccountDeletion({
+    required String confirmStoreName,
+  }) async {
+    calls.add('requestDeletion:$confirmStoreName');
+    final f = _takeFailure();
+    if (f != null) throw f;
+    if (store != null && confirmStoreName != store!.name) {
+      throw const ApiException(
+        ApiErrorCode.validationFailed,
+        fields: {'confirm_store_name': 'mismatch'},
+      );
+    }
+    final when = DateTime.utc(2026, 10, 29);
+    deletionScheduledFor = when;
+    store = null;
+    return when;
   }
 }

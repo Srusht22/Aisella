@@ -87,6 +87,7 @@ select is(
     'api.create_store(text,text,text,text,text,uuid)',
     'api.deactivate_zone(uuid,uuid,integer)',
     'api.get_my_context()',
+    'api.request_account_deletion(text)',
     'api.update_store(uuid,integer,jsonb,uuid)',
     'api.upsert_zone(uuid,uuid,integer,text,integer,text,uuid)'
   ],

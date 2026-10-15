@@ -109,6 +109,15 @@ class AuthController extends Notifier<AuthStatus> {
     if (current is PasswordRecovery) state = SignedIn(current.user);
   }
 
+  /// Confirms the signed-in seller's password with a fresh sign-in, which
+  /// renews the session's authentication time (required by destructive
+  /// account actions).
+  Future<void> reauthenticate(String password) async {
+    final current = state;
+    if (current is! SignedIn) throw const AuthError(AuthFailure.unknown);
+    await _repo.signIn(email: current.user.email, password: password);
+  }
+
   /// Re-reads the user (for example to notice a verified email on resume).
   Future<void> refreshUser() async {
     if (state is! SignedIn) return;

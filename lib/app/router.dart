@@ -77,6 +77,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.unavailable,
         builder: (_, _) => const WorkspaceUnavailableScreen(),
       ),
+      GoRoute(
+        path: Routes.accountClosed,
+        builder: (_, _) => const AccountClosedScreen(),
+      ),
       // Public (signed out).
       GoRoute(path: Routes.welcome, builder: (_, _) => const WelcomeScreen()),
       GoRoute(
@@ -169,7 +173,16 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, _) => const DeliveryZonesScreen(),
           ),
           GoRoute(path: 'payments', builder: (_, _) => const PaymentsScreen()),
-          GoRoute(path: 'account', builder: (_, _) => const AccountScreen()),
+          GoRoute(
+            path: 'account',
+            builder: (_, _) => const AccountScreen(),
+            routes: [
+              GoRoute(
+                path: 'delete',
+                builder: (_, _) => const DeleteAccountScreen(),
+              ),
+            ],
+          ),
           GoRoute(path: 'terms', builder: (_, _) => const TermsScreen()),
           GoRoute(
             path: 'language',

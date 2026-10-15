@@ -23,6 +23,9 @@ enum ApiErrorCode {
   idempotencyKeyReused,
   rateLimited,
 
+  /// A destructive account action needs a fresh password sign-in.
+  reauthenticationRequired,
+
   /// The request could not be sent (offline, DNS, connection refused).
   /// Nothing reached the server.
   network,
@@ -73,6 +76,7 @@ const _codes = <String, ApiErrorCode>{
   'CURRENCY_LOCKED': ApiErrorCode.currencyLocked,
   'IDEMPOTENCY_KEY_REUSED': ApiErrorCode.idempotencyKeyReused,
   'RATE_LIMITED': ApiErrorCode.rateLimited,
+  'REAUTHENTICATION_REQUIRED': ApiErrorCode.reauthenticationRequired,
   'INTERNAL': ApiErrorCode.internal,
 };
 

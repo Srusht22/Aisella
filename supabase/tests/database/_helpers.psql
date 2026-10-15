@@ -2,10 +2,20 @@
 -- test's transaction and is rolled back.
 
 -- Acts as a signed-in user, as PostgREST does after validating the JWT.
-create or replace function pg_temp.act_as(p_user uuid) returns void language plpgsql as $$
+-- p_password_age: when set, the JWT's amr records a password sign-in that long ago.
+create or replace function pg_temp.act_as(p_user uuid, p_password_age interval default null)
+returns void language plpgsql as $$
 begin
   perform set_config('request.jwt.claims',
-    json_build_object('sub', p_user, 'role', 'authenticated')::text, true);
+    json_build_object(
+      'sub', p_user,
+      'role', 'authenticated',
+      'amr', case when p_password_age is null then '[]'::json
+                  else json_build_array(json_build_object(
+                         'method', 'password',
+                         'timestamp', extract(epoch from now() - p_password_age)::bigint))
+             end
+    )::text, true);
   execute 'set local role authenticated';
 end $$;
 

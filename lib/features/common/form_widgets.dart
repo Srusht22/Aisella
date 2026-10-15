@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../core/l10n/l10n.dart';
 import '../../design_system/components/feedback.dart';
+import '../../design_system/components/inputs.dart';
 import '../../design_system/components/status.dart';
 import '../../design_system/icons/app_icons.dart';
 import '../../design_system/theme/theme_ext.dart';
@@ -53,6 +55,68 @@ class FormHeading extends StatelessWidget {
             Text(body!, style: type.body.copyWith(color: p.textSecondary)),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// Password field with a labelled show/hide toggle (AU-03 §16).
+class PasswordField extends StatefulWidget {
+  const PasswordField({
+    super.key,
+    required this.controller,
+    required this.label,
+    this.error,
+    this.helper,
+    this.enabled = true,
+    this.newPassword = false,
+    this.onChanged,
+    this.onSubmitted,
+    this.textInputAction = TextInputAction.done,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final String? error;
+  final String? helper;
+  final bool enabled;
+  final bool newPassword;
+  final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
+  final TextInputAction textInputAction;
+
+  @override
+  State<PasswordField> createState() => _PasswordFieldState();
+}
+
+class _PasswordFieldState extends State<PasswordField> {
+  bool _obscure = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return AppTextField(
+      label: widget.label,
+      controller: widget.controller,
+      error: widget.error,
+      helper: widget.helper,
+      ltr: true,
+      enabled: widget.enabled,
+      obscureText: _obscure,
+      onChanged: widget.onChanged,
+      onSubmitted: widget.onSubmitted,
+      textInputAction: widget.textInputAction,
+      keyboardType: TextInputType.visiblePassword,
+      autofillHints: [
+        if (widget.newPassword)
+          AutofillHints.newPassword
+        else
+          AutofillHints.password,
+      ],
+      suffix: IconButton(
+        tooltip: _obscure ? l10n.showPassword : l10n.hidePassword,
+        icon: Icon(_obscure ? AppIcons.eye : AppIcons.eyeSlash),
+        onPressed: () => setState(() => _obscure = !_obscure),
       ),
     );
   }
