@@ -3,7 +3,7 @@
 **Phase 2, Deliverable 2** · Status: **Proposed — pending owner approval** · Direction: *Ledger: pencil and ink* ([01](01-design-directions.md))
 
 **Machine-readable source:** [tokens/aisellia-tokens.json](tokens/aisellia-tokens.json). If this document and the JSON disagree, the JSON wins and this document must be corrected.
-**Validation:** [tools/contrast_check.py](tools/contrast_check.py) checks 31 declared colour pairs in both themes (62 checks). The latest run is recorded in §2.6.
+**Validation:** [tools/contrast_check.py](tools/contrast_check.py) checks 32 declared colour pairs in both themes (64 checks). The latest run is recorded in §2.6.
 
 ---
 
@@ -62,7 +62,7 @@
 | `brand.primaryPressed` | `#18326F` | Pressed primary | — |
 | `success.fg / .bg` | `#17663F` / `#E6F2EA` | Delivered, in stock, collected, success snackbar | Brand emphasis |
 | `warning.fg / .bg` | `#8A4B00` / `#FCEFD6` | Inferred, low stock, price changed, delivery failed | Errors |
-| `danger.fg / .fgOnBg / .bg` | `#B42318` / `#A21D14` / `#FBE9E7` | Blocking issues, errors, destructive actions | Optional missing fields, decoration |
+| `danger.fg / .fgOnBg / .bg / .onFill` | `#B42318` / `#A21D14` / `#FBE9E7` / `#FFFFFF` | Blocking issues, errors, destructive actions; `.onFill` is the label on a filled danger button | Optional missing fields, decoration |
 | `info.fg / .bg` | `#1F3F8F` / `#E8EDF8` | Neutral informational banners | — |
 | `neutral.badgeFg / .badgeBg` | `#3F434A` / `#ECE9E2` | Neutral statuses (Draft, Preparing, Cancelled) | — |
 | `scrim` | `#101216` at 48% | Behind sheets and dialogs | — |
@@ -82,7 +82,7 @@ Dark is a full theme, not an inversion. It is selectable (System, Light, Dark) a
 | `border.hairline` | `#2A2E35` | `text.onBrand` | `#0F1B3D` |
 | `border.control` | `#707682` | `border.pencil` | `#7A808B` |
 | `success.fg/.bg` | `#6CCB97` / `#15291F` | `warning.fg/.bg` | `#F0B35B` / `#2E2414` |
-| `danger.fg/.bg` | `#F28B80` / `#33191A` | `scrim` | `#000000` at 60% |
+| `danger.fg/.bg/.onFill` | `#F28B80` / `#33191A` / `#3A0D09` | `scrim` | `#000000` at 60% |
 
 ### 2.3 Order status colour mapping
 
@@ -123,7 +123,7 @@ Stock *within an order line* uses success colour when it is sufficient ("4 in st
 - Gradients on any UI surface. A gradient is allowed only inside product photography.
 
 ### 2.6 Contrast validation (actually run)
-`python3 docs/design/phase-2/tools/contrast_check.py` gave **62 checks, 0 failures** (31 pairs × 2 themes) after two corrections. The first run failed `border.control` on canvas (2.84:1) and `border.pencil` on pencil (2.80:1); both were darkened. Key results:
+`python3 docs/design/phase-2/tools/contrast_check.py` gave **64 checks, 0 failures** (32 pairs × 2 themes) after two corrections. The first run failed `border.control` on canvas (2.84:1) and `border.pencil` on pencil (2.80:1); both were darkened. Key results:
 
 | Pair | Light | Dark |
 |---|---|---|
