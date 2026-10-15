@@ -191,6 +191,14 @@ class NavRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final type = context.type;
+    // Large text: the value moves under the label instead of squeezing it
+    // (Phase 2 §7: rows stack at >= 1.3).
+    final stacked =
+        trailing != null && MediaQuery.textScalerOf(context).scale(1) >= 1.3;
+    final labelText = Text(
+      label,
+      style: type.body.copyWith(color: labelColor ?? p.textPrimary),
+    );
     return Semantics(
       button: onTap != null,
       label: semanticsLabel,
@@ -215,15 +223,17 @@ class NavRow extends StatelessWidget {
                   const SizedBox(width: Space.s12),
                 ],
                 Expanded(
-                  child: Text(
-                    label,
-                    style: type.body.copyWith(
-                      color: labelColor ?? p.textPrimary,
-                    ),
-                  ),
+                  child: stacked
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [labelText, trailing!],
+                        )
+                      : labelText,
                 ),
-                if (trailing != null) ...[
+                if (trailing != null && !stacked) ...[
                   const SizedBox(width: Space.s8),
+                  // Rigid: a flexible value would take half the row and
+                  // wrap short labels (visual review). Large text stacks.
                   trailing!,
                 ],
                 if (onTap != null) ...[

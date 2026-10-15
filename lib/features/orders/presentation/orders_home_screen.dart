@@ -20,13 +20,13 @@ class OrdersHomeScreen extends ConsumerWidget {
     final l10n = context.l10n;
     final sample = ref.watch(appConfigProvider).sampleData;
     return TopLevelPage(
-      title: l10n.navOrders,
+      title: l10n.ordersTitle,
       slivers: [
         SliverFillRemaining(
           hasScrollBody: false,
           child: EmptyState(
             icon: AppIcons.receipt,
-            title: l10n.deferredTitle(l10n.navOrders),
+            title: l10n.deferredTitle(l10n.ordersTitle),
             body: l10n.deferredOrdersBody,
             action: sample
                 ? AppButton(

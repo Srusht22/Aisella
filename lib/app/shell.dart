@@ -47,36 +47,38 @@ class AppShell extends StatelessWidget {
       return Scaffold(
         body: Row(
           children: [
-            NavigationRail(
-              selectedIndex: index,
-              onDestinationSelected: _select,
-              labelType: NavigationRailLabelType.all,
-              backgroundColor: p.bgSurface,
-              indicatorColor: p.bgBrandWeak,
-              minWidth: 72,
-              selectedLabelTextStyle: type.label.copyWith(
-                color: p.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-              unselectedLabelTextStyle: type.label.copyWith(
-                color: p.textSecondary,
-              ),
-              destinations: [
-                for (final (label, icon, filled) in destinations)
-                  NavigationRailDestination(
-                    icon: Icon(
-                      icon,
-                      color: p.textSecondary,
-                      size: Sizes.iconLg,
+            _ClampedLabels(
+              child: NavigationRail(
+                selectedIndex: index,
+                onDestinationSelected: _select,
+                labelType: NavigationRailLabelType.all,
+                backgroundColor: p.bgSurface,
+                indicatorColor: p.bgBrandWeak,
+                minWidth: 72,
+                selectedLabelTextStyle: type.label.copyWith(
+                  color: p.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+                unselectedLabelTextStyle: type.label.copyWith(
+                  color: p.textSecondary,
+                ),
+                destinations: [
+                  for (final (label, icon, filled) in destinations)
+                    NavigationRailDestination(
+                      icon: Icon(
+                        icon,
+                        color: p.textSecondary,
+                        size: Sizes.iconLg,
+                      ),
+                      selectedIcon: Icon(
+                        filled,
+                        color: p.brandPrimary,
+                        size: Sizes.iconLg,
+                      ),
+                      label: Text(label),
                     ),
-                    selectedIcon: Icon(
-                      filled,
-                      color: p.brandPrimary,
-                      size: Sizes.iconLg,
-                    ),
-                    label: Text(label),
-                  ),
-              ],
+                ],
+              ),
             ),
             VerticalDivider(width: Strokes.hairline, color: p.borderHairline),
             Expanded(child: body),
@@ -87,48 +89,68 @@ class AppShell extends StatelessWidget {
 
     return Scaffold(
       body: body,
-      bottomNavigationBar: DecoratedBox(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: p.borderHairline, width: Strokes.hairline),
-          ),
-        ),
-        child: NavigationBarTheme(
-          data: NavigationBarThemeData(
-            labelTextStyle: WidgetStateProperty.resolveWith(
-              (states) => type.label.copyWith(
-                color: states.contains(WidgetState.selected)
-                    ? p.textPrimary
-                    : p.textSecondary,
-                fontWeight: states.contains(WidgetState.selected)
-                    ? FontWeight.w600
-                    : null,
-              ),
+      bottomNavigationBar: _ClampedLabels(
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: p.borderHairline, width: Strokes.hairline),
             ),
           ),
-          child: NavigationBar(
-            selectedIndex: index,
-            onDestinationSelected: _select,
-            height: LayoutTokens.bottomNavHeight,
-            backgroundColor: p.bgSurface,
-            surfaceTintColor: Colors.transparent,
-            indicatorColor: p.bgBrandWeak,
-            labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-            destinations: [
-              for (final (label, icon, filled) in destinations)
-                NavigationDestination(
-                  icon: Icon(icon, color: p.textSecondary, size: Sizes.iconLg),
-                  selectedIcon: Icon(
-                    filled,
-                    color: p.brandPrimary,
-                    size: Sizes.iconLg,
-                  ),
-                  label: label,
+          child: NavigationBarTheme(
+            data: NavigationBarThemeData(
+              labelTextStyle: WidgetStateProperty.resolveWith(
+                (states) => type.label.copyWith(
+                  color: states.contains(WidgetState.selected)
+                      ? p.textPrimary
+                      : p.textSecondary,
+                  fontWeight: states.contains(WidgetState.selected)
+                      ? FontWeight.w600
+                      : null,
                 ),
-            ],
+              ),
+            ),
+            child: NavigationBar(
+              selectedIndex: index,
+              onDestinationSelected: _select,
+              height: LayoutTokens.bottomNavHeight,
+              backgroundColor: p.bgSurface,
+              surfaceTintColor: Colors.transparent,
+              indicatorColor: p.bgBrandWeak,
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              destinations: [
+                for (final (label, icon, filled) in destinations)
+                  NavigationDestination(
+                    icon: Icon(
+                      icon,
+                      color: p.textSecondary,
+                      size: Sizes.iconLg,
+                    ),
+                    selectedIcon: Icon(
+                      filled,
+                      color: p.brandPrimary,
+                      size: Sizes.iconLg,
+                    ),
+                    label: label,
+                  ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+/// Destination labels are always paired with icons and announced in full by
+/// screen readers, so their text scale is capped at 1.3: at 200 % the
+/// Sorani labels wrapped and were clipped inside the fixed-height bar
+/// (visual review). Page content is not clamped.
+class _ClampedLabels extends StatelessWidget {
+  const _ClampedLabels({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      MediaQuery.withClampedTextScaling(maxScaleFactor: 1.3, child: child);
 }

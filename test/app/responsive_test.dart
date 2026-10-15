@@ -44,7 +44,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       // Draft review: totals and actions remain present.
-      final ordersLabel = locale == 'en' ? 'Orders' : 'داواکارییەکان';
+      final ordersLabel = locale == 'en' ? 'Orders' : 'داواکاری';
       await tester.tap(
         find.descendant(
           of: find.byType(NavigationBar),
@@ -63,4 +63,20 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('navigation labels cap text scale; page content does not', (
+    tester,
+  ) async {
+    await loadAppFonts();
+    setScreen(tester, textScale: 2.0);
+    await tester.pumpWidget(testApp());
+    await tester.pumpAndSettle();
+    final nav = find.descendant(
+      of: find.byType(NavigationBar),
+      matching: find.text('Products'),
+    );
+    expect(MediaQuery.textScalerOf(tester.element(nav)).scale(10), 13);
+    final body = find.text('Sample data');
+    expect(MediaQuery.textScalerOf(tester.element(body)).scale(10), 20);
+  });
 }

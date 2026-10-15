@@ -49,16 +49,32 @@ class ContentWidth extends StatelessWidget {
   final Widget child;
   final double maxWidth;
 
+  /// Distance from the start edge of an [available]-wide area to where the
+  /// content column begins, so headers outside the column can align to it.
+  static double startInset(
+    double available, {
+    required double gutter,
+    double maxWidth = LayoutTokens.maxWidthReading,
+  }) {
+    final box = available.clamp(0.0, maxWidth + 2 * gutter);
+    return (available - box) / 2 + gutter;
+  }
+
   @override
   Widget build(BuildContext context) {
     final gutter = WindowClass.of(context).gutter;
+    // Fills the column width (children start-align) up to [maxWidth],
+    // and centres the column on wider windows.
     return Align(
       alignment: AlignmentDirectional.topCenter,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth + 2 * gutter),
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: gutter),
-          child: child,
+        child: SizedBox(
+          width: double.infinity,
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: gutter),
+            child: child,
+          ),
         ),
       ),
     );

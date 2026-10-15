@@ -1,0 +1,3 @@
+tags:
+  golden:
+    # Pixel comparisons; see test/goldens/screens_golden_test.dart.

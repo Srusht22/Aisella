@@ -70,21 +70,7 @@ class _DraftReviewPreviewScreenState
 
     return Scaffold(
       backgroundColor: p.bgCanvas,
-      appBar: AppBar(
-        title: Text(l10n.orderTitle(number)),
-        actions: [
-          Padding(
-            padding: const EdgeInsetsDirectional.only(end: Space.s16),
-            child: Center(
-              child: StatusBadge(
-                label: l10n.statusNeedsApproval,
-                icon: AppIcons.pencilSimple,
-                tone: Tone.pencil,
-              ),
-            ),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: Text(l10n.orderTitle(number))),
       body: ListView(
         padding: const EdgeInsets.only(bottom: Space.s24),
         children: [
@@ -94,6 +80,17 @@ class _DraftReviewPreviewScreenState
               children: [
                 const SampleDataBanner(),
                 const SizedBox(height: Space.s16),
+                // Status sits in the body, not the app bar: in the bar it
+                // squeezed the order number on phones (visual review).
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: StatusBadge(
+                    label: l10n.statusNeedsApproval,
+                    icon: AppIcons.pencilSimple,
+                    tone: Tone.pencil,
+                  ),
+                ),
+                const SizedBox(height: Space.s12),
                 PencilBox(
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,

@@ -46,9 +46,10 @@ void setScreen(
   WidgetTester tester, {
   Size size = const Size(390, 844),
   double textScale = 1.0,
+  double devicePixelRatio = 3,
 }) {
-  tester.view.physicalSize = size * 3;
-  tester.view.devicePixelRatio = 3;
+  tester.view.physicalSize = size * devicePixelRatio;
+  tester.view.devicePixelRatio = devicePixelRatio;
   tester.platformDispatcher.textScaleFactorTestValue = textScale;
   addTearDown(tester.view.reset);
   addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);

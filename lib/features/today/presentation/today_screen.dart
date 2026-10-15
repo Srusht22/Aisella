@@ -53,6 +53,7 @@ class TodayScreen extends ConsumerWidget {
     return TopLevelPage(
       title: l10n.todayTitle,
       subtitle: date,
+      contentMaxWidth: LayoutTokens.maxWidthDetailPane,
       slivers: [
         SliverToBoxAdapter(
           child: ContentWidth(

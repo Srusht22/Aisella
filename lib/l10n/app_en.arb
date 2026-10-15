@@ -18,7 +18,7 @@
   },
   "navOrders": "Orders",
   "@navOrders": {
-    "description": "Bottom navigation: orders destination."
+    "description": "Bottom navigation: orders destination. Keep short: tab slots are 80 dp on a 320 dp phone at 130% text."
   },
   "navProducts": "Products",
   "@navProducts": {
@@ -230,6 +230,10 @@
   "@productsTitle": {
     "description": "Product list title."
   },
+  "ordersTitle": "Orders",
+  "@ordersTitle": {
+    "description": "Title of the Orders tab's page (may be longer than the tab label navOrders)."
+  },
   "searchProductsHint": "Search products by name or SKU",
   "@searchProductsHint": {
     "description": "Placeholder of the product search field."
@@ -416,7 +420,7 @@
   "@provFromSettings": {
     "description": "Provenance: value from store settings."
   },
-  "provInferred": "Inferred — confirm",
+  "provInferred": "Inferred",
   "@provInferred": {
     "description": "Provenance: interpreted value the seller must confirm."
   },
