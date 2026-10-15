@@ -131,9 +131,9 @@ void main() {
     await tester.tap(find.byTooltip('Store menu'));
     await tester.pumpAndSettle();
     expect(find.text('Store'), findsOneWidget);
-    await tester.tap(find.text('Delivery zones'));
+    await tester.tap(find.text('Customers'));
     await tester.pumpAndSettle();
-    expect(find.text("Delivery zones isn't available yet"), findsOneWidget);
+    expect(find.text("Customers isn't available yet"), findsOneWidget);
     await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.text('Store'), findsOneWidget);

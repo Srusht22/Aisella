@@ -29,12 +29,22 @@ void main() {
     });
 
     testWidgets(
-      'without a backend, Today says no store is connected (no fake counts)',
+      'without sample data, Today shows the checklist and no fake counts',
       (tester) async {
         setScreen(tester);
         await tester.pumpWidget(testApp(sampleData: false));
         await tester.pumpAndSettle();
-        expect(find.text('No store connected yet'), findsOneWidget);
+        expect(
+          find.textContaining('arrive in a later release'),
+          findsOneWidget,
+        );
+        expect(
+          find.textContaining(
+            RegExp('set up your store', caseSensitive: false),
+          ),
+          findsOneWidget,
+        );
+        expect(find.text('2 of 5 done'), findsOneWidget);
         expect(find.text('Needs approval'), findsNothing);
         expect(find.text('Sample data'), findsNothing);
       },

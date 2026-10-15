@@ -626,5 +626,689 @@
   "productDetails": "Product details",
   "@productDetails": {
     "description": "Deferred destination name: product detail screen."
+  },
+  "welcomePanel1Title": "Answers from your own catalog",
+  "@welcomePanel1Title": {
+    "description": "Welcome panel 1 title."
+  },
+  "welcomePanel1Body": "Aisellia prepares replies only from the products, prices and policies you add.",
+  "@welcomePanel1Body": {
+    "description": "Welcome panel 1 body."
+  },
+  "welcomePanel2Title": "You approve every order",
+  "@welcomePanel2Title": {
+    "description": "Welcome panel 2 title."
+  },
+  "welcomePanel2Body": "Drafts stay in pencil until you check and approve them.",
+  "@welcomePanel2Body": {
+    "description": "Welcome panel 2 body."
+  },
+  "welcomePanel3Title": "Stock stays right",
+  "@welcomePanel3Title": {
+    "description": "Welcome panel 3 title."
+  },
+  "welcomePanel3Body": "Approving an order updates your stock, so you never sell what you don't have.",
+  "@welcomePanel3Body": {
+    "description": "Welcome panel 3 body."
+  },
+  "welcomeCreateAccount": "Create account",
+  "@welcomeCreateAccount": {
+    "description": "Primary action on welcome."
+  },
+  "welcomeHaveAccount": "I have an account",
+  "@welcomeHaveAccount": {
+    "description": "Secondary action on welcome."
+  },
+  "welcomeNext": "Next",
+  "@welcomeNext": {
+    "description": "Go to the next welcome panel."
+  },
+  "welcomeSkip": "Skip",
+  "@welcomeSkip": {
+    "description": "Jump to the last welcome panel."
+  },
+  "welcomePanelPosition": "Panel {current} of {total}",
+  "@welcomePanelPosition": {
+    "description": "Page indicator semantics.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldEmail": "Email",
+  "@fieldEmail": {
+    "description": "Email field label."
+  },
+  "fieldPassword": "Password",
+  "@fieldPassword": {
+    "description": "Password field label."
+  },
+  "fieldNewPassword": "New password",
+  "@fieldNewPassword": {
+    "description": "New password field label."
+  },
+  "fieldConfirmPassword": "Confirm password",
+  "@fieldConfirmPassword": {
+    "description": "Confirm password field label."
+  },
+  "passwordHelper": "At least 8 characters",
+  "@passwordHelper": {
+    "description": "Password strength hint."
+  },
+  "showPassword": "Show password",
+  "@showPassword": {
+    "description": "Password visibility toggle (off)."
+  },
+  "hidePassword": "Hide password",
+  "@hidePassword": {
+    "description": "Password visibility toggle (on)."
+  },
+  "signUpTitle": "Create your account",
+  "@signUpTitle": {
+    "description": "Sign-up title."
+  },
+  "termsConsent": "By creating an account you accept the Terms and the Privacy Policy.",
+  "@termsConsent": {
+    "description": "Consent text under the sign-up form."
+  },
+  "termsAndPrivacy": "Terms and Privacy Policy",
+  "@termsAndPrivacy": {
+    "description": "Link and screen title for the legal documents."
+  },
+  "termsPendingBody": "The pilot Terms of Service and Privacy Policy are being prepared with legal review. They will appear here, and you will be asked to accept them, before the pilot starts.",
+  "@termsPendingBody": {
+    "description": "Honest placeholder until legal documents exist (AD-06)."
+  },
+  "creatingAccount": "Creating account…",
+  "@creatingAccount": {
+    "description": "Sign-up button while busy."
+  },
+  "alreadyHaveAccount": "Already have an account?",
+  "@alreadyHaveAccount": {
+    "description": "Prompt before the Sign in link."
+  },
+  "signIn": "Sign in",
+  "@signIn": {
+    "description": "Sign-in action and link."
+  },
+  "resetPassword": "Reset password",
+  "@resetPassword": {
+    "description": "Action offered with 'email in use'."
+  },
+  "signInTitle": "Welcome back",
+  "@signInTitle": {
+    "description": "Sign-in title."
+  },
+  "signingIn": "Signing in…",
+  "@signingIn": {
+    "description": "Sign-in button while busy."
+  },
+  "forgotPassword": "Forgot password?",
+  "@forgotPassword": {
+    "description": "Link to the reset screen."
+  },
+  "newToAisellia": "New to Aisellia?",
+  "@newToAisellia": {
+    "description": "Prompt before Create account."
+  },
+  "sessionExpiredBanner": "Your session ended. Please sign in again.",
+  "@sessionExpiredBanner": {
+    "description": "Shown on sign-in after the session expired or was revoked (GL-02)."
+  },
+  "errEmailRequired": "Enter your email address",
+  "@errEmailRequired": {
+    "description": "Validation."
+  },
+  "errEmailInvalid": "Enter a valid email address, like name@example.com",
+  "@errEmailInvalid": {
+    "description": "Validation."
+  },
+  "errPasswordRequired": "Enter your password",
+  "@errPasswordRequired": {
+    "description": "Validation."
+  },
+  "errPasswordTooShort": "Use at least 8 characters",
+  "@errPasswordTooShort": {
+    "description": "Validation."
+  },
+  "errPasswordMismatch": "Passwords don't match",
+  "@errPasswordMismatch": {
+    "description": "Validation."
+  },
+  "errEmailInUse": "An account exists with this email.",
+  "@errEmailInUse": {
+    "description": "Sign-up with a registered email (US-001)."
+  },
+  "errInvalidCredentials": "Email or password is incorrect.",
+  "@errInvalidCredentials": {
+    "description": "Generic sign-in failure; never says which (US-002)."
+  },
+  "errEmailNotConfirmed": "Verify your email address before signing in. Check your inbox for our link.",
+  "@errEmailNotConfirmed": {
+    "description": "Sign-in before verification."
+  },
+  "errWeakPassword": "This password is too easy to guess. Choose a stronger one.",
+  "@errWeakPassword": {
+    "description": "Provider password policy."
+  },
+  "errSamePassword": "Choose a password different from your current one.",
+  "@errSamePassword": {
+    "description": "New password equals the old one."
+  },
+  "errRateLimited": "Too many attempts. Please wait a few minutes and try again.",
+  "@errRateLimited": {
+    "description": "Rate limited."
+  },
+  "errNetwork": "Couldn't reach Aisellia. Check your connection and try again.",
+  "@errNetwork": {
+    "description": "Network failure; nothing was saved."
+  },
+  "errLinkInvalid": "This link has expired or was already used. Request a new one.",
+  "@errLinkInvalid": {
+    "description": "Expired verification or reset link."
+  },
+  "errGeneric": "Something went wrong. Please try again.",
+  "@errGeneric": {
+    "description": "Unknown failure."
+  },
+  "errSaveFailed": "Couldn't save. Your information is still here — please try again.",
+  "@errSaveFailed": {
+    "description": "Action failed; input preserved (P-ERR-ACTION)."
+  },
+  "errConflictReloaded": "This was changed on another device. The latest version is shown — check it and save again.",
+  "@errConflictReloaded": {
+    "description": "Version conflict after reload."
+  },
+  "verifyTitle": "Check your inbox",
+  "@verifyTitle": {
+    "description": "Verify email title."
+  },
+  "verifyBody": "We sent a verification link to {email}. Open it on this phone to continue setting up your store.",
+  "@verifyBody": {
+    "description": "Verify email body.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyOtherDevice": "Opened the link on another device? Sign in here once it's verified.",
+  "@verifyOtherDevice": {
+    "description": "Hint on the verify screen."
+  },
+  "resendEmail": "Resend email",
+  "@resendEmail": {
+    "description": "Resend action."
+  },
+  "resendIn": "Resend in {seconds} s",
+  "@resendIn": {
+    "description": "Resend cooldown.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "verificationSent": "Verification email sent.",
+  "@verificationSent": {
+    "description": "Snackbar after resend."
+  },
+  "wrongEmail": "Wrong email? Sign up again",
+  "@wrongEmail": {
+    "description": "Link back to sign-up."
+  },
+  "backToSignIn": "Back to sign in",
+  "@backToSignIn": {
+    "description": "Link to sign-in."
+  },
+  "resetTitle": "Reset your password",
+  "@resetTitle": {
+    "description": "Reset screen title."
+  },
+  "resetBody": "Enter your account email. We'll send a link to choose a new password.",
+  "@resetBody": {
+    "description": "Reset screen body."
+  },
+  "sendResetLink": "Send reset link",
+  "@sendResetLink": {
+    "description": "Reset action."
+  },
+  "sendingResetLink": "Sending…",
+  "@sendingResetLink": {
+    "description": "Reset action busy."
+  },
+  "resetSent": "If an account exists for {email}, we've sent a link to reset the password.",
+  "@resetSent": {
+    "description": "Identical whether or not the account exists (US-003).",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "newPasswordTitle": "Choose a new password",
+  "@newPasswordTitle": {
+    "description": "Set-new-password title."
+  },
+  "savePassword": "Save password",
+  "@savePassword": {
+    "description": "Save action."
+  },
+  "savingPassword": "Saving…",
+  "@savingPassword": {
+    "description": "Save busy."
+  },
+  "passwordChanged": "Password changed",
+  "@passwordChanged": {
+    "description": "Snackbar after the change succeeded."
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Generic cancel."
+  },
+  "openingStore": "Opening your store…",
+  "@openingStore": {
+    "description": "Startup loading label."
+  },
+  "workspaceErrorTitle": "Couldn't open your store",
+  "@workspaceErrorTitle": {
+    "description": "Workspace load failed."
+  },
+  "setupStep": "Step {current} of {total}",
+  "@setupStep": {
+    "description": "Setup progress.",
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "setupStoreTitle": "Your store",
+  "@setupStoreTitle": {
+    "description": "AU-07 title."
+  },
+  "fieldStoreName": "Store name",
+  "@fieldStoreName": {
+    "description": "Field."
+  },
+  "storeNameHelper": "Customers see this name.",
+  "@storeNameHelper": {
+    "description": "Helper."
+  },
+  "fieldContactPhone": "Contact phone",
+  "@fieldContactPhone": {
+    "description": "Field."
+  },
+  "phoneHelper": "Iraqi mobile number, for example {example}",
+  "@phoneHelper": {
+    "description": "Helper. {example} is an LTR-isolated sample number.",
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldCurrency": "Currency",
+  "@fieldCurrency": {
+    "description": "Field."
+  },
+  "currencyHelper": "Can't be changed after your first approved order.",
+  "@currencyHelper": {
+    "description": "Helper."
+  },
+  "currencyIqd": "IQD",
+  "@currencyIqd": {
+    "description": "Currency option."
+  },
+  "currencyUsd": "USD",
+  "@currencyUsd": {
+    "description": "Currency option."
+  },
+  "fieldReplyLanguage": "Customer reply language",
+  "@fieldReplyLanguage": {
+    "description": "Field."
+  },
+  "replyLanguageHelper": "The language Aisellia uses for replies to your customers.",
+  "@replyLanguageHelper": {
+    "description": "Helper."
+  },
+  "languageSorani": "Sorani",
+  "@languageSorani": {
+    "description": "Reply language option."
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "Reply language option."
+  },
+  "fieldBusinessCity": "Business city",
+  "@fieldBusinessCity": {
+    "description": "Field."
+  },
+  "cityOther": "Other city",
+  "@cityOther": {
+    "description": "City option."
+  },
+  "fieldOtherCity": "City name",
+  "@fieldOtherCity": {
+    "description": "Field for another city."
+  },
+  "citySulaymaniyah": "Sulaymaniyah",
+  "@citySulaymaniyah": {
+    "description": "City."
+  },
+  "cityErbil": "Erbil",
+  "@cityErbil": {
+    "description": "City."
+  },
+  "cityDuhok": "Duhok",
+  "@cityDuhok": {
+    "description": "City."
+  },
+  "cityHalabja": "Halabja",
+  "@cityHalabja": {
+    "description": "City."
+  },
+  "creatingStore": "Creating your store…",
+  "@creatingStore": {
+    "description": "AU-07 busy."
+  },
+  "errStoreNameRequired": "Enter your store name",
+  "@errStoreNameRequired": {
+    "description": "Validation."
+  },
+  "errStoreNameTooLong": "Use 60 characters or fewer",
+  "@errStoreNameTooLong": {
+    "description": "Validation."
+  },
+  "errPhoneRequired": "Enter a contact phone number",
+  "@errPhoneRequired": {
+    "description": "Validation."
+  },
+  "errPhoneInvalid": "Enter an Iraqi mobile number, like {example}",
+  "@errPhoneInvalid": {
+    "description": "Validation. {example} is an LTR-isolated sample number.",
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "errCityRequired": "Choose or enter your city",
+  "@errCityRequired": {
+    "description": "Validation."
+  },
+  "setupZonesTitle": "Delivery zones",
+  "@setupZonesTitle": {
+    "description": "AU-08 title."
+  },
+  "setupZonesBody": "Where do you deliver, and for how much? You can change this later.",
+  "@setupZonesBody": {
+    "description": "AU-08 body."
+  },
+  "fieldFeeFor": "Fee for {zone}",
+  "@fieldFeeFor": {
+    "description": "Fee field label (Phase 2: labelled with the zone name).",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldFee": "Delivery fee",
+  "@fieldFee": {
+    "description": "Fee field in the zone editor."
+  },
+  "fieldDeliveryTime": "Delivery time (optional)",
+  "@fieldDeliveryTime": {
+    "description": "Field."
+  },
+  "deliveryTimeHelper": "For example: 1–2 days",
+  "@deliveryTimeHelper": {
+    "description": "Helper."
+  },
+  "addAnotherArea": "Add another area",
+  "@addAnotherArea": {
+    "description": "AU-08 action."
+  },
+  "fieldAreaName": "Area name",
+  "@fieldAreaName": {
+    "description": "Field."
+  },
+  "skipForNow": "Skip for now",
+  "@skipForNow": {
+    "description": "AU-08 skip."
+  },
+  "savingZones": "Saving zones…",
+  "@savingZones": {
+    "description": "AU-08 busy."
+  },
+  "errFeeRequired": "Enter a fee (0 for free delivery)",
+  "@errFeeRequired": {
+    "description": "Validation."
+  },
+  "errFeeInvalid": "Enter a whole number, 0 or more",
+  "@errFeeInvalid": {
+    "description": "Validation."
+  },
+  "errZoneNameRequired": "Enter the area name",
+  "@errZoneNameRequired": {
+    "description": "Validation."
+  },
+  "errZoneNameDuplicate": "You already have a zone with this name",
+  "@errZoneNameDuplicate": {
+    "description": "Validation."
+  },
+  "zonesWarning": "Without delivery zones, Aisellia can't quote delivery fees to customers.",
+  "@zonesWarning": {
+    "description": "Shown when no zone is set."
+  },
+  "setupPaymentsTitle": "Payments",
+  "@setupPaymentsTitle": {
+    "description": "AU-09 title."
+  },
+  "paymentCod": "Cash on delivery",
+  "@paymentCod": {
+    "description": "Payment method."
+  },
+  "paymentCodBody": "The customer pays the courier when the order arrives.",
+  "@paymentCodBody": {
+    "description": "Payment description."
+  },
+  "paymentOther": "Other (record only)",
+  "@paymentOther": {
+    "description": "Payment method."
+  },
+  "paymentOtherBody": "For payments you arrange yourself. Aisellia only records them.",
+  "@paymentOtherBody": {
+    "description": "Payment description."
+  },
+  "policiesLater": "Policy answers (exchanges, authenticity, working hours) are added later, when Aisellia's assistant becomes available.",
+  "@policiesLater": {
+    "description": "Honest note: policies are deferred."
+  },
+  "finishSetup": "Finish setup",
+  "@finishSetup": {
+    "description": "AU-09 primary."
+  },
+  "finishingSetup": "Finishing…",
+  "@finishingSetup": {
+    "description": "AU-09 busy."
+  },
+  "storeReady": "Your store is ready",
+  "@storeReady": {
+    "description": "Snackbar after setup."
+  },
+  "errPaymentAtLeastOne": "Keep at least one payment method on",
+  "@errPaymentAtLeastOne": {
+    "description": "Validation."
+  },
+  "checklistTitle": "Set up your store",
+  "@checklistTitle": {
+    "description": "Today checklist title."
+  },
+  "checklistProgress": "{done} of {total} done",
+  "@checklistProgress": {
+    "description": "Checklist progress.",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "checklistStore": "Create your store",
+  "@checklistStore": {
+    "description": "Checklist item."
+  },
+  "checklistDelivery": "Add delivery zones",
+  "@checklistDelivery": {
+    "description": "Checklist item."
+  },
+  "checklistProduct": "Add your first product",
+  "@checklistProduct": {
+    "description": "Checklist item."
+  },
+  "checklistSandbox": "Try a practice conversation",
+  "@checklistSandbox": {
+    "description": "Checklist item."
+  },
+  "checklistImport": "Import a real customer message",
+  "@checklistImport": {
+    "description": "Checklist item."
+  },
+  "checklistDone": "Done",
+  "@checklistDone": {
+    "description": "Checklist item state."
+  },
+  "checklistToDo": "To do",
+  "@checklistToDo": {
+    "description": "Checklist item state."
+  },
+  "checklistLater": "In a later release",
+  "@checklistLater": {
+    "description": "Checklist item not available yet."
+  },
+  "todayNothingYet": "Orders and conversations arrive in a later release. Your store is set up and ready for them.",
+  "@todayNothingYet": {
+    "description": "Today without sample data, after setup."
+  },
+  "menuSignOut": "Sign out",
+  "@menuSignOut": {
+    "description": "Store menu row."
+  },
+  "signOutConfirmTitle": "Sign out of Aisellia on this device?",
+  "@signOutConfirmTitle": {
+    "description": "ST-01 dialog."
+  },
+  "signOutConfirmBody": "Your store stays saved. You can sign in again any time.",
+  "@signOutConfirmBody": {
+    "description": "ST-01 dialog body."
+  },
+  "save": "Save",
+  "@save": {
+    "description": "Save action."
+  },
+  "saving": "Saving…",
+  "@saving": {
+    "description": "Save busy."
+  },
+  "saved": "Saved",
+  "@saved": {
+    "description": "Snackbar after a successful save."
+  },
+  "currencyLockedNote": "The currency can't change after your first approved order.",
+  "@currencyLockedNote": {
+    "description": "Currency lock (US-005)."
+  },
+  "addZone": "Add zone",
+  "@addZone": {
+    "description": "ST-03 action."
+  },
+  "editZone": "Edit zone",
+  "@editZone": {
+    "description": "ST-03 sheet title."
+  },
+  "removeZone": "Remove zone",
+  "@removeZone": {
+    "description": "ST-03 action."
+  },
+  "removeZoneTitle": "Remove {zone}?",
+  "@removeZoneTitle": {
+    "description": "Confirm dialog.",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "removeZoneBody": "New orders can't use this zone. Orders that already use it keep their fee.",
+  "@removeZoneBody": {
+    "description": "Confirm dialog body."
+  },
+  "remove": "Remove",
+  "@remove": {
+    "description": "Destructive confirm."
+  },
+  "zoneFeeNote": "Changing a fee doesn't change orders that are already approved.",
+  "@zoneFeeNote": {
+    "description": "ST-03 note."
+  },
+  "noZonesTitle": "No delivery zones yet",
+  "@noZonesTitle": {
+    "description": "ST-03 empty."
+  },
+  "zoneSaved": "Zone saved",
+  "@zoneSaved": {
+    "description": "Snackbar."
+  },
+  "zoneRemoved": "Zone removed",
+  "@zoneRemoved": {
+    "description": "Snackbar."
+  },
+  "accountTitle": "Account",
+  "@accountTitle": {
+    "description": "ST-07 title."
+  },
+  "emailVerified": "Verified",
+  "@emailVerified": {
+    "description": "Email status."
+  },
+  "emailNotVerified": "Not verified",
+  "@emailNotVerified": {
+    "description": "Email status."
+  },
+  "changePassword": "Change password",
+  "@changePassword": {
+    "description": "ST-07 row."
+  },
+  "changePasswordSent": "We sent a link to {email} to choose a new password.",
+  "@changePasswordSent": {
+    "description": "After requesting a password change.",
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "signOutAllDevices": "Sign out of all devices",
+  "@signOutAllDevices": {
+    "description": "ST-07 row."
+  },
+  "signOutAllTitle": "Sign out everywhere?",
+  "@signOutAllTitle": {
+    "description": "Confirm dialog."
+  },
+  "signOutAllBody": "Aisellia will be signed out on every device, including this one.",
+  "@signOutAllBody": {
+    "description": "Confirm dialog body."
   }
 }

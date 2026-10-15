@@ -56,7 +56,11 @@
   "scales": 59216,
   "lock-key": 58110,
   "wrench": 58836,
-  "sparkle": 59042
+  "sparkle": 59042,
+  "eye": 57888,
+  "eye-slash": 57892,
+  "envelope-simple": 57880,
+  "circle": 57738
  },
  "fill": {
   "house": 58050,
@@ -115,6 +119,10 @@
   "scales": 59216,
   "lock-key": 58110,
   "wrench": 58836,
-  "sparkle": 59042
+  "sparkle": 59042,
+  "eye": 57888,
+  "eye-slash": 57892,
+  "envelope-simple": 57880,
+  "circle": 57738
  }
 }

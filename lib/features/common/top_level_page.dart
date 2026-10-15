@@ -3,13 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
-import '../../core/config/app_config.dart';
 import '../../core/l10n/l10n.dart';
 import '../../design_system/components/media.dart';
 import '../../design_system/layout/responsive.dart';
 import '../../design_system/motion/motion.dart';
 import '../../design_system/theme/theme_ext.dart';
 import '../../design_system/tokens/tokens.g.dart';
+import '../store/application/workspace_controller.dart';
 
 /// Scaffold for the four tab roots: a large title that scrolls away and
 /// reappears in a compact pinned bar, with the store button at the end
@@ -61,7 +61,9 @@ class _TopLevelPageState extends ConsumerState<TopLevelPage> {
     final p = context.palette;
     final type = context.type;
     final l10n = context.l10n;
-    final sample = ref.watch(appConfigProvider).sampleData;
+    final storeName = ref.watch(
+      workspaceProvider.select((w) => w.value?.store?.name),
+    );
     final gutter = WindowClass.of(context).gutter;
     final fade = Motion.fade(context, MotionTokens.sm);
 
@@ -100,9 +102,9 @@ class _TopLevelPageState extends ConsumerState<TopLevelPage> {
                   ),
                   actions: [
                     StoreButton(
-                      initials: sample
-                          ? l10n.sampleStoreName.characters.first
-                          : null,
+                      initials: storeName == null || storeName.isEmpty
+                          ? null
+                          : storeName.characters.first,
                       tooltip: l10n.storeMenuTooltip,
                       onPressed: () => context.push(Routes.store),
                     ),

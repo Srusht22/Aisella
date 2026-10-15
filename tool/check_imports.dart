@@ -5,7 +5,9 @@
 //   in Phase 4 data/ files expose providers, so presentation may import a
 //   feature's own data/ provider file but never a backend SDK);
 // * a feature may not import another feature's data/ or presentation/;
-// * design_system/ must not import features/ or app/.
+// * design_system/ must not import features/ or app/;
+// * once a feature has an application/ layer, presentation/ code must not
+//   import that feature's data/ layer (providers live in application/).
 //
 //   dart run tool/check_imports.dart
 // ignore_for_file: avoid_print
@@ -36,6 +38,14 @@ void main() {
       .where((f) => f.path.endsWith('.dart') && !f.path.contains('/gen/'));
   final importRe = RegExp(r'''^import\s+['"]([^'"]+)['"]''', multiLine: true);
 
+  final withApplication = {
+    for (final dir in Directory(
+      'lib/features',
+    ).listSync().whereType<Directory>())
+      if (Directory('${dir.path}/application').existsSync())
+        dir.uri.pathSegments.where((s) => s.isNotEmpty).last,
+  };
+
   for (final file in files) {
     final path = file.path.replaceAll(r'\', '/');
     final imports = importRe
@@ -54,6 +64,15 @@ void main() {
           (resolved.contains('lib/features/') ||
               resolved.contains('lib/app/'))) {
         violations.add('$path: design_system must not import $imp');
+      }
+      final dataLayer = RegExp(r'lib/features/([^/]+)/data/')
+          .firstMatch(resolved);
+      if (path.contains('/presentation/') &&
+          dataLayer != null &&
+          withApplication.contains(dataLayer.group(1))) {
+        violations.add(
+          '$path: presentation imports ${dataLayer.group(1)}/data (use its application layer)',
+        );
       }
       final other = RegExp(r'lib/features/([^/]+)/(data|presentation)/')
           .firstMatch(resolved);

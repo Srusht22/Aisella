@@ -26,12 +26,15 @@ class AppSearchField extends StatefulWidget {
 }
 
 class _AppSearchFieldState extends State<AppSearchField> {
-  late final TextEditingController _controller =
-      widget.controller ?? TextEditingController();
+  // Always the current widget's controller: a parent may replace it (for
+  // example after reloading server values). Only the internal one is ours.
+  TextEditingController? _internal;
+  TextEditingController get _controller =>
+      widget.controller ?? (_internal ??= TextEditingController());
 
   @override
   void dispose() {
-    if (widget.controller == null) _controller.dispose();
+    _internal?.dispose();
     super.dispose();
   }
 
@@ -108,6 +111,13 @@ class AppTextField extends StatefulWidget {
     this.maxLines = 1,
     this.keyboardType,
     this.onChanged,
+    this.obscureText = false,
+    this.autofillHints,
+    this.textInputAction,
+    this.onSubmitted,
+    this.enabled = true,
+    this.suffix,
+    this.focusNode,
   });
 
   final String label;
@@ -119,17 +129,33 @@ class AppTextField extends StatefulWidget {
   final TextInputType? keyboardType;
   final ValueChanged<String>? onChanged;
 
+  /// Hides the text (passwords). Pair with a [suffix] show/hide toggle.
+  final bool obscureText;
+  final Iterable<String>? autofillHints;
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
+
+  /// False while the form is submitting (P-LOAD-ACTION: inputs read-only).
+  final bool enabled;
+
+  /// Trailing control inside the field, for example "Show password".
+  final Widget? suffix;
+  final FocusNode? focusNode;
+
   @override
   State<AppTextField> createState() => _AppTextFieldState();
 }
 
 class _AppTextFieldState extends State<AppTextField> {
-  late final TextEditingController _controller =
-      widget.controller ?? TextEditingController();
+  // Always the current widget's controller: a parent may replace it (for
+  // example after reloading server values). Only the internal one is ours.
+  TextEditingController? _internal;
+  TextEditingController get _controller =>
+      widget.controller ?? (_internal ??= TextEditingController());
 
   @override
   void dispose() {
-    if (widget.controller == null) _controller.dispose();
+    _internal?.dispose();
     super.dispose();
   }
 
@@ -142,70 +168,94 @@ class _AppTextFieldState extends State<AppTextField> {
       borderRadius: BorderRadius.circular(Radii.md),
       borderSide: BorderSide(color: color, width: width),
     );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(widget.label, style: type.label.copyWith(color: p.textSecondary)),
-        const SizedBox(height: Space.s4),
-        ValueListenableBuilder<TextEditingValue>(
-          valueListenable: _controller,
-          builder: (context, value, _) => TextField(
-            controller: _controller,
-            onChanged: widget.onChanged,
-            maxLines: widget.maxLines,
-            keyboardType: widget.keyboardType,
-            textDirection: widget.ltr
-                ? TextDirection.ltr
-                : Bidi.detect(value.text),
-            style: type.body.copyWith(color: p.textPrimary),
-            decoration: InputDecoration(
-              isDense: true,
-              filled: true,
-              fillColor: p.bgSurface,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: Space.s12,
-                vertical: Space.s12,
-              ),
-              enabledBorder: border(
-                hasError ? p.dangerFg : p.borderControl,
-                hasError ? Strokes.focus : Strokes.control,
-              ),
-              focusedBorder: border(
-                hasError ? p.dangerFg : p.borderFocus,
-                Strokes.focus,
-              ),
+    // The visible label sits above the field. Screen readers get it as the
+    // text field's own label (the visible copy is excluded so it is not read
+    // twice). MergeSemantics is not used: it breaks with suffix controls.
+    return Semantics(
+      container: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ExcludeSemantics(
+            child: Text(
+              widget.label,
+              style: type.label.copyWith(color: p.textSecondary),
             ),
           ),
-        ),
-        if (hasError || widget.helper != null) ...[
           const SizedBox(height: Space.s4),
-          Semantics(
-            liveRegion: hasError,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (hasError) ...[
-                  Icon(
-                    AppIcons.warningCircle,
-                    size: Sizes.iconSm,
-                    color: p.dangerFg,
+          ValueListenableBuilder<TextEditingValue>(
+            valueListenable: _controller,
+            builder: (context, value, _) => Semantics(
+              label: widget.label,
+              child: TextField(
+                controller: _controller,
+                focusNode: widget.focusNode,
+                onChanged: widget.onChanged,
+                onSubmitted: widget.onSubmitted,
+                maxLines: widget.obscureText ? 1 : widget.maxLines,
+                keyboardType: widget.keyboardType,
+                obscureText: widget.obscureText,
+                enableSuggestions: !widget.obscureText,
+                autocorrect: !widget.obscureText && !widget.ltr,
+                autofillHints: widget.enabled ? widget.autofillHints : null,
+                textInputAction: widget.textInputAction,
+                enabled: widget.enabled,
+                textDirection: widget.ltr
+                    ? TextDirection.ltr
+                    : Bidi.detect(value.text),
+                style: type.body.copyWith(color: p.textPrimary),
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: true,
+                  fillColor: p.bgSurface,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: Space.s12,
+                    vertical: Space.s12,
                   ),
-                  const SizedBox(width: Space.s4),
-                ],
-                Expanded(
-                  child: Text(
-                    widget.error ?? widget.helper!,
-                    style: type.caption.copyWith(
-                      color: hasError ? p.dangerFg : p.textSecondary,
-                    ),
+                  suffixIcon: widget.suffix,
+                  disabledBorder: border(p.borderHairline, Strokes.control),
+                  enabledBorder: border(
+                    hasError ? p.dangerFg : p.borderControl,
+                    hasError ? Strokes.focus : Strokes.control,
+                  ),
+                  focusedBorder: border(
+                    hasError ? p.dangerFg : p.borderFocus,
+                    Strokes.focus,
                   ),
                 ),
-              ],
+              ),
             ),
           ),
+          if (hasError || widget.helper != null) ...[
+            const SizedBox(height: Space.s4),
+            Semantics(
+              liveRegion: hasError,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (hasError) ...[
+                    Icon(
+                      AppIcons.warningCircle,
+                      size: Sizes.iconSm,
+                      color: p.dangerFg,
+                    ),
+                    const SizedBox(width: Space.s4),
+                  ],
+                  Expanded(
+                    child: Text(
+                      widget.error ?? widget.helper!,
+                      style: type.caption.copyWith(
+                        color: hasError ? p.dangerFg : p.textSecondary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ],
-      ],
+      ),
     );
   }
 }
@@ -447,6 +497,71 @@ class SelectionRow extends StatelessWidget {
                       width: selected ? 7 : Strokes.control * 2,
                     ),
                   ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// On/off setting row with a title and an optional description (Phase 2
+/// CMP-Switch). [onChanged] null disables it (for example while saving).
+class SwitchRow extends StatelessWidget {
+  const SwitchRow({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+    this.description,
+  });
+
+  final String label;
+  final String? description;
+  final bool value;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final type = context.type;
+    return MergeSemantics(
+      child: InkWell(
+        onTap: onChanged == null ? null : () => onChanged!(!value),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 56),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Space.s12,
+              vertical: Space.s8,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        label,
+                        style: type.body.copyWith(color: p.textPrimary),
+                      ),
+                      if (description != null) ...[
+                        const SizedBox(height: Space.s2),
+                        Text(
+                          description!,
+                          style: type.caption.copyWith(color: p.textSecondary),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const SizedBox(width: Space.s12),
+                Switch(
+                  value: value,
+                  onChanged: onChanged,
+                  activeTrackColor: p.brandPrimary,
                 ),
               ],
             ),

@@ -183,7 +183,8 @@ class _ProductRow extends ConsumerWidget {
       label: '${product.name}, $price, $stockLabel',
       excludeSemantics: true,
       child: InkWell(
-        onTap: () => context.push(Routes.later(DeferredFeature.productDetails)),
+        onTap: () =>
+            context.push(Routes.later(DeferredFeature.productDetails.name)),
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 72),
           child: Padding(

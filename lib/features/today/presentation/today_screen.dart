@@ -17,6 +17,7 @@ import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../common/top_level_page.dart';
 import '../data/today_repository.dart';
+import 'setup_checklist.dart';
 
 /// TD-01 Today: what needs the seller now, as rows — no KPI cards, no charts
 /// (Phase 2 §4). Counts come from the repository; on failure an error is
@@ -37,10 +38,16 @@ class TodayScreen extends ConsumerWidget {
     );
 
     final Widget content = switch (today) {
-      AsyncData(value: TodayNoStore()) => EmptyState(
-        icon: AppIcons.storefront,
-        title: l10n.noStoreConnected,
-        body: l10n.deferredBody,
+      // No orders exist yet (they arrive in a later phase): say so honestly
+      // instead of showing zero counts.
+      AsyncData(value: TodayNoStore()) => Padding(
+        padding: const EdgeInsets.only(top: Space.s8),
+        child: Text(
+          l10n.todayNothingYet,
+          style: context.type.body.copyWith(
+            color: context.palette.textSecondary,
+          ),
+        ),
       ),
       AsyncData(value: final TodayData data) => _TodayContent(data: data),
       AsyncError() => ErrorState(
@@ -58,7 +65,13 @@ class TodayScreen extends ConsumerWidget {
         SliverToBoxAdapter(
           child: ContentWidth(
             maxWidth: LayoutTokens.maxWidthDetailPane,
-            child: AnimatedSwitcher(duration: MotionTokens.sm, child: content),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SetupChecklist(),
+                AnimatedSwitcher(duration: MotionTokens.sm, child: content),
+              ],
+            ),
           ),
         ),
       ],

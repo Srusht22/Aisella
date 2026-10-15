@@ -5,56 +5,66 @@ import 'package:go_router/go_router.dart';
 import '../core/config/app_config.dart';
 import '../core/settings/app_settings.dart';
 import '../design_system/gallery/gallery_screen.dart';
+import '../features/auth/application/auth_controller.dart';
+import '../features/auth/domain/auth_status.dart';
+import '../features/auth/presentation/email_link_screens.dart';
+import '../features/auth/presentation/sign_in_screen.dart';
+import '../features/auth/presentation/sign_up_screen.dart';
+import '../features/auth/presentation/terms_screen.dart';
+import '../features/auth/presentation/welcome_screen.dart';
 import '../features/common/deferred_feature_screen.dart';
 import '../features/common/not_found_screen.dart';
 import '../features/inbox/inbox_screen.dart';
 import '../features/onboarding/language_selection_screen.dart';
+import '../features/onboarding/presentation/setup_screens.dart';
 import '../features/orders/presentation/draft_review_preview_screen.dart';
 import '../features/orders/presentation/orders_home_screen.dart';
 import '../features/products/presentation/products_screen.dart';
 import '../features/settings/language_display_screen.dart';
 import '../features/settings/store_menu_screen.dart';
+import '../features/settings/store_settings_screens.dart';
+import '../features/store/application/workspace_controller.dart';
 import '../features/today/presentation/today_screen.dart';
+import 'gate_screens.dart';
+import 'route_guard.dart';
 import 'shell.dart';
 
-/// Route paths (Phase 3 Flutter architecture §5).
-abstract final class Routes {
-  static const language = '/language';
-  static const today = '/today';
-  static const inbox = '/inbox';
-  static const orders = '/orders';
-  static const draftPreview = '/orders/preview-draft';
-  static const products = '/products';
-  static const store = '/store';
-  static const storeLanguage = '/store/language';
-  static const storeGallery = '/store/gallery';
-  static String later(DeferredFeature f) => '/later/${f.name}';
-}
+export 'route_guard.dart' show Routes;
 
 final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
-/// Rebuilds redirects when the language choice changes.
-class _SettingsListenable extends ChangeNotifier {
+/// Re-runs the redirect when any input of the navigation decision changes.
+class _GateListenable extends ChangeNotifier {
   void ping() => notifyListeners();
 }
 
+/// The navigation inputs, read fresh on every redirect.
+RouteGate readGate(Ref ref) {
+  final auth = ref.read(authControllerProvider);
+  return RouteGate(
+    languageChosen: ref.read(settingsProvider).languageChosen,
+    auth: auth,
+    workspace: auth is SignedIn
+        ? workspaceGateFor(ref.read(workspaceProvider), auth.user.id)
+        : const GateLoading(),
+  );
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
-  final refresh = _SettingsListenable();
+  final refresh = _GateListenable();
   ref.listen(settingsProvider, (_, _) => refresh.ping());
+  ref.listen(authControllerProvider, (_, _) => refresh.ping());
+  ref.listen(workspaceProvider, (_, _) => refresh.ping());
   ref.onDispose(refresh.dispose);
   final isProduction = ref.read(appConfigProvider).isProduction;
 
+  String? email(GoRouterState s) => s.uri.queryParameters['email'];
+
   final router = GoRouter(
     navigatorKey: _rootKey,
-    initialLocation: Routes.today,
+    initialLocation: Routes.starting,
     refreshListenable: refresh,
-    redirect: (context, state) {
-      final chosen = ref.read(settingsProvider).languageChosen;
-      final atLanguage = state.matchedLocation == Routes.language;
-      if (!chosen && !atLanguage) return Routes.language;
-      if (chosen && atLanguage) return Routes.today;
-      return null;
-    },
+    redirect: (context, state) => guardRedirect(state.uri.path, readGate(ref)),
     errorBuilder: (context, state) => const NotFoundScreen(),
     routes: [
       GoRoute(path: '/', redirect: (_, _) => Routes.today),
@@ -62,6 +72,46 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: Routes.language,
         builder: (_, _) => const LanguageSelectionScreen(),
       ),
+      GoRoute(path: Routes.starting, builder: (_, _) => const StartingScreen()),
+      GoRoute(
+        path: Routes.unavailable,
+        builder: (_, _) => const WorkspaceUnavailableScreen(),
+      ),
+      // Public (signed out).
+      GoRoute(path: Routes.welcome, builder: (_, _) => const WelcomeScreen()),
+      GoRoute(
+        path: Routes.signIn,
+        builder: (_, s) => SignInScreen(initialEmail: email(s)),
+      ),
+      GoRoute(path: Routes.signUp, builder: (_, _) => const SignUpScreen()),
+      GoRoute(
+        path: Routes.verifyEmail,
+        builder: (_, s) => VerifyEmailScreen(email: email(s) ?? ''),
+      ),
+      GoRoute(
+        path: Routes.forgotPassword,
+        builder: (_, s) => ForgotPasswordScreen(initialEmail: email(s)),
+      ),
+      GoRoute(path: Routes.terms, builder: (_, _) => const TermsScreen()),
+      // Recovery session.
+      GoRoute(
+        path: Routes.newPassword,
+        builder: (_, _) => const NewPasswordScreen(),
+      ),
+      // Store setup.
+      GoRoute(
+        path: Routes.setupStore,
+        builder: (_, _) => const SetupStoreScreen(),
+      ),
+      GoRoute(
+        path: Routes.setupZones,
+        builder: (_, _) => const SetupZonesScreen(),
+      ),
+      GoRoute(
+        path: Routes.setupPayments,
+        builder: (_, _) => const SetupPaymentsScreen(),
+      ),
+      // Workspace.
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(navigationShell: shell),
         branches: [
@@ -110,6 +160,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootKey,
         builder: (_, _) => const StoreMenuScreen(),
         routes: [
+          GoRoute(
+            path: 'profile',
+            builder: (_, _) => const StoreProfileScreen(),
+          ),
+          GoRoute(
+            path: 'zones',
+            builder: (_, _) => const DeliveryZonesScreen(),
+          ),
+          GoRoute(path: 'payments', builder: (_, _) => const PaymentsScreen()),
+          GoRoute(path: 'account', builder: (_, _) => const AccountScreen()),
+          GoRoute(path: 'terms', builder: (_, _) => const TermsScreen()),
           GoRoute(
             path: 'language',
             builder: (_, _) => const LanguageDisplayScreen(),

@@ -292,6 +292,26 @@ abstract final class AppIcons {
     fontFamily: 'PhosphorRegular',
     matchTextDirection: false,
   );
+  static const IconData eye = IconData(
+    0xe220,
+    fontFamily: 'PhosphorRegular',
+    matchTextDirection: false,
+  );
+  static const IconData eyeSlash = IconData(
+    0xe224,
+    fontFamily: 'PhosphorRegular',
+    matchTextDirection: false,
+  );
+  static const IconData envelopeSimple = IconData(
+    0xe218,
+    fontFamily: 'PhosphorRegular',
+    matchTextDirection: false,
+  );
+  static const IconData circle = IconData(
+    0xe18a,
+    fontFamily: 'PhosphorRegular',
+    matchTextDirection: false,
+  );
 
   static const IconData houseFill = IconData(
     0xe2c2,
@@ -575,6 +595,26 @@ abstract final class AppIcons {
   );
   static const IconData sparkleFill = IconData(
     0xe6a2,
+    fontFamily: 'PhosphorFill',
+    matchTextDirection: false,
+  );
+  static const IconData eyeFill = IconData(
+    0xe220,
+    fontFamily: 'PhosphorFill',
+    matchTextDirection: false,
+  );
+  static const IconData eyeSlashFill = IconData(
+    0xe224,
+    fontFamily: 'PhosphorFill',
+    matchTextDirection: false,
+  );
+  static const IconData envelopeSimpleFill = IconData(
+    0xe218,
+    fontFamily: 'PhosphorFill',
+    matchTextDirection: false,
+  );
+  static const IconData circleFill = IconData(
+    0xe18a,
     fontFamily: 'PhosphorFill',
     matchTextDirection: false,
   );

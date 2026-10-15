@@ -16,9 +16,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: 3.4.3 # state + DI (ADR-006)
+  flutter_secure_storage: 11.2.0
   go_router: 18.1.0 # routing, per-tab stacks (ADR-006)
   intl: any # version pinned by flutter_localizations
   shared_preferences: 2.5.6 # device-local UI preferences (language before sign-in)
+  supabase_flutter: 2.18.3
 
 dev_dependencies:
   flutter_test:

@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Device-local storage for UI preferences only (language, digits, theme,
-/// motion). Never used for tokens, business data or personal data.
+/// motion) and the install marker. Never used for tokens, business data or
+/// personal data: the session lives in the keystore (ADR-013).
 abstract interface class KeyValueStore {
   String? read(String key);
   Future<void> write(String key, String value);
@@ -19,7 +20,11 @@ class SharedPreferencesStore implements KeyValueStore {
     'settings.digits',
     'settings.theme',
     'settings.motion',
+    installMarkerKey,
   };
+
+  /// Set on the first launch of an installation (see bootstrap).
+  static const installMarkerKey = 'install.initialized';
 
   static Future<SharedPreferencesStore> open() async => SharedPreferencesStore(
     await SharedPreferencesWithCache.create(

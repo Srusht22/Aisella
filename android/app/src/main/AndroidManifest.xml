@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required in release builds to reach the Supabase API. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="aisellia"
         android:name="${applicationName}"
@@ -24,6 +26,17 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Email links (verification, password reset) open the app:
+                 app.aisellia://auth/... (provisional scheme until AD-10). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="app.aisellia" android:host="auth"/>
+            </intent-filter>
+            <!-- Auth links are handled by the Supabase client (app_links),
+                 not by Flutter's router. -->
+            <meta-data android:name="flutter_deeplinking_enabled" android:value="false"/>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

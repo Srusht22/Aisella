@@ -11,6 +11,7 @@
 library;
 
 import 'package:aisellia/app/router.dart';
+import 'package:aisellia/features/store/domain/store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,6 +30,8 @@ Future<void> _shot(
   Size size = _phone,
   double textScale = 1.0,
   Future<void> Function(WidgetTester)? before,
+  bool signedIn = true,
+  FakeStoreRepository? storeBackend,
 }) async {
   await loadAppFonts();
   // flutter_test paints elevation as a solid black outline by default;
@@ -36,7 +39,18 @@ Future<void> _shot(
   // Restored before the test ends: flutter_test checks it is unchanged.
   debugDisableShadows = false;
   try {
-    await _render(tester, name, locale, route, dark, size, textScale, before);
+    await _render(
+      tester,
+      name,
+      locale,
+      route,
+      dark,
+      size,
+      textScale,
+      before,
+      signedIn,
+      storeBackend,
+    );
   } finally {
     debugDisableShadows = true;
   }
@@ -51,14 +65,21 @@ Future<void> _render(
   Size size,
   double textScale,
   Future<void> Function(WidgetTester)? before,
+  bool signedIn,
+  FakeStoreRepository? storeBackend,
 ) async {
   // 2x keeps the committed PNGs small while staying legible for review.
   setScreen(tester, size: size, textScale: textScale, devicePixelRatio: 2);
   await tester.pumpWidget(
-    testApp(locale: locale, extraPrefs: {if (dark) 'settings.theme': 'dark'}),
+    testApp(
+      locale: locale,
+      extraPrefs: {if (dark) 'settings.theme': 'dark'},
+      signedIn: signedIn,
+      storeBackend: storeBackend,
+    ),
   );
   await tester.pumpAndSettle();
-  if (locale != null && route != Routes.today) {
+  if (locale != null && route != Routes.today && route != '') {
     ProviderScope.containerOf(tester.element(find.byType(MaterialApp)))
         .read(routerProvider)
         .go(route);
@@ -162,6 +183,93 @@ void main() {
       locale: 'en',
       route: Routes.products,
       size: const Size(320, 568),
+    );
+  });
+
+  // Phase 5: authentication and store setup.
+  testWidgets('welcome en', (t) {
+    return _shot(
+      t,
+      name: 'p5_welcome_en',
+      locale: 'en',
+      signedIn: false,
+      route: '',
+    );
+  });
+  testWidgets('sign in ckb', (t) {
+    return _shot(
+      t,
+      name: 'p5_sign_in_ckb',
+      locale: 'ckb',
+      signedIn: false,
+      route: Routes.signIn,
+    );
+  });
+  testWidgets('sign up en', (t) {
+    return _shot(
+      t,
+      name: 'p5_sign_up_en',
+      locale: 'en',
+      signedIn: false,
+      route: Routes.signUp,
+    );
+  });
+  testWidgets('verify email ckb', (t) {
+    return _shot(
+      t,
+      name: 'p5_verify_ckb',
+      locale: 'ckb',
+      signedIn: false,
+      route: '${Routes.verifyEmail}?email=seller%40example.test',
+      before: (t) async {
+        // Stop the resend countdown timer once the frame is captured.
+        addTearDown(() => t.pump(const Duration(seconds: 61)));
+      },
+    );
+  });
+  testWidgets('setup store ckb', (t) {
+    return _shot(
+      t,
+      name: 'p5_setup_store_ckb',
+      locale: 'ckb',
+      route: '',
+      storeBackend: FakeStoreRepository(),
+    );
+  });
+  testWidgets('setup zones en', (t) {
+    return _shot(
+      t,
+      name: 'p5_setup_zones_en',
+      locale: 'en',
+      route: '',
+      storeBackend: FakeStoreRepository(
+        store: testStore(step: OnboardingStep.zones),
+      ),
+      before: (t) async {
+        await t.tap(find.text('Erbil'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+  testWidgets('setup payments ckb dark', (t) {
+    return _shot(
+      t,
+      name: 'p5_setup_payments_ckb_dark',
+      locale: 'ckb',
+      dark: true,
+      route: '',
+      storeBackend: FakeStoreRepository(
+        store: testStore(step: OnboardingStep.payments),
+      ),
+    );
+  });
+  testWidgets('today checklist, no sample data, ckb', (t) {
+    return _shot(
+      t,
+      name: 'p5_today_checklist_ckb',
+      locale: 'ckb',
+      route: '',
+      storeBackend: FakeStoreRepository(store: testStore()),
     );
   });
 }

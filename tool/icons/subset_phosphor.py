@@ -24,7 +24,8 @@ pencil-simple trash archive camera image image-broken arrow-clockwise check seal
 check-circle warning-circle warning x-circle prohibit truck arrow-u-up-left flask
 chat-text book-open gear question user-circle storefront phone map-pin money trend-down
 clock-counter-clockwise cloud-slash info translate circle-half flag download-simple
-sign-out users scales lock-key wrench sparkle""".split()
+sign-out users scales lock-key wrench sparkle
+eye eye-slash envelope-simple circle""".split()
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 

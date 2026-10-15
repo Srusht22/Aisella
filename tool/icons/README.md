@@ -17,5 +17,5 @@ The `phosphor_flutter` package was last published on 2024-05-10, so instead of d
    ```
    python3 tool/icons/subset_phosphor.py <path>
    ```
-3. Regenerate `app_icons.dart` from `phosphor_codepoints.json`. The generator snippet is in the Phase 4 implementation report.
-4. If the new icon is directional, add it to the mirror list (Phase 2 [07 §2](../../docs/design/phase-2/07-localization-and-accessibility.md#2-rtl-layout-rules)).
+3. Regenerate the constants: `python3 tool/icons/gen_app_icons.py && dart format lib/design_system/icons`.
+4. If the new icon is directional, add it to `MIRRORED` in `gen_app_icons.py` (Phase 2 [07 §2](../../docs/design/phase-2/07-localization-and-accessibility.md#2-rtl-layout-rules)).

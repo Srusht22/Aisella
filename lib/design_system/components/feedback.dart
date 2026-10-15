@@ -279,10 +279,14 @@ class SkeletonBlock extends StatelessWidget {
 
 /// Snackbar for completed non-critical actions (Phase 2 CMP-Snackbar).
 /// No Undo in P0.
-void showAppSnackBar(BuildContext context, String message) {
-  ScaffoldMessenger.of(context)
-    ..hideCurrentSnackBar()
-    ..showSnackBar(
-      SnackBar(content: Text(message), duration: const Duration(seconds: 4)),
-    );
-}
+void showAppSnackBar(BuildContext context, String message) =>
+    showSnackOn(ScaffoldMessenger.of(context), message);
+
+/// Same as [showAppSnackBar] for a messenger captured before an `await`
+/// (the widget may be gone by the time the result arrives). A new message
+/// replaces the current one instead of queueing behind it.
+void showSnackOn(ScaffoldMessengerState messenger, String message) => messenger
+  ..hideCurrentSnackBar()
+  ..showSnackBar(
+    SnackBar(content: Text(message), duration: const Duration(seconds: 4)),
+  );

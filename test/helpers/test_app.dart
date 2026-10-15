@@ -1,15 +1,23 @@
 import 'package:aisellia/app/app.dart';
 import 'package:aisellia/core/config/app_config.dart';
 import 'package:aisellia/core/settings/key_value_store.dart';
+import 'package:aisellia/features/auth/application/auth_controller.dart';
 import 'package:aisellia/features/products/data/products_repository.dart';
+import 'package:aisellia/features/store/application/workspace_controller.dart';
+import 'package:aisellia/features/store/domain/store.dart';
 import 'package:aisellia/features/today/data/today_repository.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'fakes.dart';
+
+export 'fakes.dart';
+
 /// Builds the real app with test overrides: in-memory preferences, chosen
-/// language and zero-latency repositories. No network, no real data.
+/// language, fake auth and store backends, zero-latency repositories.
+/// By default a verified seller is signed in with a fully set-up store.
 Widget testApp({
   String? locale = 'en',
   bool sampleData = true,
@@ -17,14 +25,25 @@ Widget testApp({
   Map<String, String> extraPrefs = const {},
   TodayRepository? today,
   ProductsRepository? products,
+  FakeAuthRepository? auth,
+  FakeStoreRepository? storeBackend,
+  bool signedIn = true,
+  Store? store,
 }) {
-  final store = InMemoryStore({'settings.locale': ?locale, ...extraPrefs});
+  final authRepo =
+      auth ?? FakeAuthRepository(initialUser: signedIn ? testUser : null);
+  final storeRepo =
+      storeBackend ??
+      FakeStoreRepository(store: store ?? testStore(), zones: [_zone]);
+  final prefs = InMemoryStore({'settings.locale': ?locale, ...extraPrefs});
   return ProviderScope(
     overrides: [
       appConfigProvider.overrideWithValue(
         AppConfig(environment: environment, sampleData: sampleData),
       ),
-      keyValueStoreProvider.overrideWithValue(store),
+      keyValueStoreProvider.overrideWithValue(prefs),
+      authRepositoryProvider.overrideWithValue(authRepo),
+      storeRepositoryProvider.overrideWithValue(storeRepo),
       todayRepositoryProvider.overrideWithValue(
         today ??
             (sampleData
@@ -55,6 +74,14 @@ void setScreen(
   addTearDown(tester.view.reset);
   addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
 }
+
+const _zone = DeliveryZone(
+  id: 'zone-1',
+  name: 'Erbil',
+  fee: 5000,
+  timeText: null,
+  version: 1,
+);
 
 bool _fontsLoaded = false;
 

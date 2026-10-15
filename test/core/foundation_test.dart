@@ -17,30 +17,65 @@ String _strip(String s) => s.replaceAll(RegExp('[\u2066-\u2069]'), '');
 
 void main() {
   group('AppConfig', () {
+    const url = 'https://project.supabase.co';
+    const key = 'sb_publishable_test';
+    AppConfig make({
+      String? env,
+      String? sample,
+      String? u = url,
+      String? k = key,
+    }) => AppConfig.fromValues(
+      envName: env,
+      sampleData: sample,
+      supabaseUrl: u,
+      supabasePublishableKey: k,
+    );
+    // Builds a JWT-shaped string with the given role claim. Not a real key.
+    String jwtWithRole(String role) =>
+        'header.${base64Url.encode(utf8.encode('{"role":"$role"}')).replaceAll('=', '')}.sig';
+
     test('defaults to dev with sample data', () {
-      final c = AppConfig.fromValues();
+      final c = make();
       expect(c.environment, AppEnvironment.dev);
       expect(c.sampleData, isTrue);
+      expect(c.supabaseUrl, Uri.parse(url));
     });
     test('staging and prod default to no sample data', () {
-      expect(AppConfig.fromValues(envName: 'staging').sampleData, isFalse);
-      expect(AppConfig.fromValues(envName: 'prod').sampleData, isFalse);
+      expect(make(env: 'staging').sampleData, isFalse);
+      expect(make(env: 'prod').sampleData, isFalse);
     });
     test('rejects sample data in prod', () {
       expect(
-        () => AppConfig.fromValues(envName: 'prod', sampleData: 'true'),
+        () => make(env: 'prod', sample: 'true'),
         throwsA(isA<AppConfigException>()),
       );
     });
     test('rejects unknown values', () {
+      expect(() => make(env: 'qa'), throwsA(isA<AppConfigException>()));
+      expect(() => make(sample: 'yes'), throwsA(isA<AppConfigException>()));
+    });
+    test('requires the backend URL and publishable key', () {
+      expect(() => make(u: ''), throwsA(isA<AppConfigException>()));
+      expect(() => make(k: ''), throwsA(isA<AppConfigException>()));
+      expect(() => make(u: 'not a url'), throwsA(isA<AppConfigException>()));
+    });
+    test('plain http is allowed only for a dev build', () {
+      expect(make(u: 'http://127.0.0.1:54321').supabaseUrl!.port, 54321);
       expect(
-        () => AppConfig.fromValues(envName: 'qa'),
+        () => make(env: 'staging', u: 'http://staging.example.test'),
+        throwsA(isA<AppConfigException>()),
+      );
+    });
+    test('refuses privileged keys in the app', () {
+      expect(
+        () => make(k: 'sb_secret_abc'),
         throwsA(isA<AppConfigException>()),
       );
       expect(
-        () => AppConfig.fromValues(sampleData: 'yes'),
+        () => make(k: jwtWithRole('service_role')),
         throwsA(isA<AppConfigException>()),
       );
+      expect(make(k: jwtWithRole('anon')).supabasePublishableKey, isNotEmpty);
     });
   });
 
