@@ -180,4 +180,49 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text("This page isn't available"), findsOneWidget);
   });
+
+  testWidgets('no screen renders an icon from a font the app does not bundle', (
+    tester,
+  ) async {
+    // uses-material-design is false: Material/Cupertino icon glyphs would
+    // render as empty boxes. Only the vendored Phosphor fonts are bundled.
+    const bundled = {'PhosphorRegular', 'PhosphorFill'};
+    void expectOnlyBundledIcons(String where) {
+      for (final icon in tester.widgetList<Icon>(find.byType(Icon))) {
+        expect(bundled, contains(icon.icon?.fontFamily), reason: where);
+      }
+    }
+
+    setScreen(tester);
+    await tester.pumpWidget(testApp());
+    await tester.pumpAndSettle();
+    for (final route in [
+      Routes.today,
+      Routes.inbox,
+      Routes.orders,
+      Routes.draftPreview,
+      Routes.products,
+      Routes.store,
+      Routes.storeLanguage,
+      Routes.storeGallery,
+    ]) {
+      _router(tester).go(route);
+      // Fixed pumps: the gallery's skeleton pulse repeats forever.
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(seconds: 1));
+      expectOnlyBundledIcons(route);
+    }
+    _router(tester).go(Routes.store);
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    await tester.scrollUntilVisible(find.text('Legal and licences'), 100);
+    await tester.tap(find.text('Legal and licences'));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(seconds: 1)),
+    );
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    expect(find.byType(LicensePage), findsOneWidget);
+    expectOnlyBundledIcons('licenses');
+  });
 }
