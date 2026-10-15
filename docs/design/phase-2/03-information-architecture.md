@@ -80,7 +80,7 @@ flowchart TD
   TD01 -- "Low stock" --> PR01
 ```
 
-Shared pickers (sheets): **CU-03 Customer picker** (used by CV-02, OR-06) and **OR-07 Product and variant picker** (used by OR-02, OR-06). Global states: **GL-01 to GL-08** ([04 §8](04-screen-specifications.md#8-global-states-gl)).
+Shared pickers (sheets): **CU-03 Customer picker** (used by CV-02, OR-06) and **OR-07 Product and variant picker** (used by OR-02, OR-06). Global states: **GL-01 to GL-08** ([04 §11](04-screen-specifications.md#11-global-states)).
 
 ---
 
