@@ -118,6 +118,6 @@ Scores run from 1 (poor) to 5 (excellent). Weights reflect a daily business tool
 **Things the board review changed in the spec:**
 1. The board originally showed an *optional* missing field (landmark) in error red. That is alarming and contradicts the rule that red means blocking. Optional missing fields are now neutral (`text.tertiary`, "— Not provided (optional)").
 2. Fixed-width label columns wrapped "Total · COD" in the dark theme. Totals rows now use flexible label width (specified in [05 Components](05-components.md), `PriceRow`).
-3. The quote-mark glyph used as a provenance icon read poorly. It is replaced with a dedicated "message" icon (see [02 §5 Iconography](02-visual-identity-and-tokens.md#5-iconography)).
+3. The quote-mark glyph used as a provenance icon read poorly. It is replaced with a dedicated "message" icon (see [02 §6 Iconography](02-visual-identity-and-tokens.md#6-iconography)).
 
 **Not decided here:** the final logo or wordmark. A wordmark direction is proposed in [02 §1](02-visual-identity-and-tokens.md#1-brand-expression). A finished logo should be commissioned or approved separately (decision DD-02 in [10](10-phase-2-report.md)).

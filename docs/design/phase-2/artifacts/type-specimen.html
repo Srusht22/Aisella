@@ -1,0 +1,74 @@
+<!doctype html>
+<!--
+  Aisellia — type specimen (DESIGN REFERENCE ONLY, sample text).
+  Checks the proposed Inter + Vazirmatn NL pairing and per-script scale
+  from tokens/aisellia-tokens.json. Sorani text is machine-drafted and
+  requires native-speaker review. Fonts: SIL OFL 1.1, loaded from jsDelivr.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aisellia Type Specimen</title>
+<style>
+@font-face{font-family:Inter;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:500;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:600;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:VazirNL;font-weight:100 900;src:url("https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/misc/Non-Latin/fonts/webfonts/Vazirmatn-NL[wght].woff2") format("woff2")}
+:root{--bg:#F6F4EF;--sheet:#FFFFFF;--ink:#1A1C20;--ink2:#555A63;--rule:#E4E0D7}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121417;--sheet:#1B1E23;--ink:#ECEDEF;--ink2:#A9AEB8;--rule:#2A2E35}}
+:root[data-theme="dark"]{--bg:#121417;--sheet:#1B1E23;--ink:#ECEDEF;--ink2:#A9AEB8;--rule:#2A2E35}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,VazirNL,sans-serif;padding:24px 16px}
+.wrap{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;width:560px;max-width:100%;padding:8px 20px}
+.row{display:flex;gap:16px;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--rule)}
+.row:last-child{border:0}
+.tag{font:500 11px/14px Inter;color:var(--ink2);width:120px;flex:none;direction:ltr;text-align:left}
+.s{flex:1;min-width:0;outline:1px dashed rgba(31,63,143,.25)}
+.num{font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+[lang=en] .title-large{font-size:24px;line-height:32px;font-weight:600}
+[lang=en] .title{font-size:18px;line-height:26px;font-weight:600}
+[lang=en] .heading{font-size:16px;line-height:24px;font-weight:600}
+[lang=en] .overline{font-size:12px;line-height:16px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+[lang=en] .body{font-size:15px;line-height:22px}
+[lang=en] .label{font-size:13px;line-height:18px;font-weight:500}
+[lang=en] .caption{font-size:12px;line-height:16px}
+[lang=en] .total{font-size:20px;line-height:28px;font-weight:600}
+[lang=ckb] .title-large{font-size:24px;line-height:38px;font-weight:600}
+[lang=ckb] .title{font-size:19px;line-height:30px;font-weight:600}
+[lang=ckb] .heading{font-size:17px;line-height:28px;font-weight:600}
+[lang=ckb] .overline{font-size:13px;line-height:20px;font-weight:600}
+[lang=ckb] .body{font-size:16px;line-height:26px}
+[lang=ckb] .label{font-size:14px;line-height:22px;font-weight:500}
+[lang=ckb] .caption{font-size:13px;line-height:20px}
+[lang=ckb] .total{font-size:20px;line-height:30px;font-weight:600}
+[lang=ckb] .tag{direction:ltr}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="sheet" lang="en" dir="ltr">
+  <div class="row"><span class="tag">title.large 24/32</span><span class="s title-large">Today</span></div>
+  <div class="row"><span class="tag">title 18/26</span><span class="s title">Order <span class="num">#1042</span></span></div>
+  <div class="row"><span class="tag">heading 16/24</span><span class="s heading">Needs approval</span></div>
+  <div class="row"><span class="tag">overline 12/16</span><span class="s overline">Delivery</span></div>
+  <div class="row"><span class="tag">body 15/22</span><span class="s body">Beige Abaya, size M — 4 in stock. Delivery to Erbil usually takes 1–2 days.</span></div>
+  <div class="row"><span class="tag">label 13/18</span><span class="s label">Customer phone</span></div>
+  <div class="row"><span class="tag">caption 12/16</span><span class="s caption">From customer · 2 min ago</span></div>
+  <div class="row"><span class="tag">numeric.total 20/28</span><span class="s total num">1,250,000 IQD</span></div>
+</div>
+<div class="sheet" lang="ckb" dir="rtl">
+  <div class="row"><span class="tag">title.large 24/38</span><span class="s title-large">ئەمڕۆ</span></div>
+  <div class="row"><span class="tag">title 19/30</span><span class="s title">داواکاری <span class="num">#1042</span></span></div>
+  <div class="row"><span class="tag">heading 17/28</span><span class="s heading">پێویستی بە پەسەندکردنە</span></div>
+  <div class="row"><span class="tag">overline 13/20</span><span class="s overline">گەیاندن</span></div>
+  <div class="row"><span class="tag">body 16/26</span><span class="s body"><bdi>Beige Abaya</bdi>، قەبارەی M — <span class="num">4</span> دانە لە کۆگادا هەیە. گەیاندن بۆ هەولێر زۆربەی جار ١–٢ ڕۆژ دەخایەنێت.</span></div>
+  <div class="row"><span class="tag">label 14/22</span><span class="s label">ژمارەی مۆبایلی کڕیار</span></div>
+  <div class="row"><span class="tag">caption 13/20</span><span class="s caption">لە کڕیارەوە · <span class="num">2</span> خولەک لەمەوبەر</span></div>
+  <div class="row"><span class="tag">numeric.total 20/30</span><span class="s total num">1,250,000 IQD</span></div>
+  <div class="row"><span class="tag">glyph check</span><span class="s body">ڕ ڵ ۆ ێ ە ڤ پ چ ژ گ ک ی ھ ئ · ٠١٢٣٤٥٦٧٨٩</span></div>
+</div>
+</div>
+</body>
+</html>
