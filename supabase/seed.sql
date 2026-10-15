@@ -1,0 +1,1 @@
+-- No seed data. Aisellia never ships fake stores or users; tests create their own.

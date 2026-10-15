@@ -1,0 +1,34 @@
+-- Shared test helpers, included by each test file (psql \ir). Everything runs inside the
+-- test's transaction and is rolled back.
+
+-- Acts as a signed-in user, as PostgREST does after validating the JWT.
+create or replace function pg_temp.act_as(p_user uuid) returns void language plpgsql as $$
+begin
+  perform set_config('request.jwt.claims',
+    json_build_object('sub', p_user, 'role', 'authenticated')::text, true);
+  execute 'set local role authenticated';
+end $$;
+
+create or replace function pg_temp.act_as_anon() returns void language plpgsql as $$
+begin
+  perform set_config('request.jwt.claims', '{"role": "anon"}', true);
+  execute 'set local role anon';
+end $$;
+
+create or replace function pg_temp.act_as_admin() returns void language plpgsql as $$
+begin
+  execute 'reset role';
+  perform set_config('request.jwt.claims', '', true);
+end $$;
+
+-- Creates a confirmed auth user directly (the sign-up path itself is covered by the
+-- client integration tests against GoTrue).
+create or replace function pg_temp.new_user(p_email text) returns uuid language plpgsql as $$
+declare v_id uuid := gen_random_uuid();
+begin
+  insert into auth.users (id, instance_id, aud, role, email, email_confirmed_at, raw_user_meta_data)
+  values (v_id, '00000000-0000-0000-0000-000000000000', 'authenticated', 'authenticated',
+          p_email, now(), '{"terms_version": "2026-10"}');
+  return v_id;
+end $$;
+
