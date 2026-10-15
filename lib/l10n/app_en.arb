@@ -1,0 +1,626 @@
+{
+  "@@locale": "en",
+  "appName": "Aisellia",
+  "@appName": {
+    "description": "Product name; not translated."
+  },
+  "appTagline": "Your AI Sales Employee",
+  "@appTagline": {
+    "description": "Brand tagline shown on welcome and about surfaces."
+  },
+  "navToday": "Today",
+  "@navToday": {
+    "description": "Bottom navigation: daily overview destination."
+  },
+  "navInbox": "Inbox",
+  "@navInbox": {
+    "description": "Bottom navigation: customer conversations destination."
+  },
+  "navOrders": "Orders",
+  "@navOrders": {
+    "description": "Bottom navigation: orders destination."
+  },
+  "navProducts": "Products",
+  "@navProducts": {
+    "description": "Bottom navigation: catalog and inventory destination."
+  },
+  "storeMenuTooltip": "Store menu",
+  "@storeMenuTooltip": {
+    "description": "Tooltip and screen-reader label of the store button in top-level app bars."
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Generic back action."
+  },
+  "close": "Close",
+  "@close": {
+    "description": "Generic close action."
+  },
+  "continueAction": "Continue",
+  "@continueAction": {
+    "description": "Primary button to proceed to the next step."
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Button to retry a failed operation."
+  },
+  "loading": "Loading",
+  "@loading": {
+    "description": "Screen-reader label for loading placeholders."
+  },
+  "envRibbon": "{environment} build",
+  "@envRibbon": {
+    "description": "Ribbon on non-production builds so test data is never confused with real data.",
+    "placeholders": {
+      "environment": {
+        "type": "String",
+        "example": "DEV"
+      }
+    }
+  },
+  "sampleDataTitle": "Sample data",
+  "@sampleDataTitle": {
+    "description": "Title of the banner that marks fictional design-review data."
+  },
+  "sampleDataBody": "Fictional data for design review. It is not your store and nothing here is saved.",
+  "@sampleDataBody": {
+    "description": "Explains that the screen shows sample data only."
+  },
+  "startupErrorTitle": "Aisellia can't start",
+  "@startupErrorTitle": {
+    "description": "Title when the build configuration is invalid."
+  },
+  "startupErrorBody": "This build is not configured correctly. Please install an official version of the app.",
+  "@startupErrorBody": {
+    "description": "Body when the build configuration is invalid. No technical details."
+  },
+  "chooseLanguageTitle": "Choose your language",
+  "@chooseLanguageTitle": {
+    "description": "First-launch language selection title."
+  },
+  "chooseLanguageBody": "You can change this later in Language and display.",
+  "@chooseLanguageBody": {
+    "description": "Hint under the first-launch language list."
+  },
+  "deferredTitle": "{feature} isn't available yet",
+  "@deferredTitle": {
+    "description": "Title for destinations planned for a later release.",
+    "placeholders": {
+      "feature": {
+        "type": "String",
+        "example": "Inbox"
+      }
+    }
+  },
+  "deferredBody": "This part of Aisellia is planned for a later release. Nothing here is connected to your store yet.",
+  "@deferredBody": {
+    "description": "Explains that a destination is not implemented and nothing is connected."
+  },
+  "deferredInboxBody": "Importing customer messages and Aisellia's suggested replies arrive in a later release. No messaging app is connected.",
+  "@deferredInboxBody": {
+    "description": "Inbox placeholder body; must not imply any channel is connected."
+  },
+  "deferredOrdersBody": "Creating, approving and tracking orders arrive in a later release. No orders are stored yet.",
+  "@deferredOrdersBody": {
+    "description": "Orders placeholder body."
+  },
+  "previewDraftReview": "Preview the draft review screen",
+  "@previewDraftReview": {
+    "description": "Link (sample-data builds only) to the design preview of the order draft review."
+  },
+  "notFoundTitle": "This page isn't available",
+  "@notFoundTitle": {
+    "description": "Shown for unknown routes or deep links."
+  },
+  "notFoundBody": "It may have moved or never existed.",
+  "@notFoundBody": {
+    "description": "Body for unknown routes."
+  },
+  "goToToday": "Go to Today",
+  "@goToToday": {
+    "description": "Button returning to the Today screen."
+  },
+  "errorLoadTitle": "Couldn't load this",
+  "@errorLoadTitle": {
+    "description": "Generic load failure title."
+  },
+  "errorOffline": "You're offline.",
+  "@errorOffline": {
+    "description": "Cause line when the device has no connection."
+  },
+  "errorServer": "Something went wrong on our side.",
+  "@errorServer": {
+    "description": "Cause line for server-side failures; no technical detail."
+  },
+  "errorReference": "Ref: {reference}",
+  "@errorReference": {
+    "description": "Support reference code shown under errors.",
+    "placeholders": {
+      "reference": {
+        "type": "String",
+        "example": "7F3K-21"
+      }
+    }
+  },
+  "discardTitle": "Discard changes?",
+  "@discardTitle": {
+    "description": "Unsaved-changes dialog title."
+  },
+  "discardBody": "Your changes will be lost.",
+  "@discardBody": {
+    "description": "Unsaved-changes dialog body."
+  },
+  "keepEditing": "Keep editing",
+  "@keepEditing": {
+    "description": "Safe default button in the unsaved-changes dialog."
+  },
+  "discard": "Discard",
+  "@discard": {
+    "description": "Destructive button in the unsaved-changes dialog."
+  },
+  "todayTitle": "Today",
+  "@todayTitle": {
+    "description": "Today screen title."
+  },
+  "needsAttention": "Needs attention",
+  "@needsAttention": {
+    "description": "Section label for items needing the seller."
+  },
+  "attnNeedsApproval": "Needs approval",
+  "@attnNeedsApproval": {
+    "description": "Attention row: orders waiting for approval."
+  },
+  "attnNeedsYou": "Needs you",
+  "@attnNeedsYou": {
+    "description": "Attention row: escalated conversations."
+  },
+  "attnDraftsMissing": "Drafts missing details",
+  "@attnDraftsMissing": {
+    "description": "Attention row: incomplete drafts."
+  },
+  "attnToDispatch": "To prepare or dispatch",
+  "@attnToDispatch": {
+    "description": "Attention row: approved orders to fulfil."
+  },
+  "attnDeliveryProblems": "Delivery problems",
+  "@attnDeliveryProblems": {
+    "description": "Attention row: failed deliveries."
+  },
+  "attnCashToCollect": "Cash to collect",
+  "@attnCashToCollect": {
+    "description": "Attention row: outstanding cash on delivery."
+  },
+  "attnLowStock": "Low or out of stock",
+  "@attnLowStock": {
+    "description": "Attention row: variants at or below threshold."
+  },
+  "attnRowSemantics": "{label}, {value}",
+  "@attnRowSemantics": {
+    "description": "Screen-reader sentence for an attention row.",
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "todaySoFar": "Today so far",
+  "@todaySoFar": {
+    "description": "Section label for today's totals."
+  },
+  "todayApproved": "Approved",
+  "@todayApproved": {
+    "description": "Count of orders approved today."
+  },
+  "todayDelivered": "Delivered",
+  "@todayDelivered": {
+    "description": "Count of orders delivered today."
+  },
+  "todayValueApproved": "Value approved",
+  "@todayValueApproved": {
+    "description": "Sum of approved order totals today."
+  },
+  "allCaughtUp": "All caught up. New drafts and messages will appear here.",
+  "@allCaughtUp": {
+    "description": "Shown when nothing needs attention."
+  },
+  "productsTitle": "Products",
+  "@productsTitle": {
+    "description": "Product list title."
+  },
+  "searchProductsHint": "Search products by name or SKU",
+  "@searchProductsHint": {
+    "description": "Placeholder of the product search field."
+  },
+  "filterAll": "All",
+  "@filterAll": {
+    "description": "Filter chip: all products."
+  },
+  "filterLowStock": "Low stock",
+  "@filterLowStock": {
+    "description": "Filter chip: low stock."
+  },
+  "filterOutOfStock": "Out of stock",
+  "@filterOutOfStock": {
+    "description": "Filter chip: out of stock."
+  },
+  "addProduct": "Add product",
+  "@addProduct": {
+    "description": "Button to create a product."
+  },
+  "addProductUnavailable": "Adding products arrives with catalog management. Nothing was created.",
+  "@addProductUnavailable": {
+    "description": "Honest message when the not-yet-implemented add action is used."
+  },
+  "productsEmptyTitle": "Add your first product",
+  "@productsEmptyTitle": {
+    "description": "Empty catalog title."
+  },
+  "productsEmptyBody": "Aisellia only answers customers with products and prices you add here.",
+  "@productsEmptyBody": {
+    "description": "Empty catalog explanation."
+  },
+  "noResultsFor": "No results for “{query}”",
+  "@noResultsFor": {
+    "description": "Empty search result title.",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "noResultsFilters": "No products match these filters",
+  "@noResultsFilters": {
+    "description": "Empty filter result title."
+  },
+  "clearFilters": "Clear filters",
+  "@clearFilters": {
+    "description": "Resets search and filters."
+  },
+  "stockInStock": "{count} in stock",
+  "@stockInStock": {
+    "description": "Stock indicator.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "stockLow": "Low · {count} left",
+  "@stockLow": {
+    "description": "Low stock indicator.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "stockOut": "Out of stock",
+  "@stockOut": {
+    "description": "Out-of-stock indicator."
+  },
+  "variantCount": "{count, plural, =1{1 option} other{{count} options}}",
+  "@variantCount": {
+    "description": "Number of variants of a product.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "orderTitle": "Order {number}",
+  "@orderTitle": {
+    "description": "Order screen title. Number is pre-formatted and LTR-isolated.",
+    "placeholders": {
+      "number": {
+        "type": "String",
+        "example": "#1042"
+      }
+    }
+  },
+  "statusNeedsApproval": "Needs approval",
+  "@statusNeedsApproval": {
+    "description": "Order status label for pending_approval."
+  },
+  "statusDraft": "Draft",
+  "@statusDraft": {
+    "description": "Order status label for draft."
+  },
+  "statusApproved": "Approved",
+  "@statusApproved": {
+    "description": "Order status label for approved."
+  },
+  "statusDelivered": "Delivered",
+  "@statusDelivered": {
+    "description": "Order status label for delivered."
+  },
+  "statusDeliveryFailed": "Delivery failed",
+  "@statusDeliveryFailed": {
+    "description": "Order status label for delivery_failed."
+  },
+  "draftBannerTitle": "Draft — not confirmed",
+  "@draftBannerTitle": {
+    "description": "Mandatory banner on every draft order."
+  },
+  "draftBannerBody": "Prepared by Aisellia from an imported {source} chat. Nothing is confirmed until you approve.",
+  "@draftBannerBody": {
+    "description": "Draft banner description.",
+    "placeholders": {
+      "source": {
+        "type": "String",
+        "example": "Instagram"
+      }
+    }
+  },
+  "issuesCount": "{count, plural, =1{1 thing to check} other{{count} things to check}}",
+  "@issuesCount": {
+    "description": "Issue summary title on a draft.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "issueInferredQuantity": "Quantity was inferred from “{quote}”.",
+  "@issueInferredQuantity": {
+    "description": "Issue explaining an inferred quantity.",
+    "placeholders": {
+      "quote": {
+        "type": "String"
+      }
+    }
+  },
+  "sectionCustomer": "Customer",
+  "@sectionCustomer": {
+    "description": "Section label."
+  },
+  "sectionDelivery": "Delivery",
+  "@sectionDelivery": {
+    "description": "Section label."
+  },
+  "sectionItems": "Items",
+  "@sectionItems": {
+    "description": "Section label."
+  },
+  "sectionTotal": "Total",
+  "@sectionTotal": {
+    "description": "Section label."
+  },
+  "fieldName": "Name",
+  "@fieldName": {
+    "description": "Field label: customer name."
+  },
+  "fieldPhone": "Phone",
+  "@fieldPhone": {
+    "description": "Field label: phone number."
+  },
+  "fieldCity": "City",
+  "@fieldCity": {
+    "description": "Field label: city or delivery zone."
+  },
+  "fieldLandmark": "Landmark",
+  "@fieldLandmark": {
+    "description": "Field label: nearest landmark."
+  },
+  "provFromCustomer": "From customer",
+  "@provFromCustomer": {
+    "description": "Provenance: value extracted from a customer message."
+  },
+  "provCatalogPrice": "Catalog price",
+  "@provCatalogPrice": {
+    "description": "Provenance: price from the catalog."
+  },
+  "provFromSettings": "From your settings",
+  "@provFromSettings": {
+    "description": "Provenance: value from store settings."
+  },
+  "provInferred": "Inferred — confirm",
+  "@provInferred": {
+    "description": "Provenance: interpreted value the seller must confirm."
+  },
+  "provEditedByYou": "Edited by you",
+  "@provEditedByYou": {
+    "description": "Provenance: value changed by the seller."
+  },
+  "notProvidedOptional": "— Not provided (optional)",
+  "@notProvidedOptional": {
+    "description": "Optional field with no value; neutral, not an error."
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Confirms an inferred value."
+  },
+  "quantityShort": "Qty {quantity}",
+  "@quantityShort": {
+    "description": "Quantity label on an order line.",
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "sizeValue": "Size {size}",
+  "@sizeValue": {
+    "description": "Variant label for a size.",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "subtotal": "Subtotal",
+  "@subtotal": {
+    "description": "Order subtotal label."
+  },
+  "deliveryFee": "Delivery",
+  "@deliveryFee": {
+    "description": "Order delivery fee label."
+  },
+  "totalCashOnDelivery": "Total · Cash on delivery",
+  "@totalCashOnDelivery": {
+    "description": "Order total label including payment method."
+  },
+  "reject": "Reject",
+  "@reject": {
+    "description": "Rejects a draft order."
+  },
+  "approveOrder": "Approve order",
+  "@approveOrder": {
+    "description": "Primary action on a draft order."
+  },
+  "reasonConfirmQuantity": "Confirm the quantity to enable approval",
+  "@reasonConfirmQuantity": {
+    "description": "Reason line above a disabled Approve button."
+  },
+  "approveSheetTitle": "Approve order {number}?",
+  "@approveSheetTitle": {
+    "description": "Approval confirmation sheet title.",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "stockAfterApproval": "Stock after approval",
+  "@stockAfterApproval": {
+    "description": "Label of the stock effect list."
+  },
+  "approveStatement": "Approving confirms this order and removes these items from stock. The customer is not messaged automatically.",
+  "@approveStatement": {
+    "description": "Consequence statement in the approval sheet."
+  },
+  "confirmApproval": "Confirm approval",
+  "@confirmApproval": {
+    "description": "Final approval button."
+  },
+  "previewNotConnectedTitle": "Not connected yet",
+  "@previewNotConnectedTitle": {
+    "description": "Title when an action is pressed in the design preview."
+  },
+  "previewApproveNotConnected": "This is a design preview with sample data. Nothing was approved and no stock changed.",
+  "@previewApproveNotConnected": {
+    "description": "Honest result of pressing Confirm approval in the preview."
+  },
+  "previewRejectNotConnected": "This is a design preview with sample data. Nothing was rejected.",
+  "@previewRejectNotConnected": {
+    "description": "Honest result of pressing Reject in the preview."
+  },
+  "storeMenuTitle": "Store",
+  "@storeMenuTitle": {
+    "description": "Store menu screen title."
+  },
+  "noStoreConnected": "No store connected yet",
+  "@noStoreConnected": {
+    "description": "Store header when no account or store exists yet."
+  },
+  "sampleStoreName": "Sample store",
+  "@sampleStoreName": {
+    "description": "Store header name in sample-data builds."
+  },
+  "menuCustomers": "Customers",
+  "@menuCustomers": {
+    "description": "Store menu row."
+  },
+  "menuStoreProfile": "Store profile",
+  "@menuStoreProfile": {
+    "description": "Store menu row."
+  },
+  "menuDeliveryZones": "Delivery zones",
+  "@menuDeliveryZones": {
+    "description": "Store menu row."
+  },
+  "menuPayments": "Payments",
+  "@menuPayments": {
+    "description": "Store menu row."
+  },
+  "menuPolicies": "Policies",
+  "@menuPolicies": {
+    "description": "Store menu row."
+  },
+  "menuChannels": "Messaging channels",
+  "@menuChannels": {
+    "description": "Store menu row."
+  },
+  "menuLanguageDisplay": "Language and display",
+  "@menuLanguageDisplay": {
+    "description": "Store menu row and screen title."
+  },
+  "menuAccount": "Account",
+  "@menuAccount": {
+    "description": "Store menu row."
+  },
+  "menuLegal": "Legal and licences",
+  "@menuLegal": {
+    "description": "Store menu row; opens open-source licences."
+  },
+  "menuDesignSystem": "Design system (debug)",
+  "@menuDesignSystem": {
+    "description": "Debug-only store menu row opening the component gallery."
+  },
+  "laterRelease": "Later release",
+  "@laterRelease": {
+    "description": "Trailing label on menu rows that are not available yet."
+  },
+  "appLanguage": "App language",
+  "@appLanguage": {
+    "description": "Section label for the UI language choice."
+  },
+  "digitsTitle": "Digits",
+  "@digitsTitle": {
+    "description": "Section label for digit display style."
+  },
+  "digitsWestern": "Western",
+  "@digitsWestern": {
+    "description": "Digit style option: 0-9."
+  },
+  "digitsEastern": "Eastern Arabic",
+  "@digitsEastern": {
+    "description": "Digit style option: ٠-٩."
+  },
+  "digitsNote": "Phone numbers and order numbers always use Western digits.",
+  "@digitsNote": {
+    "description": "Helper under the digit setting (DD-07)."
+  },
+  "themeTitle": "Theme",
+  "@themeTitle": {
+    "description": "Section label for theme."
+  },
+  "themeSystem": "System",
+  "@themeSystem": {
+    "description": "Theme option."
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Theme option."
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Theme option."
+  },
+  "motionTitle": "Motion",
+  "@motionTitle": {
+    "description": "Section label for animation preference."
+  },
+  "motionSystem": "Follow system",
+  "@motionSystem": {
+    "description": "Motion option."
+  },
+  "motionReduce": "Reduce motion",
+  "@motionReduce": {
+    "description": "Motion option."
+  },
+  "previewLabel": "Preview",
+  "@previewLabel": {
+    "description": "Label of the formatting preview row."
+  },
+  "galleryTitle": "Design system",
+  "@galleryTitle": {
+    "description": "Debug gallery title."
+  },
+  "productDetails": "Product details",
+  "@productDetails": {
+    "description": "Deferred destination name: product detail screen."
+  }
+}
