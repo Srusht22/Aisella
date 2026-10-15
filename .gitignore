@@ -1,0 +1,9 @@
+# Local and generated files that must never be committed
+.DS_Store
+__pycache__/
+*.pyc
+
+# Local environment and secrets (commit only *.example files)
+.env
+.env.*
+!.env.example
