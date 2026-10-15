@@ -48,7 +48,7 @@ Scores run from 1 (poor) to 5 (strong) for *this* product (relational orders and
 | Logging and monitoring | 3. Platform logs, plus Sentry | 4. Cloud Logging | 3 |
 | Deployment and ops burden | 5. Managed | 5. Managed | 2. Servers, auth, patching |
 | Lock-in | 4. Standard Postgres; Auth (GoTrue) and the edge runtime are open source | 2. Proprietary data model | 5 |
-| Pilot cost | 4. Pro $25/month *(verify)*; Free tier for staging | 4. Usage-based; free daily quotas | 3. Host + database + auth |
+| Pilot cost | 4. Pro $25/month *(verify)*; staging option per AD-09 (second Pro project ≈ $10, or Free organisation) | 4. Usage-based; free daily quotas | 3. Host + database + auth |
 | Team productivity | 4. SQL skills required (RLS, plpgsql) | 4 | 3 |
 
 **Decision ([ADR-001](architecture-decision-records/ADR-001-backend-platform.md)): Supabase on PostgreSQL, in a single project per environment.** It is the only option where the database itself enforces the core invariants: stock never negative, one approval per order, tenant isolation. The prototype demonstrated each of those, which reduces the most expensive class of bugs for this product.
