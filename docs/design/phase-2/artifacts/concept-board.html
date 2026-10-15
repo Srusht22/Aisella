@@ -1,0 +1,222 @@
+<!doctype html>
+<!--
+  Aisellia — Phase 2 concept board (DESIGN REFERENCE ONLY).
+  Static HTML/CSS mock-ups used to compare visual directions. This is not the
+  Flutter application and does not represent working software. All names,
+  prices, phone numbers and stock values are SAMPLE DATA.
+  Sorani strings are machine-drafted and require native-speaker review.
+  Fonts (SIL OFL 1.1): Inter, Vazirmatn Non-Latin — loaded from jsDelivr.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aisellia Concept Board</title>
+<style>
+@font-face{font-family:Inter;font-weight:400;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:500;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:600;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:Inter;font-weight:700;src:url(https://cdn.jsdelivr.net/npm/@fontsource/inter@5.3.0/files/inter-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:VazirNL;font-weight:100 900;src:url("https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/misc/Non-Latin/fonts/webfonts/Vazirmatn-NL[wght].woff2") format("woff2")}
+:root{--board-bg:#E9E6DF;--board-ink:#1A1C20}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--board-bg:#0B0C0E;--board-ink:#ECEDEF}}
+:root[data-theme="dark"]{--board-bg:#0B0C0E;--board-ink:#ECEDEF}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board-bg);color:var(--board-ink);font-family:Inter,VazirNL,system-ui,sans-serif;padding:24px 16px}
+.board{display:flex;flex-wrap:wrap;gap:28px;justify-content:center}
+.col{display:flex;flex-direction:column;gap:10px;align-items:center;max-width:100%}
+.cap{font:600 13px/18px Inter,sans-serif;letter-spacing:.02em;text-align:center}
+.cap small{display:block;font-weight:400;opacity:.7}
+h1{font:600 18px/24px Inter,sans-serif;text-align:center;margin-bottom:4px}
+.note{font:400 12px/18px Inter,sans-serif;text-align:center;opacity:.75;margin-bottom:22px}
+.phone{width:360px;max-width:100%;height:760px;border-radius:28px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(0,0,0,.12),0 12px 32px rgba(0,0,0,.14)}
+svg{flex:none}
+[dir=rtl] .dir{transform:scaleX(-1)}
+.num{font-family:Inter,sans-serif;font-variant-numeric:tabular-nums;direction:ltr;unicode-bidi:isolate}
+
+/* ===== Concept A — Ledger (light) ===== */
+.A{--paper:#F6F4EF;--surface:#FFFFFF;--ink:#1A1C20;--ink2:#555A63;--ink3:#6B7079;--rule:#E4E0D7;--lapis:#1F3F8F;--lapis-weak:#E8EDF8;
+   --pencil:#4A4F59;--pencil-bg:#F1EEE6;--pencil-line:#9A9EA6;--warn:#8A4B00;--warn-bg:#FCEFD6;--err:#A21D14;--err-bg:#FBE9E7;--ok:#17663F;--ok-bg:#E6F2EA;
+   background:var(--paper);color:var(--ink);font-size:15px;line-height:22px}
+.A.dark{--paper:#121417;--surface:#1B1E23;--ink:#ECEDEF;--ink2:#A9AEB8;--ink3:#8C929D;--rule:#2A2E35;--lapis:#9DB4F2;--lapis-weak:#1D2740;
+   --pencil:#B9BDC6;--pencil-bg:#1F2228;--pencil-line:#6A707B;--warn:#F0B35B;--warn-bg:#2E2414;--err:#F28B80;--err-bg:#33191A;--ok:#6CCB97;--ok-bg:#15291F}
+.A[dir=rtl]{font-family:VazirNL,Inter,sans-serif;font-size:16px;line-height:26px}
+.A .bar{height:56px;display:flex;align-items:center;gap:8px;padding:0 8px 0 4px;margin-top:24px}
+.A .iconbtn{width:48px;height:48px;display:grid;place-items:center;color:var(--ink)}
+.A .bar h2{font-size:17px;font-weight:600;flex:1}
+.A .bar .meta{font-size:13px;color:var(--ink2)}
+.A .scroll{flex:1;overflow:hidden;padding:0 16px}
+.A .draft{border:1.5px dashed var(--pencil-line);background:var(--pencil-bg);border-radius:10px;padding:10px 12px;display:flex;gap:10px;align-items:flex-start;color:var(--pencil)}
+.A .draft b{display:block;color:var(--ink);font-weight:600;font-size:14px}
+.A .draft span{font-size:13px;line-height:18px}
+.A .check{margin-top:12px;border-radius:10px;background:var(--warn-bg);color:var(--warn);padding:10px 12px;font-size:13px;line-height:18px;display:flex;gap:8px}
+.A .sec{margin-top:18px}
+.A .sec h3{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px}
+.A[dir=rtl] .sec h3{font-size:13px;letter-spacing:0;text-transform:none}
+.A .rows{background:var(--surface);border:1px solid var(--rule);border-radius:10px}
+.A .row{display:flex;align-items:center;gap:10px;padding:10px 12px;min-height:48px}
+.A .row+.row{border-top:1px solid var(--rule)}
+.A .row .k{color:var(--ink2);font-size:13px;width:78px;flex:none}
+.A .row .v{flex:1;min-width:0}
+.A .src{font-size:11px;line-height:14px;color:var(--ink3);display:flex;gap:4px;align-items:center;margin-top:1px}
+.A .pencilv{border-bottom:1.5px dotted var(--pencil-line)}
+.A .missing{color:var(--ink3);font-size:13px;display:flex;gap:6px;align-items:center}
+.A .item{display:flex;gap:10px;padding:10px 12px;align-items:flex-start}
+.A .thumb{width:44px;height:44px;border-radius:6px;background:linear-gradient(135deg,#D9C9AE,#BFA983);flex:none}
+.A.dark .thumb{background:linear-gradient(135deg,#5B4E3B,#3F3628)}
+.A .item .name{font-weight:600;font-size:14px;line-height:20px}
+.A .item .var{font-size:13px;color:var(--ink2)}
+.A .qty{display:inline-flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;color:var(--warn);background:var(--warn-bg);border:1.5px dotted var(--warn);border-radius:6px;padding:2px 8px}
+.A .price{text-align:end;font-size:14px}
+.A .stock{font-size:11px;color:var(--ok)}
+.A .tot .row{min-height:36px;padding:6px 12px}
+.A .tot .row .k{width:auto;flex:1}
+.A .tot .row .v{text-align:end;flex:none}
+.A .tot .grand{font-weight:600;font-size:17px}
+.A .actions{background:var(--surface);border-top:1px solid var(--rule);padding:10px 16px 26px;display:flex;flex-direction:column;gap:8px}
+.A .why{font-size:12px;color:var(--warn);display:flex;gap:6px;align-items:center}
+.A .btns{display:flex;gap:10px}
+.A .btn{height:48px;border-radius:10px;display:grid;place-items:center;font-weight:600;font-size:15px;padding:0 16px}
+.A .btn.ghost{color:var(--err);border:1px solid var(--rule)}
+.A .btn.primary{flex:1;background:var(--lapis);color:var(--surface);opacity:.38}
+.A.dark .btn.primary{color:#0F1B3D}
+
+/* ===== Concept B — Bazaar ===== */
+.B{background:#FBF3E6;color:#2B1A12;font-size:15px;line-height:22px}
+.B .hero{background:#B5492A;color:#FFF7EC;padding:36px 20px 26px;position:relative}
+.B .hero:after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:10px;background:repeating-linear-gradient(135deg,#E8B03A 0 8px,#B5492A 8px 16px)}
+.B .hero small{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.B .hero h2{font-size:28px;line-height:34px;font-weight:700;margin-top:4px}
+.B .badge{display:inline-block;margin-top:10px;background:#E8B03A;color:#2B1A12;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:600}
+.B .body{padding:24px 16px;display:flex;flex-direction:column;gap:14px}
+.B .card{background:#FFFFFF;border-radius:24px;padding:16px;box-shadow:0 6px 18px rgba(120,60,20,.12)}
+.B .photo{height:120px;border-radius:18px;background:linear-gradient(135deg,#E9C9A0,#C98E5A);margin-bottom:12px}
+.B .card h4{font-size:17px;font-weight:700}
+.B .card p{font-size:14px;color:#6E4E3E}
+.B .pill{margin-top:8px;display:inline-block;border-radius:999px;background:#FDE7C8;color:#8A4B00;padding:3px 10px;font-size:12px;font-weight:600}
+.B .cta{margin:auto 16px 26px;height:56px;border-radius:999px;background:#B5492A;color:#FFF;display:grid;place-items:center;font-weight:700;font-size:16px;box-shadow:0 8px 20px rgba(181,73,42,.35)}
+
+/* ===== Concept C — Console ===== */
+.C{background:radial-gradient(120% 60% at 80% 0%,#2A1F6B 0%,#0E1220 55%);color:#E8EAF0;font-size:15px;line-height:22px}
+.C .top{padding:40px 18px 8px;display:flex;justify-content:space-between;align-items:center}
+.C .ai{background:linear-gradient(90deg,#8B7CFF,#3FE0D0);color:#0E1220;font-weight:700;font-size:12px;border-radius:999px;padding:4px 10px}
+.C h2{font-size:22px;font-weight:600;padding:6px 18px 14px}
+.C .glass{margin:0 14px 12px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(139,124,255,.35);padding:14px;box-shadow:0 0 24px rgba(139,124,255,.18)}
+.C .lbl{font-size:12px;color:#6C7590;text-transform:uppercase;letter-spacing:.08em}
+.C .big{font-size:30px;font-weight:600;color:#3FE0D0;margin-top:4px}
+.C .line{display:flex;justify-content:space-between;font-size:14px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.C .conf{height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:8px;overflow:hidden}
+.C .conf i{display:block;height:100%;width:82%;background:linear-gradient(90deg,#8B7CFF,#3FE0D0)}
+.C .cta{margin:auto 14px 26px;height:52px;border-radius:14px;background:linear-gradient(90deg,#8B7CFF,#5B8CFF);display:grid;place-items:center;font-weight:600}
+</style>
+</head>
+<body>
+<h1>Aisellia — visual direction concept board</h1>
+<p class="note">Design reference only, not working software. All data is sample data. Same screen in each direction: an AI order draft under review.<br>Sorani text is machine-drafted and needs native-speaker review.</p>
+<div class="board">
+
+<!-- A1: Ledger, English, light -->
+<div class="col">
+<div class="phone A" dir="ltr" lang="en">
+  <div class="bar"><span class="iconbtn"><svg class="dir" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span><h2>Order <span class="num">#1042</span></h2><span class="meta">Needs approval</span></div>
+  <div class="scroll">
+    <div class="draft"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg><div><b>Draft — not confirmed</b><span>Prepared by Aisellia from an imported Instagram chat. Nothing is confirmed until you approve.</span></div></div>
+    <div class="check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 17h-19L12 3z"/><path d="M12 10v4M12 17.5v.01"/></svg><div><b>1 thing to check</b> — quantity was inferred from “for me and my sister”.</div></div>
+    <div class="sec"><h3>Customer</h3><div class="rows">
+      <div class="row"><span class="k">Name</span><div class="v"><span class="pencilv">Nzar Ahmad</span><div class="src"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/></svg>From customer</div></div></div>
+      <div class="row"><span class="k">Phone</span><div class="v"><span class="num pencilv">+964 750 123 4567</span><div class="src"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/></svg>From customer</div></div></div>
+    </div></div>
+    <div class="sec"><h3>Delivery</h3><div class="rows">
+      <div class="row"><span class="k">City</span><div class="v">Erbil · Ankawa<div class="src">Zone from your settings</div></div></div>
+      <div class="row"><span class="k">Landmark</span><div class="v"><span class="missing">— Not provided (optional)</span></div></div>
+    </div></div>
+    <div class="sec"><h3>Items</h3><div class="rows">
+      <div class="item"><span class="thumb"></span><div class="v" style="flex:1"><div class="name">Beige Abaya</div><div class="var">Size M · <span class="stock">4 in stock</span></div><span class="qty">Qty 2 · Inferred — confirm</span></div><div class="price num">35,000<br><span class="src" style="justify-content:flex-end">Catalog price</span></div></div>
+    </div></div>
+    <div class="sec tot"><div class="rows">
+      <div class="row"><span class="k">Subtotal</span><span class="v num">70,000 IQD</span></div>
+      <div class="row"><span class="k">Delivery</span><span class="v num">5,000 IQD</span></div>
+      <div class="row"><span class="k grand">Total · COD</span><span class="v num grand">75,000 IQD</span></div>
+    </div></div>
+  </div>
+  <div class="actions"><div class="why"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16v.01"/></svg>Confirm the quantity to enable approval</div><div class="btns"><span class="btn ghost">Reject</span><span class="btn primary">Approve order</span></div></div>
+</div>
+<div class="cap">A · Ledger — light, English<small>Recommended direction</small></div>
+</div>
+
+<!-- A2: Ledger, Sorani RTL -->
+<div class="col">
+<div class="phone A" dir="rtl" lang="ckb">
+  <div class="bar"><span class="iconbtn"><svg class="dir" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span><h2>داواکاری <span class="num">#1042</span></h2><span class="meta">پێویستی بە پەسەندکردنە</span></div>
+  <div class="scroll">
+    <div class="draft"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg><div><b>ڕەشنووس — پشتڕاست نەکراوەتەوە</b><span>ئایسێلیا لە گفتوگۆیەکی ئینستاگرامەوە ئامادەی کردووە. هیچ شتێک پشتڕاست ناکرێتەوە تا تۆ پەسەندی نەکەیت.</span></div></div>
+    <div class="check"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 17h-19L12 3z"/><path d="M12 10v4M12 17.5v.01"/></svg><div><b>یەک خاڵ بۆ پشکنین</b> — ژمارەکە مەزەندە کراوە.</div></div>
+    <div class="sec"><h3>کڕیار</h3><div class="rows">
+      <div class="row"><span class="k">ناو</span><div class="v"><span class="pencilv">نزار ئەحمەد</span><div class="src">لە کڕیارەوە</div></div></div>
+      <div class="row"><span class="k">مۆبایل</span><div class="v"><span class="num pencilv">+964 750 123 4567</span><div class="src">لە کڕیارەوە</div></div></div>
+    </div></div>
+    <div class="sec"><h3>گەیاندن</h3><div class="rows">
+      <div class="row"><span class="k">شار</span><div class="v">هەولێر · عەینکاوە<div class="src">ناوچە لە ڕێکخستنەکانتەوە</div></div></div>
+    </div></div>
+    <div class="sec"><h3>کاڵاکان</h3><div class="rows">
+      <div class="item"><span class="thumb"></span><div class="v" style="flex:1"><div class="name"><bdi>Beige Abaya</bdi></div><div class="var">قەبارە M · <span class="stock"><span class="num">4</span> لە کۆگا</span></div><span class="qty">ژمارە <span class="num">2</span> · مەزەندەکراوە — پشتڕاستی بکەرەوە</span></div><div class="price num">35,000</div></div>
+    </div></div>
+    <div class="sec tot"><div class="rows">
+      <div class="row"><span class="k grand">کۆی گشتی</span><span class="v num grand">75,000 IQD</span></div>
+    </div></div>
+  </div>
+  <div class="actions"><div class="btns"><span class="btn ghost">ڕەتکردنەوە</span><span class="btn primary">پەسەندکردنی داواکاری</span></div></div>
+</div>
+<div class="cap">A · Ledger — Kurdish Sorani, RTL<small>Mirrored layout, LTR-isolated numbers</small></div>
+</div>
+
+<!-- A3: Ledger, dark -->
+<div class="col">
+<div class="phone A dark" dir="ltr" lang="en">
+  <div class="bar"><span class="iconbtn"><svg class="dir" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span><h2>Order <span class="num">#1042</span></h2><span class="meta">Needs approval</span></div>
+  <div class="scroll">
+    <div class="draft"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg><div><b>Draft — not confirmed</b><span>Prepared by Aisellia. Nothing is confirmed until you approve.</span></div></div>
+    <div class="sec"><h3>Customer</h3><div class="rows">
+      <div class="row"><span class="k">Name</span><div class="v"><span class="pencilv">Nzar Ahmad</span><div class="src"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 5h16v11H9l-5 4z"/></svg>From customer</div></div></div>
+      <div class="row"><span class="k">Phone</span><div class="v"><span class="num pencilv">+964 750 123 4567</span></div></div>
+    </div></div>
+    <div class="sec"><h3>Items</h3><div class="rows">
+      <div class="item"><span class="thumb"></span><div class="v" style="flex:1"><div class="name">Beige Abaya</div><div class="var">Size M · <span class="stock">4 in stock</span></div><span class="qty">Qty 2 · Inferred — confirm</span></div><div class="price num">35,000</div></div>
+    </div></div>
+    <div class="sec tot"><div class="rows">
+      <div class="row"><span class="k grand">Total · COD</span><span class="v num grand">75,000 IQD</span></div>
+    </div></div>
+  </div>
+  <div class="actions"><div class="btns"><span class="btn ghost">Reject</span><span class="btn primary">Approve order</span></div></div>
+</div>
+<div class="cap">A · Ledger — dark theme<small>Same hierarchy, re-tuned tones</small></div>
+</div>
+
+<!-- B: Bazaar -->
+<div class="col">
+<div class="phone B" dir="ltr" lang="en">
+  <div class="hero"><small>New order</small><h2>Nzar wants 2 Beige Abayas!</h2><span class="badge">✦ AI found an order</span></div>
+  <div class="body">
+    <div class="card"><div class="photo"></div><h4>Beige Abaya · M</h4><p>2 × 35,000 IQD</p><span class="pill">Quantity guessed</span></div>
+    <div class="card"><h4>Erbil · Ankawa</h4><p>+964 750 123 4567 · Cash on delivery</p></div>
+  </div>
+  <div class="cta">Approve · 75,000 IQD</div>
+</div>
+<div class="cap">B · Bazaar — warm, expressive<small>Not recommended</small></div>
+</div>
+
+<!-- C: Console -->
+<div class="col">
+<div class="phone C" dir="ltr" lang="en">
+  <div class="top"><span class="ai">AI ORDER · 82% confident</span><span>⋯</span></div>
+  <h2>Order draft #1042</h2>
+  <div class="glass"><div class="lbl">Total</div><div class="big num">75,000 IQD</div><div class="conf"><i></i></div></div>
+  <div class="glass"><div class="line"><span>Beige Abaya · M × 2</span><span class="num">70,000</span></div><div class="line"><span>Delivery · Erbil</span><span class="num">5,000</span></div><div class="line" style="border:0"><span>Nzar Ahmad</span><span class="num">+964 750 123 4567</span></div></div>
+  <div class="cta">Approve with AI</div>
+</div>
+<div class="cap">C · Console — dark, AI-forward<small>Not recommended</small></div>
+</div>
+
+</div>
+</body>
+</html>
