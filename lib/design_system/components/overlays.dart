@@ -90,7 +90,7 @@ class _SheetBody extends StatelessWidget {
                 ),
               ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(
+              padding: const EdgeInsetsDirectional.fromSTEB(
                 Space.s16,
                 Space.s16,
                 Space.s16,
@@ -106,7 +106,7 @@ class _SheetBody extends StatelessWidget {
             ),
             Flexible(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(
+                padding: const EdgeInsetsDirectional.fromSTEB(
                   Space.s16,
                   0,
                   Space.s16,
@@ -225,7 +225,7 @@ class StickyActionBar extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(
+          padding: const EdgeInsetsDirectional.fromSTEB(
             Space.s16,
             Space.s12,
             Space.s16,

@@ -1,4 +1,5 @@
 import 'package:aisellia/app/router.dart';
+import 'package:aisellia/core/config/app_config.dart';
 import 'package:aisellia/features/inbox/inbox_screen.dart';
 import 'package:aisellia/features/onboarding/language_selection_screen.dart';
 import 'package:aisellia/features/orders/presentation/orders_home_screen.dart';
@@ -165,5 +166,18 @@ void main() {
     }
     await tester.pumpAndSettle();
     expect(find.byType(ProductsScreen), findsOneWidget);
+  });
+
+  testWidgets('the debug gallery route does not exist in production', (
+    tester,
+  ) async {
+    setScreen(tester);
+    await tester.pumpWidget(
+      testApp(environment: AppEnvironment.prod, sampleData: false),
+    );
+    await tester.pumpAndSettle();
+    _router(tester).go(Routes.storeGallery);
+    await tester.pumpAndSettle();
+    expect(find.text("This page isn't available"), findsOneWidget);
   });
 }

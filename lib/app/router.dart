@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/config/app_config.dart';
 import '../core/settings/app_settings.dart';
 import '../design_system/gallery/gallery_screen.dart';
 import '../features/common/deferred_feature_screen.dart';
@@ -41,6 +42,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final refresh = _SettingsListenable();
   ref.listen(settingsProvider, (_, _) => refresh.ping());
   ref.onDispose(refresh.dispose);
+  final isProduction = ref.read(appConfigProvider).isProduction;
 
   final router = GoRouter(
     navigatorKey: _rootKey,
@@ -112,7 +114,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'language',
             builder: (_, _) => const LanguageDisplayScreen(),
           ),
-          GoRoute(path: 'gallery', builder: (_, _) => const GalleryScreen()),
+          // Debug gallery: not registered in production, so a deep link
+          // cannot reach it either.
+          if (!isProduction)
+            GoRoute(path: 'gallery', builder: (_, _) => const GalleryScreen()),
         ],
       ),
       GoRoute(

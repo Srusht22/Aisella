@@ -13,6 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 Widget testApp({
   String? locale = 'en',
   bool sampleData = true,
+  AppEnvironment environment = AppEnvironment.dev,
   Map<String, String> extraPrefs = const {},
   TodayRepository? today,
   ProductsRepository? products,
@@ -21,7 +22,7 @@ Widget testApp({
   return ProviderScope(
     overrides: [
       appConfigProvider.overrideWithValue(
-        AppConfig(environment: AppEnvironment.dev, sampleData: sampleData),
+        AppConfig(environment: environment, sampleData: sampleData),
       ),
       keyValueStoreProvider.overrideWithValue(store),
       todayRepositoryProvider.overrideWithValue(
