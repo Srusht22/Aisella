@@ -173,7 +173,7 @@ Shown under the DraftBanner when issues exist. Danger tone if any issue blocks a
 4 nodes (Approved, Preparing, Out for delivery, Delivered) joined by a 2 px line. Completed nodes are filled `brand.primary` with a check; the current node is a filled ring; future nodes are outlined `border.control`. Labels sit below (`caption`, wrapping to 2 lines). A branch state (Delivery failed, Returned, Cancelled) replaces the remaining nodes with a single labelled state node in its semantic colour. Mirrored in RTL.
 
 ### CMP-CountBadge
-On navigation icons: `danger.fg`-free, using a `brand.primary` fill with `text.onBrand` digits (counts mean "work to do", not "error"), 18 high, capped at "99+".
+On navigation icons: never red. A `brand.primary` fill with `text.onBrand` digits (counts mean "work to do", not "error"), 18 high, capped at "99+".
 
 ---
 

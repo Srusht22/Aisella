@@ -59,7 +59,7 @@ Where a screen uses a shared pattern from §1, the block names the pattern inste
 | **P-ERR-ACTION** | Action failed | Inline danger banner at the top of the form or sheet: what failed, why (when known) and **Retry**. Input is preserved; the sheet stays open; field errors are shown on their fields. **Never a success snackbar.** |
 | **P-ERR-UNKNOWN** | Outcome unknown (timeout or lost response on a critical write) | The action button shows "Checking…". The client re-reads the record. If the change happened, show success; if not, show P-ERR-ACTION with "Not approved — try again". The user never sees an optimistic success. |
 | **P-OFFLINE** | No connectivity | GL-01 banner under the app bar. Lists keep showing data already loaded in this session with "Last updated {time}". Write actions stay visible but disabled, with the reason "You're offline". Reads retry automatically on reconnect; writes are never retried automatically. |
-| **P-SUCCESS-INPLACE** | Success | The changed record updates in place (status badge, stock number), using the motion in [06](06-motion.md). Minor actions also show a snackbar (4 s; with Undo only where the undo is real and safe). |
+| **P-SUCCESS-INPLACE** | Success | The changed record updates in place (status badge, stock number), using the motion in [06](06-motion.md). Minor actions also show a snackbar (4 s). P0 offers no Undo on snackbars (see [05 CMP-Snackbar](05-components.md#cmp-snackbar)). |
 | **P-A11Y-BASE** | Baseline accessibility | All baseline requirements in [07 §5](07-localization-and-accessibility.md#5-accessibility-requirements). Each screen block lists only screen-specific additions. |
 | **P-RTL-BASE** | Baseline RTL | All baseline rules in [07 §2](07-localization-and-accessibility.md#2-rtl-layout-rules). Each screen block lists only screen-specific notes. |
 
@@ -722,7 +722,7 @@ Same as CV-03, plus:
 ### PR-05 Adjust stock (sheet)
 | # | Spec |
 |---|---|
-| 5 | Variant name. Segmented: **Add · Remove · Set count**. Quantity input. Reason chips (Received stock, Sold in shop, Damaged, Count correction, Other plus note). **Result preview: "12 → 15"** (large tabular). **Save adjustment**. |
+| 5 | Variant name. Segmented: **Add · Remove · Set count**. Quantity input. Reason chips (Received stock, Sold in shop, Damaged, Count correction, Other plus note). **Result preview: "12 → 15"** (`numeric.metric`). **Save adjustment**. |
 | 10 | The result cannot be negative ("Only 12 in stock"); integer only. |
 | 13 | P-ERR-ACTION; a concurrent change shows "Stock changed to 10 while you were editing" and refreshes the preview. |
 | 14 | Sheet closes; number roll on PR-02; snackbar with the result. |

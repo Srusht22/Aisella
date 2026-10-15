@@ -179,7 +179,7 @@ Script-specific values: Sorani styles are one step larger and have more line hei
 | `button` | 15/20/600 | 16/24/600 | Buttons |
 | `numeric.body` | 15/22/500, tabular | 15/26/500, tabular | Prices, quantities, stock in rows |
 | `numeric.total` | 20/28/600, tabular | 20/30/600, tabular | Order totals |
-| `numeric.metric` | 28/34/600, tabular | 28/36/600, tabular | Today counts (the largest numbers in the app) |
+| `numeric.metric` | 28/34/600, tabular | 28/36/600, tabular | Single key number on a focused surface: the stock-adjustment result preview (PR-05). Not used for dashboards or metric cards. |
 
 **Rules**
 - Numbers that are compared or aligned (prices, totals, quantities, stock, counts) always use **tabular figures** and are end-aligned in their column.
