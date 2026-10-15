@@ -603,5 +603,62 @@
       "shape": "circle",
       "content": "initials"
     }
+  },
+  "motion": {
+    "duration": {
+      "instant": 0,
+      "xs": 100,
+      "sm": 160,
+      "md": 200,
+      "lg": 260,
+      "xl": 300,
+      "sheetEnter": 280,
+      "sheetExit": 200,
+      "numberRoll": 240,
+      "inkSettle": 480
+    },
+    "easing": {
+      "standard": [
+        0.2,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "enter": [
+        0.05,
+        0.7,
+        0.1,
+        1.0
+      ],
+      "exit": [
+        0.3,
+        0.0,
+        0.8,
+        0.15
+      ],
+      "linear": "linear"
+    },
+    "spring": {
+      "sheet": {
+        "mass": 1,
+        "stiffness": 400,
+        "damping": 40
+      }
+    },
+    "stagger": {
+      "perItemMs": 40,
+      "maxItems": 4
+    },
+    "distance": {
+      "small": 8,
+      "medium": 30
+    },
+    "skeleton": {
+      "delayMs": 300,
+      "pulseMs": 1600,
+      "minOpacity": 0.6
+    },
+    "longContentCrossfadeThreshold": 600,
+    "reducedMotion": "Replace spatial motion with crossfades of motion.duration.sm or instant changes; never remove state feedback."
   }
 }
