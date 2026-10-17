@@ -32,4 +32,5 @@
 | `902c006` | Migration `20261019090000_ai_guard_hardening.sql`, pgTAP 16 (78 assertions) |
 | `78b1a5a` | Migration `20261019100000_customer_notes_redaction.sql`, pgTAP 17 (42 assertions), pgTAP 13 updated |
 | `ba7f84b` | `ai-assist`: inference region, per-language evaluation report, spending cap, consented-set input, staging preflight, tests |
-| (this commit) | These documents and a correction to Phase 8 G |
+| `e64d639` | Documents A–G and a correction to Phase 8 G |
+| `e808434` | Document H: open gates, evaluation approval procedure, native review protocol |
