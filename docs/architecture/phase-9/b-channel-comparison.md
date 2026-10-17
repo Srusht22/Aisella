@@ -1,5 +1,7 @@
 # B. Channel comparison and recommendation
 
+> **Superseded for the multi-channel plan by [M](m-platform-matrix.md)**, which covers all target platforms with VERIFIED / ASSUMPTION / UNRESOLVED labels. This page is kept for traceability; its "recommendation" is **not** a selection.
+>
 > **Revised after the owner's review.**
 > - Facts were re-checked against official domains in [I](i-official-verification.md), which supersedes this page where they differ.
 > - The **first channel is not chosen by the score in §3**. It is decided with the seller interviews in [J](j-seller-interview-questionnaire.md) and the owner's explicit approval.

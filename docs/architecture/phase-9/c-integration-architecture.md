@@ -1,5 +1,9 @@
 # C. Integration architecture
 
+> **Generalized by [L](l-multichannel-architecture.md)** for multiple providers and a public launch.
+> - The roles, flows and rules here stay valid.
+> - Where they differ, L wins: the provider registry instead of the `channel` check list; provider-neutral table names (`connections`, `contacts`, `delivery_events`, `message_attachments`); per-provider webhook functions; fair queuing.
+
 ## 1. Components
 
 ```
