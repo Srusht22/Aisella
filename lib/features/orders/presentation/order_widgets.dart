@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/formatting/bidi.dart';
 import '../../../core/formatting/money.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/settings/app_settings.dart';
@@ -131,6 +132,9 @@ class OrderLineTile extends ConsumerWidget {
     final digits = ref.watch(settingsProvider).digits;
     String m(int v) => money(context, v, currency, digits);
     final c = line.current;
+    if (!line.isResolved) {
+      return _UnresolvedLine(line: line, currency: currency);
+    }
 
     final notes = <Widget>[];
     if (review) {
@@ -175,6 +179,15 @@ class OrderLineTile extends ConsumerWidget {
       );
     }
 
+    if (review && line.quantityInferred) {
+      notes.add(
+        StatusBadge(
+          label: l10n.provInferred,
+          icon: AppIcons.question,
+          tone: Tone.pencil,
+        ),
+      );
+    }
     final qty = l10n.qtyTimesPrice(
       count(line.quantity, digits),
       m(line.unitPrice),
@@ -223,6 +236,72 @@ class OrderLineTile extends ConsumerWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// An AI line the seller still has to resolve (Phase 1 §8.4): what the
+/// customer asked for and the catalog candidates. It blocks approval until the
+/// seller picks the product in the editor.
+class _UnresolvedLine extends ConsumerWidget {
+  const _UnresolvedLine({required this.line, required this.currency});
+
+  final OrderLine line;
+  final Currency currency;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final p = context.palette;
+    final type = context.type;
+    final digits = ref.watch(settingsProvider).digits;
+    final title = switch (line.resolution) {
+      LineResolution.chooseProduct => l10n.lineChooseProduct,
+      LineResolution.variantNeeded => l10n.lineChooseVariant,
+      _ => l10n.lineNotInCatalog,
+    };
+    final asked = line.customerText == null
+        ? null
+        : l10n.lineCustomerAsked(Bidi.auto(line.customerText!));
+    final qty = l10n.lineQuantity(count(line.quantity, digits));
+    return Semantics(
+      label: [title, ?asked, qty].join(', '),
+      child: Padding(
+        padding: const EdgeInsets.all(Space.s12),
+        child: ExcludeSemantics(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              StatusBadge(
+                label: title,
+                icon: AppIcons.warning,
+                tone: Tone.warning,
+              ),
+              const SizedBox(height: Space.s4),
+              if (asked != null)
+                Text(asked, style: type.body.copyWith(color: p.textPrimary)),
+              Text(
+                line.quantityInferred ? '$qty · ${l10n.provInferred}' : qty,
+                style: type.caption.copyWith(color: p.textSecondary),
+              ),
+              if (line.candidates.isNotEmpty) ...[
+                const SizedBox(height: Space.s4),
+                Text(
+                  l10n.lineCandidates,
+                  style: type.caption.copyWith(color: p.textSecondary),
+                ),
+                for (final cand in line.candidates)
+                  Text(
+                    '• ${itemName(cand.name, cand.variantLabel)} · '
+                    '${money(context, cand.price, currency, digits)}'
+                    '${cand.available ? '' : ' · ${l10n.lineNotSold}'}',
+                    style: type.caption.copyWith(color: p.textPrimary),
+                  ),
+              ],
+            ],
+          ),
         ),
       ),
     );

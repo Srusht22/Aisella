@@ -2970,5 +2970,687 @@
   "writeOff": "Write off",
   "@writeOff": {
     "description": "Return decision."
+  },
+  "actorAi": "the AI assistant",
+  "@actorAi": {
+    "description": "Order history actor: the AI (Phase 8)."
+  },
+  "addMessage": "Add message",
+  "@addMessage": {
+    "description": "Button."
+  },
+  "addMessages": "Add messages",
+  "@addMessages": {
+    "description": "Conversation menu."
+  },
+  "addPolicy": "Add policy",
+  "@addPolicy": {
+    "description": "AI settings."
+  },
+  "aiAssistantSwitch": "AI assistant",
+  "@aiAssistantSwitch": {
+    "description": "Switch title."
+  },
+  "aiAssistantSwitchHelp": "Suggests replies and prepares draft orders from conversations. You review everything.",
+  "@aiAssistantSwitchHelp": {
+    "description": "Switch help."
+  },
+  "aiDraftBody": "Prepared by the AI assistant from a conversation. Not confirmed: check every field before you approve.",
+  "@aiDraftBody": {
+    "description": "AI draft banner."
+  },
+  "aiDraftNotConfirmed": "{status} · not confirmed",
+  "@aiDraftNotConfirmed": {
+    "description": "Conversation draft card.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "aiFailBusy": "The AI service is busy. Try again in a moment.",
+  "@aiFailBusy": {
+    "description": "Run failure."
+  },
+  "aiFailExpired": "The request took too long and was stopped. Try again.",
+  "@aiFailExpired": {
+    "description": "Run failure."
+  },
+  "aiFailInvalid": "The AI's answer could not be checked, so nothing was saved. Try again.",
+  "@aiFailInvalid": {
+    "description": "Run failure."
+  },
+  "aiFailRefused": "The AI did not answer this conversation. It needs you.",
+  "@aiFailRefused": {
+    "description": "Run failure."
+  },
+  "aiFailSkipped": "The AI assistant was switched off or paused.",
+  "@aiFailSkipped": {
+    "description": "Run failure."
+  },
+  "aiFailTimeout": "The AI took too long to answer.",
+  "@aiFailTimeout": {
+    "description": "Run failure."
+  },
+  "aiFailUnavailable": "AI assistant temporarily unavailable.",
+  "@aiFailUnavailable": {
+    "description": "Run failure (Phase 1 §8.9)."
+  },
+  "aiManualPath": "Your messages are saved. You can reply yourself or create the order manually.",
+  "@aiManualPath": {
+    "description": "Manual path after AI failure."
+  },
+  "aiNeverSends": "Aisellia never sends messages to customers. You copy a reply, send it yourself, then mark it as sent.",
+  "@aiNeverSends": {
+    "description": "AI settings note."
+  },
+  "aiPausedShort": "AI paused",
+  "@aiPausedShort": {
+    "description": "Inbox row."
+  },
+  "aiSettings": "AI assistant & policies",
+  "@aiSettings": {
+    "description": "Store menu / screen title."
+  },
+  "aiStillWorking": "No answer yet. The assistant may still be working: refresh in a moment.",
+  "@aiStillWorking": {
+    "description": "Client timeout."
+  },
+  "aiUsage": "AI uses in the last 24 hours: {used} of {limit}",
+  "@aiUsage": {
+    "description": "Usage line.",
+    "placeholders": {
+      "used": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  },
+  "aiWorking": "Preparing a suggestion…",
+  "@aiWorking": {
+    "description": "Loading."
+  },
+  "aiWorkingBody": "Using your catalog, delivery zones and written policies only.",
+  "@aiWorkingBody": {
+    "description": "Loading body."
+  },
+  "basedOnStoreData": "Based on your store's data:",
+  "@basedOnStoreData": {
+    "description": "Facts list title."
+  },
+  "closeConversation": "Close conversation",
+  "@closeConversation": {
+    "description": "Menu."
+  },
+  "conflictingDetails": "Contradictory details: {fields}",
+  "@conflictingDetails": {
+    "description": "Suggestion conflicts.",
+    "placeholders": {
+      "fields": {
+        "type": "String"
+      }
+    }
+  },
+  "convClosed": "Closed",
+  "@convClosed": {
+    "description": "Conversation status."
+  },
+  "convNeedsReply": "Needs reply",
+  "@convNeedsReply": {
+    "description": "Conversation status."
+  },
+  "convNeedsYou": "Needs you",
+  "@convNeedsYou": {
+    "description": "Conversation status (escalated)."
+  },
+  "convWaiting": "Waiting for customer",
+  "@convWaiting": {
+    "description": "Conversation status."
+  },
+  "conversationUnavailable": "This conversation is no longer available.",
+  "@conversationUnavailable": {
+    "description": "Not found."
+  },
+  "copiedPasteThenMark": "Copied. Paste it in your chat app, send it, then tap “I sent this”.",
+  "@copiedPasteThenMark": {
+    "description": "Snackbar after copy."
+  },
+  "copyReply": "Copy reply",
+  "@copyReply": {
+    "description": "Button."
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Button."
+  },
+  "deleteConversation": "Delete conversation",
+  "@deleteConversation": {
+    "description": "Menu."
+  },
+  "deleteConversationBody": "The messages and suggestions are deleted. An order created from it stays.",
+  "@deleteConversationBody": {
+    "description": "Confirm body."
+  },
+  "deleteConversationTitle": "Delete this conversation?",
+  "@deleteConversationTitle": {
+    "description": "Confirm title."
+  },
+  "deletePolicy": "Delete policy",
+  "@deletePolicy": {
+    "description": "Button."
+  },
+  "deletePolicyBody": "The assistant will no longer quote it.",
+  "@deletePolicyBody": {
+    "description": "Confirm body."
+  },
+  "deletePolicyTitle": "Delete this policy?",
+  "@deletePolicyTitle": {
+    "description": "Confirm title."
+  },
+  "dismiss": "Dismiss",
+  "@dismiss": {
+    "description": "Button."
+  },
+  "editBeforeCopy": "Edit",
+  "@editBeforeCopy": {
+    "description": "Button: edit suggestion before copying."
+  },
+  "editPolicy": "Edit policy",
+  "@editPolicy": {
+    "description": "Sheet title."
+  },
+  "editSuggestion": "Edit reply",
+  "@editSuggestion": {
+    "description": "Sheet title."
+  },
+  "editSuggestionHelp": "Your edited text is what will be recorded as copied.",
+  "@editSuggestionHelp": {
+    "description": "Sheet help."
+  },
+  "errAiBusy": "The assistant is already working on this conversation.",
+  "@errAiBusy": {
+    "description": "Error."
+  },
+  "errAiDisabled": "The AI assistant is switched off for your store.",
+  "@errAiDisabled": {
+    "description": "Error."
+  },
+  "errAiPaused": "The AI assistant is paused for this conversation.",
+  "@errAiPaused": {
+    "description": "Error."
+  },
+  "errAiRateLimited": "You've reached the AI limit for now. Try again later.",
+  "@errAiRateLimited": {
+    "description": "Error."
+  },
+  "errMessageRequired": "Paste or type the message.",
+  "@errMessageRequired": {
+    "description": "Validation."
+  },
+  "errMessageTooLong": "A message can be at most 4,000 characters.",
+  "@errMessageTooLong": {
+    "description": "Validation."
+  },
+  "errNothingToAnswer": "Add the customer's message first.",
+  "@errNothingToAnswer": {
+    "description": "Error."
+  },
+  "errPolicyRequired": "Write the policy.",
+  "@errPolicyRequired": {
+    "description": "Validation."
+  },
+  "errPolicyTooLong": "A policy can be at most 1,000 characters.",
+  "@errPolicyTooLong": {
+    "description": "Validation."
+  },
+  "errSuggestionClosed": "This suggestion was replaced. Use the latest one.",
+  "@errSuggestionClosed": {
+    "description": "Error."
+  },
+  "errTooManyMessages": "This conversation has too many messages.",
+  "@errTooManyMessages": {
+    "description": "Error."
+  },
+  "escAbuse": "Abuse or threats",
+  "@escAbuse": {
+    "description": "Escalation reason."
+  },
+  "escAuthenticity": "Authenticity dispute",
+  "@escAuthenticity": {
+    "description": "Escalation reason."
+  },
+  "escComplaint": "Complaint",
+  "@escComplaint": {
+    "description": "Escalation reason."
+  },
+  "escDiscount": "Discount or special price request",
+  "@escDiscount": {
+    "description": "Escalation reason."
+  },
+  "escHealth": "Health or safety question",
+  "@escHealth": {
+    "description": "Escalation reason."
+  },
+  "escHuman": "Asked for a person",
+  "@escHuman": {
+    "description": "Escalation reason."
+  },
+  "escLanguage": "Language not understood",
+  "@escLanguage": {
+    "description": "Escalation reason."
+  },
+  "escManipulation": "Tried to give the assistant instructions",
+  "@escManipulation": {
+    "description": "Escalation reason."
+  },
+  "escModifyApproved": "Wants to change an approved order",
+  "@escModifyApproved": {
+    "description": "Escalation reason."
+  },
+  "escOrderStatus": "Asks about an order's status",
+  "@escOrderStatus": {
+    "description": "Escalation reason."
+  },
+  "escOutOfScope": "Outside what the assistant handles",
+  "@escOutOfScope": {
+    "description": "Escalation reason."
+  },
+  "escRefund": "Refund or payment dispute",
+  "@escRefund": {
+    "description": "Escalation reason."
+  },
+  "escRepeatedClarification": "Details still missing after repeated questions",
+  "@escRepeatedClarification": {
+    "description": "Escalation reason."
+  },
+  "factAvailability": "Availability · {item}",
+  "@factAvailability": {
+    "description": "Fact label.",
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "factDeliveryFee": "Delivery fee · {zone}",
+  "@factDeliveryFee": {
+    "description": "Fact label.",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "factDeliveryTime": "Delivery time · {zone}",
+  "@factDeliveryTime": {
+    "description": "Fact label.",
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "factPayment": "Payment methods",
+  "@factPayment": {
+    "description": "Fact label."
+  },
+  "factPolicy": "Your written policy",
+  "@factPolicy": {
+    "description": "Fact label."
+  },
+  "factPrice": "Price · {item}",
+  "@factPrice": {
+    "description": "Fact label.",
+    "placeholders": {
+      "item": {
+        "type": "String"
+      }
+    }
+  },
+  "factProduct": "Product",
+  "@factProduct": {
+    "description": "Fact label."
+  },
+  "factStoreName": "Store name",
+  "@factStoreName": {
+    "description": "Fact label."
+  },
+  "factZone": "Delivery zone",
+  "@factZone": {
+    "description": "Fact label."
+  },
+  "fieldCustomerLabel": "Customer name (optional)",
+  "@fieldCustomerLabel": {
+    "description": "Field."
+  },
+  "fieldCustomerLabelHelp": "Only for you, to recognise the conversation.",
+  "@fieldCustomerLabelHelp": {
+    "description": "Field help."
+  },
+  "fieldCustomerMessage": "Customer's message",
+  "@fieldCustomerMessage": {
+    "description": "Field."
+  },
+  "fieldReply": "Reply",
+  "@fieldReply": {
+    "description": "Field."
+  },
+  "fieldSource": "Where is this conversation from?",
+  "@fieldSource": {
+    "description": "Field."
+  },
+  "fieldYourEarlierReply": "Your reply (already sent)",
+  "@fieldYourEarlierReply": {
+    "description": "Field."
+  },
+  "fieldYourReply": "Your reply",
+  "@fieldYourReply": {
+    "description": "Field."
+  },
+  "fromCustomer": "From the customer",
+  "@fromCustomer": {
+    "description": "Message direction."
+  },
+  "fromMeAlreadySent": "From me (already sent)",
+  "@fromMeAlreadySent": {
+    "description": "Message direction."
+  },
+  "fromYou": "From you",
+  "@fromYou": {
+    "description": "Message semantics."
+  },
+  "getSuggestion": "Suggest a reply",
+  "@getSuggestion": {
+    "description": "Primary AI button."
+  },
+  "holdingUnknownFact": "The assistant referred to something not in your store's data, so only a neutral reply is offered.",
+  "@holdingUnknownFact": {
+    "description": "Holding reason."
+  },
+  "holdingUnsupportedClaim": "The assistant's text stated a price, promise or confirmation itself, so only a neutral reply is offered.",
+  "@holdingUnsupportedClaim": {
+    "description": "Holding reason."
+  },
+  "importedNote": "Pasted manually from {source}. No channel is connected: Aisellia never sends messages.",
+  "@importedNote": {
+    "description": "Conversation note (US-020).",
+    "placeholders": {
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "inboxEmptyBody": "Paste a customer's message from Instagram, WhatsApp or another app. The assistant suggests a reply; you send it yourself.",
+  "@inboxEmptyBody": {
+    "description": "Empty state."
+  },
+  "inboxEmptyFilter": "No conversations here.",
+  "@inboxEmptyFilter": {
+    "description": "Empty filter."
+  },
+  "inboxEmptyTitle": "No conversations yet",
+  "@inboxEmptyTitle": {
+    "description": "Empty state."
+  },
+  "inboxFilterOpen": "Open",
+  "@inboxFilterOpen": {
+    "description": "Inbox filter."
+  },
+  "inboxSubtitle": "Pasted conversations · no channel connected",
+  "@inboxSubtitle": {
+    "description": "Inbox subtitle."
+  },
+  "lineCandidates": "Possible matches:",
+  "@lineCandidates": {
+    "description": "Unresolved line."
+  },
+  "lineChooseProduct": "Choose product",
+  "@lineChooseProduct": {
+    "description": "Unresolved line."
+  },
+  "lineChooseVariant": "Choose size or option",
+  "@lineChooseVariant": {
+    "description": "Unresolved line."
+  },
+  "lineCustomerAsked": "Customer asked for: “{text}”",
+  "@lineCustomerAsked": {
+    "description": "Unresolved line.",
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "lineNotInCatalog": "Not in your catalog",
+  "@lineNotInCatalog": {
+    "description": "Unresolved line."
+  },
+  "lineQuantity": "Quantity {quantity}",
+  "@lineQuantity": {
+    "description": "Unresolved line.",
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "markHandled": "Mark as handled",
+  "@markHandled": {
+    "description": "Escalation banner."
+  },
+  "messageRemoved": "(text removed after the retention period)",
+  "@messageRemoved": {
+    "description": "Purged body."
+  },
+  "missingProduct": "product",
+  "@missingProduct": {
+    "description": "Missing field."
+  },
+  "missingQuantity": "quantity",
+  "@missingQuantity": {
+    "description": "Missing field."
+  },
+  "missingVariant": "size or option",
+  "@missingVariant": {
+    "description": "Missing field."
+  },
+  "msgCopiedEdited": "AI reply edited and copied · not confirmed as sent",
+  "@msgCopiedEdited": {
+    "description": "Message state."
+  },
+  "msgCopiedNotSent": "AI reply copied · not confirmed as sent",
+  "@msgCopiedNotSent": {
+    "description": "Message state (US-024)."
+  },
+  "msgFromCustomerPasted": "Customer · pasted",
+  "@msgFromCustomerPasted": {
+    "description": "Message state."
+  },
+  "msgMarkedSentByYou": "Marked as sent by you",
+  "@msgMarkedSentByYou": {
+    "description": "Message state (US-024)."
+  },
+  "msgSentEdited": "Edited AI reply · marked as sent by you",
+  "@msgSentEdited": {
+    "description": "Message state."
+  },
+  "msgYourReplyPasted": "Your reply · pasted",
+  "@msgYourReplyPasted": {
+    "description": "Message state."
+  },
+  "noPoliciesYet": "No written policies yet. Without one, the assistant says you will confirm.",
+  "@noPoliciesYet": {
+    "description": "Empty policies."
+  },
+  "openConversation": "Open conversation",
+  "@openConversation": {
+    "description": "Order detail link."
+  },
+  "pasteConversation": "Paste a conversation",
+  "@pasteConversation": {
+    "description": "Inbox primary action."
+  },
+  "pasteConversationHelp": "Copy the customer's message from your chat app and paste it here. Nothing is connected or sent.",
+  "@pasteConversationHelp": {
+    "description": "Sheet help."
+  },
+  "pauseAi": "Pause AI here",
+  "@pauseAi": {
+    "description": "Menu."
+  },
+  "policyDelivery": "Delivery",
+  "@policyDelivery": {
+    "description": "Policy topic."
+  },
+  "policyExchange": "Exchange",
+  "@policyExchange": {
+    "description": "Policy topic."
+  },
+  "policyHours": "Working hours",
+  "@policyHours": {
+    "description": "Policy topic."
+  },
+  "policyOther": "Other",
+  "@policyOther": {
+    "description": "Policy topic."
+  },
+  "policyPayment": "Payment",
+  "@policyPayment": {
+    "description": "Policy topic."
+  },
+  "policyReturns": "Returns",
+  "@policyReturns": {
+    "description": "Policy topic."
+  },
+  "policyText": "Policy",
+  "@policyText": {
+    "description": "Field."
+  },
+  "policyTextHelp": "Written as you want customers to read it. The assistant quotes it word for word.",
+  "@policyTextHelp": {
+    "description": "Field help."
+  },
+  "policyWarranty": "Warranty",
+  "@policyWarranty": {
+    "description": "Policy topic."
+  },
+  "prepareDraft": "Prepare draft order",
+  "@prepareDraft": {
+    "description": "Secondary AI button."
+  },
+  "previewYou": "You:",
+  "@previewYou": {
+    "description": "Inbox preview prefix."
+  },
+  "provInferred": "Inferred — check",
+  "@provInferred": {
+    "description": "Provenance (Phase 1 §8.6)."
+  },
+  "recordMyReply": "Record my reply",
+  "@recordMyReply": {
+    "description": "Menu."
+  },
+  "recordMyReplyHelp": "A reply you already sent yourself. It is saved as marked sent by you.",
+  "@recordMyReplyHelp": {
+    "description": "Sheet help."
+  },
+  "reopenConversation": "Reopen",
+  "@reopenConversation": {
+    "description": "Menu."
+  },
+  "resumeAi": "Resume AI here",
+  "@resumeAi": {
+    "description": "Menu."
+  },
+  "sandboxBanner": "Sandbox — test only, not a real customer",
+  "@sandboxBanner": {
+    "description": "US-021 banner."
+  },
+  "sandboxNote": "Orders made here are test orders: they never move stock or count in reports.",
+  "@sandboxNote": {
+    "description": "Sandbox note."
+  },
+  "saveConversation": "Save conversation",
+  "@saveConversation": {
+    "description": "Button."
+  },
+  "saveReply": "Save reply",
+  "@saveReply": {
+    "description": "Button."
+  },
+  "sectionAiAssistant": "AI assistant",
+  "@sectionAiAssistant": {
+    "description": "Section."
+  },
+  "sectionAiDraft": "Draft order",
+  "@sectionAiDraft": {
+    "description": "Section."
+  },
+  "selectConversationHint": "Select a conversation",
+  "@selectConversationHint": {
+    "description": "Tablet empty pane."
+  },
+  "sourceInstagram": "Instagram",
+  "@sourceInstagram": {
+    "description": "Source."
+  },
+  "sourceMessenger": "Messenger",
+  "@sourceMessenger": {
+    "description": "Source."
+  },
+  "sourceOther": "Other",
+  "@sourceOther": {
+    "description": "Source."
+  },
+  "sourcePhone": "Phone call",
+  "@sourcePhone": {
+    "description": "Source."
+  },
+  "sourceSandbox": "Sandbox",
+  "@sourceSandbox": {
+    "description": "Source."
+  },
+  "sourceTelegram": "Telegram",
+  "@sourceTelegram": {
+    "description": "Source."
+  },
+  "sourceWhatsapp": "WhatsApp",
+  "@sourceWhatsapp": {
+    "description": "Source."
+  },
+  "stillNeeded": "Still needed: {fields}",
+  "@stillNeeded": {
+    "description": "Suggestion missing fields.",
+    "placeholders": {
+      "fields": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestAgain": "Suggest again",
+  "@suggestAgain": {
+    "description": "Primary AI button after a suggestion."
+  },
+  "suggestionCopied": "Copied — not confirmed as sent",
+  "@suggestionCopied": {
+    "description": "Suggestion badge."
+  },
+  "suggestionNotSent": "Suggested reply — not sent",
+  "@suggestionNotSent": {
+    "description": "Suggestion badge (Phase 3 AI §10)."
+  },
+  "unknownCustomer": "Unknown customer",
+  "@unknownCustomer": {
+    "description": "Conversation title."
+  },
+  "writtenPolicies": "Written policies",
+  "@writtenPolicies": {
+    "description": "Section."
+  },
+  "writtenPoliciesHelp": "The assistant answers policy questions only from these.",
+  "@writtenPoliciesHelp": {
+    "description": "Section help."
   }
 }

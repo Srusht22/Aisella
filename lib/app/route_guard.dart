@@ -30,6 +30,7 @@ abstract final class Routes {
   // Workspace.
   static const today = '/today';
   static const inbox = '/inbox';
+  static String conversation(String id) => '/inbox/$id';
   static const orders = '/orders';
   static const orderNew = '/orders/new';
   static String order(String id) => '/orders/$id';
@@ -45,6 +46,7 @@ abstract final class Routes {
   static const storeZones = '/store/zones';
   static const storePayments = '/store/payments';
   static const storeInventory = '/store/inventory';
+  static const storeAi = '/store/ai';
   static const storeAccount = '/store/account';
   static const storeDeleteAccount = '/store/account/delete';
   static const storeLanguage = '/store/language';

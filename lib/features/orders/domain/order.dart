@@ -95,13 +95,66 @@ class OrderQuery {
 enum Actor {
   you,
   member,
-  system;
+  system,
+
+  /// The AI assistant (Phase 8): it can create and update drafts, never
+  /// approve or change anything after approval.
+  ai;
 
   static Actor parse(Object? v) => switch (v) {
     'you' => Actor.you,
     'member' => Actor.member,
+    'ai' => Actor.ai,
     _ => Actor.system,
   };
+}
+
+/// How an order line is tied to the catalog (Phase 1 §8.4). Only manual and
+/// unambiguous AI lines are [resolved]; the others wait for the seller.
+enum LineResolution {
+  resolved,
+
+  /// Several products could match: the seller chooses (up to 3 candidates).
+  chooseProduct,
+
+  /// The product is clear but not the variant (size, colour…).
+  variantNeeded,
+
+  /// Nothing in the catalog matches what the customer asked for.
+  notInCatalog;
+
+  static LineResolution parse(Object? v) => switch (v) {
+    'choose_product' => LineResolution.chooseProduct,
+    'variant_needed' => LineResolution.variantNeeded,
+    'not_in_catalog' => LineResolution.notInCatalog,
+    _ => LineResolution.resolved,
+  };
+}
+
+/// A catalog variant the AI proposed for an unresolved line.
+@immutable
+class LineCandidate {
+  const LineCandidate({
+    required this.variantId,
+    required this.name,
+    required this.variantLabel,
+    required this.price,
+    required this.available,
+  });
+
+  factory LineCandidate.fromJson(Map<String, dynamic> j) => LineCandidate(
+    variantId: j['variant_id'] as String,
+    name: j['name'] as String? ?? '',
+    variantLabel: j['variant_label'] as String? ?? '',
+    price: (j['price'] as num?)?.toInt() ?? 0,
+    available: j['available'] == true,
+  );
+
+  final String variantId;
+  final String name;
+  final String variantLabel;
+  final int price;
+  final bool available;
 }
 
 /// A required field that is missing (BR-36). [itemId] for line issues.
@@ -191,11 +244,22 @@ class OrderLine {
     this.imagePath,
     this.current,
     this.returned,
+    this.resolution = LineResolution.resolved,
+    this.customerText,
+    this.quantityInferred = false,
+    this.candidates = const [],
   });
 
   factory OrderLine.fromJson(Map<String, dynamic> j) {
     final ret = j['return'];
     return OrderLine(
+      resolution: LineResolution.parse(j['resolution']),
+      customerText: j['customer_text'] as String?,
+      quantityInferred: j['quantity_basis'] == 'inferred',
+      candidates: [
+        for (final c in j['candidates'] as List? ?? const [])
+          if (c is Map) LineCandidate.fromJson(c.cast<String, dynamic>()),
+      ],
       id: j['id'] as String,
       variantId: j['variant_id'] as String?,
       productId: j['product_id'] as String?,
@@ -243,6 +307,16 @@ class OrderLine {
   final LiveVariant? current;
   final ReturnDecision? returned;
 
+  /// Unresolved AI lines carry what the customer wrote and the candidates.
+  final LineResolution resolution;
+  final String? customerText;
+
+  /// The quantity was interpreted, not stated ("a couple" → 2): check it.
+  final bool quantityInferred;
+  final List<LineCandidate> candidates;
+
+  bool get isResolved => resolution == LineResolution.resolved;
+
   /// Before approval: the catalog price differs from the quote (BR-23).
   bool get priceChanged =>
       approvedUnitPrice == null &&
@@ -250,8 +324,9 @@ class OrderLine {
       quotedUnitPrice != null &&
       current!.price != quotedUnitPrice;
 
-  /// Before approval: the line cannot be approved as it is.
-  bool get unavailable => current == null || !current!.sellable;
+  /// Before approval: a resolved line whose variant cannot be sold. An
+  /// unresolved AI line blocks approval through its issue instead.
+  bool get unavailable => isResolved && (current == null || !current!.sellable);
 
   /// Before approval: units missing from stock (0 when enough or untracked).
   int get shortBy {
@@ -345,6 +420,9 @@ class Order {
     this.approvedBy,
     this.approvedAt,
     this.confirmationMarkedSentAt,
+    this.fromAi = false,
+    this.isTest = false,
+    this.conversationId,
   });
 
   factory Order.fromJson(Map<String, dynamic> j) {
@@ -388,6 +466,9 @@ class Order {
           : Actor.parse(j['approved_by']),
       approvedAt: time(j['approved_at']),
       confirmationMarkedSentAt: time(j['confirmation_marked_sent_at']),
+      fromAi: j['origin'] == 'ai',
+      isTest: j['is_test'] == true,
+      conversationId: j['conversation_id'] as String?,
       version: (j['version'] as num).toInt(),
       createdAt: time(j['created_at'])!,
       statusChangedAt: time(j['status_changed_at']) ?? time(j['created_at'])!,
@@ -410,6 +491,15 @@ class Order {
   final int number;
   final OrderStatus status;
   final Currency currency;
+
+  /// Created by the AI assistant from a conversation (Phase 8).
+  final bool fromAi;
+
+  /// A sandbox order: never moves stock, never counted (BR-50).
+  final bool isTest;
+
+  /// The conversation an AI draft came from, while it exists.
+  final String? conversationId;
   final String? customerName;
 
   /// E.164 (`+9647XXXXXXXXX`).

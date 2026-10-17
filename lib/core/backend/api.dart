@@ -57,6 +57,24 @@ enum ApiErrorCode {
   /// The account's email is not confirmed; approval needs it.
   emailNotVerified,
 
+  /// The store's AI assistant is switched off (owner setting).
+  aiDisabled,
+
+  /// The AI assistant is paused for this conversation.
+  aiPaused,
+
+  /// An AI run for this conversation is already in progress.
+  aiBusy,
+
+  /// The conversation has no customer message to answer yet.
+  nothingToAnswer,
+
+  /// The AI service could not be reached or failed; everything else works.
+  aiUnavailable,
+
+  /// The suggestion was replaced or dismissed meanwhile.
+  suggestionClosed,
+
   /// The request could not be sent (offline, DNS, connection refused).
   /// Nothing reached the server.
   network,
@@ -136,6 +154,12 @@ const _codes = <String, ApiErrorCode>{
   'PRICE_CHANGED': ApiErrorCode.priceChanged,
   'LINE_UNAVAILABLE': ApiErrorCode.lineUnavailable,
   'EMAIL_NOT_VERIFIED': ApiErrorCode.emailNotVerified,
+  'AI_DISABLED': ApiErrorCode.aiDisabled,
+  'AI_PAUSED': ApiErrorCode.aiPaused,
+  'AI_BUSY': ApiErrorCode.aiBusy,
+  'NOTHING_TO_ANSWER': ApiErrorCode.nothingToAnswer,
+  'AI_UNAVAILABLE': ApiErrorCode.aiUnavailable,
+  'SUGGESTION_CLOSED': ApiErrorCode.suggestionClosed,
   'INTERNAL': ApiErrorCode.internal,
 };
 

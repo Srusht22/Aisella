@@ -185,7 +185,7 @@ class _DetailBody extends ConsumerWidget {
                     ),
                     const SizedBox(height: Space.s2),
                     Text(
-                      l10n.manualDraftBody,
+                      order.fromAi ? l10n.aiDraftBody : l10n.manualDraftBody,
                       style: type.label.copyWith(color: p.textPencil),
                     ),
                   ],
@@ -194,6 +194,17 @@ class _DetailBody extends ConsumerWidget {
             ],
           ),
         ),
+        if (order.conversationId case final conversationId?)
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: AppButton(
+              label: l10n.openConversation,
+              icon: AppIcons.chatsCircle,
+              variant: AppButtonVariant.tertiary,
+              onPressed: () =>
+                  context.push(Routes.conversation(conversationId)),
+            ),
+          ),
         if (order.issues.isNotEmpty) ...[
           const SizedBox(height: Space.s12),
           Semantics(
@@ -410,6 +421,7 @@ String eventText(AppLocalizations l10n, OrderEvent e) {
     Actor.you => l10n.actorYou,
     Actor.member => l10n.actorMember,
     Actor.system => l10n.actorSystem,
+    Actor.ai => l10n.actorAi,
   };
   final what = e.from == null
       ? l10n.eventCreated(statusLabel(l10n, e.to))

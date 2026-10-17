@@ -10,23 +10,13 @@ import '../../../design_system/components/status.dart';
 import '../../../design_system/icons/app_icons.dart';
 import '../../../l10n/gen/app_localizations.dart';
 import '../../common/api_error_text.dart';
+import '../../common/order_labels.dart';
 import '../../store/application/workspace_controller.dart';
 import '../domain/order.dart';
 
-/// Localised order wording shared by the order screens (Phase 1 §6.4 labels).
+export '../../common/order_labels.dart';
 
-String statusLabel(AppLocalizations l10n, OrderStatus s) => switch (s) {
-  OrderStatus.draft => l10n.statusDraft,
-  OrderStatus.pendingApproval => l10n.statusNeedsApproval,
-  OrderStatus.rejected => l10n.statusRejected,
-  OrderStatus.approved => l10n.statusApproved,
-  OrderStatus.processing => l10n.statusPreparing,
-  OrderStatus.dispatched => l10n.statusOutForDelivery,
-  OrderStatus.delivered => l10n.statusDelivered,
-  OrderStatus.deliveryFailed => l10n.statusDeliveryFailed,
-  OrderStatus.returned => l10n.statusReturned,
-  OrderStatus.cancelled => l10n.statusCancelled,
-};
+// Localised order wording shared by the order screens (Phase 1 §6.4 labels).
 
 /// Icon and tone: never colour alone (Phase 2 CMP-StatusBadge). Drafts use
 /// the pencil tone so a draft can never look approved (OR-02 #19a).
@@ -68,9 +58,6 @@ String filterLabel(AppLocalizations l10n, OrderFilter f) => switch (f) {
   OrderFilter.closed => l10n.filterClosed,
 };
 
-/// "#1042", always LTR with Western digits (Phase 2 §07: order numbers).
-String orderNumber(int n) => Bidi.ltr('#$n');
-
 String reasonText(AppLocalizations l10n, String? reason) => switch (reason) {
   'customer_changed_mind' => l10n.rejectChangedMind,
   'not_serious' => l10n.rejectNotSerious,
@@ -85,19 +72,6 @@ String reasonText(AppLocalizations l10n, String? reason) => switch (reason) {
   _ => '',
 };
 
-/// The missing-field issues (BR-36) as the review screen lists them.
-String issueText(AppLocalizations l10n, OrderIssue i) => switch (i.field) {
-  'customer_name' => l10n.issueCustomerName,
-  'customer_phone' => l10n.issueCustomerPhone,
-  'zone' => l10n.issueZone,
-  'area' => l10n.issueArea,
-  'delivery_fee' => l10n.issueDeliveryFee,
-  'payment_method' => l10n.issuePaymentMethod,
-  'lines' when i.kind == 'missing' => l10n.issueNoItems,
-  'lines' when i.kind == 'quantity_inferred' => l10n.issueQuantityToConfirm,
-  _ => l10n.issueItemToResolve,
-};
-
 /// Short field names for the editor's "Still missing: …" line.
 String missingText(AppLocalizations l10n, String field) => switch (field) {
   'customer_name' => l10n.fieldName,
@@ -108,18 +82,6 @@ String missingText(AppLocalizations l10n, String field) => switch (field) {
   'payment_method' => l10n.fieldPaymentMethod,
   _ => l10n.sectionItems,
 };
-
-String money(
-  BuildContext context,
-  int amount,
-  Currency currency,
-  DigitStyle digits,
-) => Money.format(
-  amount,
-  currency,
-  locale: Localizations.localeOf(context),
-  digits: digits,
-);
 
 String count(int value, DigitStyle digits) =>
     Bidi.ltr(Digits.display('$value', digits));

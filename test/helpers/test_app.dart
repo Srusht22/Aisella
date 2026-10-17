@@ -5,6 +5,7 @@ import 'package:aisellia/core/settings/key_value_store.dart';
 import 'package:aisellia/features/auth/application/auth_controller.dart';
 import 'package:aisellia/features/catalog/data/catalog_repository.dart';
 import 'package:aisellia/features/catalog/data/media_store.dart';
+import 'package:aisellia/features/inbox/data/conversations_repository.dart';
 import 'package:aisellia/features/orders/data/orders_repository.dart';
 import 'package:aisellia/features/store/application/workspace_controller.dart';
 import 'package:aisellia/features/store/domain/store.dart';
@@ -16,10 +17,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'catalog_fakes.dart';
 import 'fakes.dart';
+import 'inbox_fakes.dart';
 import 'order_fakes.dart';
 
 export 'catalog_fakes.dart';
 export 'fakes.dart';
+export 'inbox_fakes.dart';
 export 'order_fakes.dart';
 
 /// Builds the real app with test overrides: in-memory preferences, chosen
@@ -35,6 +38,7 @@ Widget testApp({
   TodayRepository? today,
   FakeCatalogRepository? catalog,
   FakeOrdersRepository? orders,
+  FakeConversationsRepository? conversations,
   FakeMediaStore? media,
   FakePhotoPicker? picker,
   FakeAuthRepository? auth,
@@ -67,6 +71,9 @@ Widget testApp({
       catalogRepositoryProvider.overrideWithValue(catalogRepo),
       ordersRepositoryProvider.overrideWithValue(
         orders ?? FakeOrdersRepository(catalog: catalogRepo),
+      ),
+      conversationsRepositoryProvider.overrideWithValue(
+        conversations ?? FakeConversationsRepository(),
       ),
       mediaStoreProvider.overrideWithValue(media ?? FakeMediaStore()),
       photoPickerProvider.overrideWithValue(picker ?? FakePhotoPicker()),

@@ -19,6 +19,8 @@ import '../features/catalog/presentation/product_list_screen.dart';
 import '../features/common/deferred_feature_screen.dart';
 import '../features/common/not_found_screen.dart';
 import '../features/inbox/inbox_screen.dart';
+import '../features/inbox/presentation/ai_settings_screen.dart';
+import '../features/inbox/presentation/conversation_screen.dart';
 import '../features/onboarding/language_selection_screen.dart';
 import '../features/onboarding/presentation/setup_screens.dart';
 import '../features/orders/presentation/order_detail_screen.dart';
@@ -137,6 +139,14 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.inbox,
                 builder: (_, _) => const InboxScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':conversationId',
+                    builder: (_, s) => ConversationScreen(
+                      conversationId: s.pathParameters['conversationId']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -246,6 +256,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: 'inventory',
             builder: (_, _) => const InventorySettingsScreen(),
           ),
+          GoRoute(path: 'ai', builder: (_, _) => const AiSettingsScreen()),
           GoRoute(
             path: 'account',
             builder: (_, _) => const AccountScreen(),

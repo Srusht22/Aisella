@@ -61,6 +61,10 @@ class FakeOrdersRepository implements OrdersRepository {
 
   Map<String, dynamic> raw(String id) => _orders[id]!;
 
+  /// Server fields a test sets on top of an order (for example an AI draft's
+  /// origin, conversation link and unresolved lines).
+  final overlays = <String, Map<String, dynamic>>{};
+
   // -------------------------------------------------------------------------
   // Building orders as the server returns them.
   // -------------------------------------------------------------------------
@@ -171,6 +175,7 @@ class FakeOrdersRepository implements OrdersRepository {
             'return': l['return'],
           },
       ],
+      ...?overlays[id],
     });
   }
 

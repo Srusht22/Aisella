@@ -78,6 +78,7 @@ class _Entry extends ConsumerWidget {
       Actor.you => l10n.actorYou,
       Actor.member => l10n.actorMember,
       Actor.system => l10n.actorSystem,
+      Actor.ai => l10n.actorAi,
     };
     final (IconData icon, String title) = switch (e.kind) {
       HistoryKind.status => (
