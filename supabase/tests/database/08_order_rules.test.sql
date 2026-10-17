@@ -191,7 +191,8 @@ select is(api.update_draft(pg_temp.id('store'), pg_temp.id('o2'), 4, '{}', gen_r
 -- ---- Lists, counts and search (OR-01) --------------------------------------------------------------
 select is((api.order_summary(pg_temp.id('store')) -> 'data') - 'currency',
           '{"all": 3, "needs_approval": 2, "drafts": 0, "active": 0, "delivered": 0, "problems": 0, "closed": 1,
-            "test": 0, "cod_outstanding": 0}'::jsonb, 'summary counts per filter');
+            "test": 0, "cod_outstanding": 0, "to_dispatch": 0, "delivery_failed": 0, "approved_today": 0,
+            "value_approved_today": 0, "delivered_today": 0}'::jsonb, 'summary counts per filter');
 select is((select jsonb_object_agg(f, api.list_orders(pg_temp.id('store'), null, f) #> '{data,total}')
              from unnest(array['all', 'needs_approval', 'closed']) f),
           '{"all": 3, "needs_approval": 2, "closed": 1}'::jsonb, 'each count equals its list''s total');

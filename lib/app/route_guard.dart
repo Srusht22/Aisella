@@ -31,7 +31,10 @@ abstract final class Routes {
   static const today = '/today';
   static const inbox = '/inbox';
   static const orders = '/orders';
-  static const draftPreview = '/orders/preview-draft';
+  static const orderNew = '/orders/new';
+  static String order(String id) => '/orders/$id';
+  static String orderEdit(String id) => '/orders/$id/edit';
+  static String orderHistory(String id) => '/orders/$id/history';
   static const products = '/products';
   static const productNew = '/products/new';
   static String product(String id) => '/products/$id';

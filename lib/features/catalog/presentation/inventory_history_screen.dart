@@ -187,7 +187,9 @@ class _MovementRow extends ConsumerWidget {
     final delta = Bidi.ltr(
       '${m.delta > 0 ? '+' : '−'}${Digits.display('${m.delta.abs()}', digits)}',
     );
-    final reason = reasonLabel(l10n, m.reason);
+    final reason = m.orderNumber == null
+        ? reasonLabel(l10n, m.reason)
+        : '${reasonLabel(l10n, m.reason)} · ${l10n.orderTitle(Bidi.ltr('#${m.orderNumber}'))}';
     final details = [
       Dates.time(m.createdAt, digits: digits),
       actorLabel(l10n, m.actor),

@@ -3,7 +3,7 @@ import 'package:aisellia/core/config/app_config.dart';
 import 'package:aisellia/features/catalog/presentation/product_list_screen.dart';
 import 'package:aisellia/features/inbox/inbox_screen.dart';
 import 'package:aisellia/features/onboarding/language_selection_screen.dart';
-import 'package:aisellia/features/orders/presentation/orders_home_screen.dart';
+import 'package:aisellia/features/orders/presentation/orders_screen.dart';
 import 'package:aisellia/features/today/presentation/today_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,7 +42,7 @@ void main() {
 
     for (final (label, screen) in [
       ('Inbox', InboxScreen),
-      ('Orders', OrdersHomeScreen),
+      ('Orders', OrdersScreen),
       ('Products', ProductsScreen),
     ]) {
       await tester.tap(
@@ -62,7 +62,7 @@ void main() {
     tester,
   ) async {
     setScreen(tester);
-    await tester.pumpWidget(testApp());
+    await tester.pumpWidget(testApp(orders: sampleOrders()));
     await tester.pumpAndSettle();
     await tester.tap(
       find.descendant(
@@ -71,7 +71,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Preview the draft review screen'));
+    await tester.tap(find.textContaining('Nzar Ahmad'));
     await tester.pumpAndSettle();
     expect(find.text('Draft — not confirmed'), findsOneWidget);
 
@@ -100,7 +100,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(OrdersHomeScreen), findsOneWidget);
+    expect(find.byType(OrdersScreen), findsOneWidget);
     expect(find.text('Draft — not confirmed'), findsNothing);
   });
 
@@ -200,7 +200,7 @@ void main() {
       Routes.today,
       Routes.inbox,
       Routes.orders,
-      Routes.draftPreview,
+      '/orders/order-1006',
       Routes.products,
       Routes.store,
       Routes.storeLanguage,

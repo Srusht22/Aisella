@@ -14,12 +14,16 @@ class AppSearchField extends StatefulWidget {
     required this.onChanged,
     this.controller,
     this.clearTooltip = 'Clear',
+    this.autofocus = false,
   });
 
   final String hint;
   final ValueChanged<String> onChanged;
   final TextEditingController? controller;
   final String clearTooltip;
+
+  /// Focus on open (pickers whose first step is a search, OR-07).
+  final bool autofocus;
 
   @override
   State<AppSearchField> createState() => _AppSearchFieldState();
@@ -45,6 +49,7 @@ class _AppSearchFieldState extends State<AppSearchField> {
     return ValueListenableBuilder<TextEditingValue>(
       valueListenable: _controller,
       builder: (context, value, _) => TextField(
+        autofocus: widget.autofocus,
         controller: _controller,
         onChanged: widget.onChanged,
         textDirection: Bidi.detect(value.text),

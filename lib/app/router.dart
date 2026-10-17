@@ -21,8 +21,10 @@ import '../features/common/not_found_screen.dart';
 import '../features/inbox/inbox_screen.dart';
 import '../features/onboarding/language_selection_screen.dart';
 import '../features/onboarding/presentation/setup_screens.dart';
-import '../features/orders/presentation/draft_review_preview_screen.dart';
-import '../features/orders/presentation/orders_home_screen.dart';
+import '../features/orders/presentation/order_detail_screen.dart';
+import '../features/orders/presentation/order_editor_screen.dart';
+import '../features/orders/presentation/order_history_screen.dart';
+import '../features/orders/presentation/orders_screen.dart';
 import '../features/settings/language_display_screen.dart';
 import '../features/settings/store_menu_screen.dart';
 import '../features/settings/store_settings_screens.dart';
@@ -142,11 +144,40 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: Routes.orders,
-                builder: (_, _) => const OrdersHomeScreen(),
+                builder: (_, _) => const OrdersScreen(),
                 routes: [
+                  // OR-06 editor: a full-screen modal above the tabs.
                   GoRoute(
-                    path: 'preview-draft',
-                    builder: (_, _) => const DraftReviewPreviewScreen(),
+                    path: 'new',
+                    parentNavigatorKey: _rootKey,
+                    pageBuilder: (_, _) => const MaterialPage(
+                      fullscreenDialog: true,
+                      child: OrderEditorScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':orderId',
+                    builder: (_, s) => OrderDetailScreen(
+                      orderId: s.pathParameters['orderId']!,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'edit',
+                        parentNavigatorKey: _rootKey,
+                        pageBuilder: (_, s) => MaterialPage(
+                          fullscreenDialog: true,
+                          child: OrderEditorScreen(
+                            orderId: s.pathParameters['orderId'],
+                          ),
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'history',
+                        builder: (_, s) => OrderHistoryScreen(
+                          orderId: s.pathParameters['orderId']!,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

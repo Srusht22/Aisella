@@ -5,6 +5,7 @@ import 'package:aisellia/core/settings/key_value_store.dart';
 import 'package:aisellia/features/auth/application/auth_controller.dart';
 import 'package:aisellia/features/catalog/data/catalog_repository.dart';
 import 'package:aisellia/features/catalog/data/media_store.dart';
+import 'package:aisellia/features/orders/data/orders_repository.dart';
 import 'package:aisellia/features/store/application/workspace_controller.dart';
 import 'package:aisellia/features/store/domain/store.dart';
 import 'package:aisellia/features/today/data/today_repository.dart';
@@ -15,9 +16,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'catalog_fakes.dart';
 import 'fakes.dart';
+import 'order_fakes.dart';
 
 export 'catalog_fakes.dart';
 export 'fakes.dart';
+export 'order_fakes.dart';
 
 /// Builds the real app with test overrides: in-memory preferences, chosen
 /// language, fake auth and store backends, zero-latency repositories.
@@ -31,6 +34,7 @@ Widget testApp({
   Map<String, String> extraPrefs = const {},
   TodayRepository? today,
   FakeCatalogRepository? catalog,
+  FakeOrdersRepository? orders,
   FakeMediaStore? media,
   FakePhotoPicker? picker,
   FakeAuthRepository? auth,
@@ -43,6 +47,7 @@ Widget testApp({
   final storeRepo =
       storeBackend ??
       FakeStoreRepository(store: store ?? testStore(), zones: [_zone]);
+  final catalogRepo = orders?.catalog ?? catalog ?? FakeCatalogRepository();
   final prefs = InMemoryStore({'settings.locale': ?locale, ...extraPrefs});
   return ProviderScope(
     overrides: [
@@ -57,10 +62,11 @@ Widget testApp({
         today ??
             (sampleData
                 ? const SampleTodayRepository(latency: Duration.zero)
-                : const NotConnectedTodayRepository()),
+                : null),
       ),
-      catalogRepositoryProvider.overrideWithValue(
-        catalog ?? FakeCatalogRepository(),
+      catalogRepositoryProvider.overrideWithValue(catalogRepo),
+      ordersRepositoryProvider.overrideWithValue(
+        orders ?? FakeOrdersRepository(catalog: catalogRepo),
       ),
       mediaStoreProvider.overrideWithValue(media ?? FakeMediaStore()),
       photoPickerProvider.overrideWithValue(picker ?? FakePhotoPicker()),

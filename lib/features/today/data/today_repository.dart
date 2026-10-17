@@ -3,10 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config/app_config.dart';
 import '../../../core/formatting/money.dart';
+import '../../orders/application/order_providers.dart';
+import '../../orders/domain/order.dart';
+import '../../store/application/workspace_controller.dart'
+    show noAutomaticRetry;
 
-/// Counts for the Today screen (Phase 1 Journey G). Phase 7 replaces the
-/// sample source with the `v_today_attention` read (Phase 3 contracts §3.8).
-/// Low stock is not here: it is real since Phase 6 (catalog summary).
+/// Counts for the Today screen (Phase 1 Journey G). Since Phase 7 they come
+/// from the order summary (`api.order_summary`); conversations ("needs you")
+/// arrive with Phase 8. Low stock comes from the catalog summary.
 @immutable
 class TodaySnapshot {
   const TodaySnapshot({
@@ -66,14 +70,6 @@ abstract interface class TodayRepository {
   Future<TodayResult> load();
 }
 
-/// Phase 4 default when sample data is off: no backend exists yet.
-class NotConnectedTodayRepository implements TodayRepository {
-  const NotConnectedTodayRepository();
-
-  @override
-  Future<TodayResult> load() async => const TodayNoStore();
-}
-
 /// SAMPLE DATA — fictional values for design review only. Never shown
 /// without the sample banner, never used in production builds.
 class SampleTodayRepository implements TodayRepository {
@@ -104,12 +100,37 @@ class SampleTodayRepository implements TodayRepository {
   }
 }
 
-final todayRepositoryProvider = Provider<TodayRepository>(
+/// Sample builds may override this with [SampleTodayRepository]; otherwise
+/// Today reads the real order counts.
+final todayRepositoryProvider = Provider<TodayRepository?>(
   (ref) => ref.watch(appConfigProvider).sampleData
       ? const SampleTodayRepository()
-      : const NotConnectedTodayRepository(),
+      : null,
 );
 
-final todayProvider = FutureProvider<TodayResult>(
-  (ref) => ref.watch(todayRepositoryProvider).load(),
-);
+/// Today from the store's orders: no store means nothing to show yet.
+TodayResult todayFromCounts(OrderCounts? c) => c == null
+    ? const TodayNoStore()
+    : TodayData(
+        TodaySnapshot(
+          currency: c.currency,
+          needsApproval: c[OrderFilter.needsApproval],
+          needsYou: 0,
+          draftsMissing: c[OrderFilter.drafts],
+          toDispatch: c.toDispatch,
+          deliveryProblems: c.deliveryFailed,
+          cashToCollect: c.codOutstanding,
+          approvedToday: c.approvedToday,
+          deliveredToday: c.deliveredToday,
+          valueApprovedToday: c.valueApprovedToday,
+        ),
+        isSample: false,
+      );
+
+final todayProvider = FutureProvider<TodayResult>(retry: noAutomaticRetry, (
+  ref,
+) async {
+  final sample = ref.watch(todayRepositoryProvider);
+  if (sample != null) return sample.load();
+  return todayFromCounts(await ref.watch(orderCountsProvider.future));
+});

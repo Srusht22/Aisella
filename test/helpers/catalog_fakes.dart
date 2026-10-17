@@ -365,6 +365,73 @@ class FakeCatalogRepository implements CatalogRepository {
     return adj;
   }
 
+  /// The product holding [variantId], if any.
+  Product? productOfVariant(String variantId) => _products.values
+      .where((p) => p.variants.any((v) => v.id == variantId))
+      .firstOrNull;
+
+  /// Order stock moves (approval, edit, cancel, return), as the order
+  /// functions do on the server.
+  void moveStock(String variantId, int delta, StockReason reason) {
+    final p = productOfVariant(variantId)!;
+    _products[p.id] = _copy(
+      p,
+      variants: [
+        for (final v in p.variants)
+          if (v.id != variantId)
+            v
+          else
+            Variant(
+              id: v.id,
+              optionValues: v.optionValues,
+              label: v.label,
+              sku: v.sku,
+              priceOverride: v.priceOverride,
+              price: v.price,
+              stockOnHand: v.stockOnHand + delta,
+              available: v.available,
+              lowStockThreshold: v.lowStockThreshold,
+              archived: v.archived,
+              hasHistory: true,
+            ),
+      ],
+    );
+    final v = _products[p.id]!.variants.firstWhere((x) => x.id == variantId);
+    _record(v, delta, v.stockOnHand, reason);
+  }
+
+  /// Simulates a catalog price change made elsewhere.
+  void setPriceElsewhere(String productId, int price) {
+    final p = _products[productId]!;
+    _products[productId] = Product(
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      category: p.category,
+      basePrice: price,
+      trackStock: p.trackStock,
+      optionTypes: p.optionTypes,
+      status: p.status,
+      version: p.version + 1,
+      lowStockDefault: p.lowStockDefault,
+      variants: [
+        for (final v in p.variants)
+          Variant(
+            id: v.id,
+            optionValues: v.optionValues,
+            label: v.label,
+            sku: v.sku,
+            price: price,
+            stockOnHand: v.stockOnHand,
+            available: v.available,
+            archived: v.archived,
+            hasHistory: v.hasHistory,
+          ),
+      ],
+      images: p.images,
+    );
+  }
+
   /// Simulates a change made on another device.
   void setStockElsewhere(String productId, int stock) {
     final p = _products[productId]!;

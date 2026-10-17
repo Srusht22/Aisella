@@ -41,8 +41,7 @@ class TodayScreen extends ConsumerWidget {
     );
 
     final Widget content = switch (today) {
-      // No orders exist yet (they arrive in a later phase): say so honestly
-      // instead of showing zero counts.
+      // No store yet: nothing to count (never zeros that look like data).
       AsyncData(value: TodayNoStore()) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

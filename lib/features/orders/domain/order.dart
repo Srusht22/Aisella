@@ -568,19 +568,39 @@ class OrderCounts {
     required this.byFilter,
     required this.codOutstanding,
     required this.currency,
+    this.toDispatch = 0,
+    this.deliveryFailed = 0,
+    this.approvedToday = 0,
+    this.valueApprovedToday = 0,
+    this.deliveredToday = 0,
   });
 
-  factory OrderCounts.fromJson(Map<String, dynamic> j) => OrderCounts(
-    byFilter: {
-      for (final f in OrderFilter.values) f: (j[f.wire] as num?)?.toInt() ?? 0,
-    },
-    codOutstanding: (j['cod_outstanding'] as num?)?.toInt() ?? 0,
-    currency: j['currency'] == 'USD' ? Currency.usd : Currency.iqd,
-  );
+  factory OrderCounts.fromJson(Map<String, dynamic> j) {
+    int n(String k) => (j[k] as num?)?.toInt() ?? 0;
+    return OrderCounts(
+      byFilter: {for (final f in OrderFilter.values) f: n(f.wire)},
+      codOutstanding: n('cod_outstanding'),
+      currency: j['currency'] == 'USD' ? Currency.usd : Currency.iqd,
+      toDispatch: n('to_dispatch'),
+      deliveryFailed: n('delivery_failed'),
+      approvedToday: n('approved_today'),
+      valueApprovedToday: n('value_approved_today'),
+      deliveredToday: n('delivered_today'),
+    );
+  }
 
   final Map<OrderFilter, int> byFilter;
   final int codOutstanding;
   final Currency currency;
+
+  /// Approved or preparing (Today "To prepare or dispatch").
+  final int toDispatch;
+  final int deliveryFailed;
+
+  /// Today in the store's time zone (Asia/Baghdad), committed orders only.
+  final int approvedToday;
+  final int valueApprovedToday;
+  final int deliveredToday;
 
   int operator [](OrderFilter f) => byFilter[f] ?? 0;
 }

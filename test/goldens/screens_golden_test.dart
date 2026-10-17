@@ -33,6 +33,8 @@ Future<void> _shot(
   bool signedIn = true,
   FakeStoreRepository? storeBackend,
   FakeCatalogRepository? catalog,
+  FakeOrdersRepository? orders,
+  bool sampleData = true,
 }) async {
   await loadAppFonts();
   // flutter_test paints elevation as a solid black outline by default;
@@ -52,6 +54,8 @@ Future<void> _shot(
       signedIn,
       storeBackend,
       catalog,
+      orders,
+      sampleData,
     );
   } finally {
     debugDisableShadows = true;
@@ -70,6 +74,8 @@ Future<void> _render(
   bool signedIn,
   FakeStoreRepository? storeBackend,
   FakeCatalogRepository? catalog,
+  FakeOrdersRepository? orders,
+  bool sampleData,
 ) async {
   // 2x keeps the committed PNGs small while staying legible for review.
   setScreen(tester, size: size, textScale: textScale, devicePixelRatio: 2);
@@ -80,6 +86,8 @@ Future<void> _render(
       signedIn: signedIn,
       storeBackend: storeBackend,
       catalog: catalog,
+      orders: orders,
+      sampleData: sampleData,
     ),
   );
   await tester.pumpAndSettle();
@@ -122,13 +130,14 @@ void main() {
           dark: dark,
         );
       });
-      testWidgets('draft preview $locale $theme', (t) {
+      testWidgets('order review $locale $theme', (t) {
         return _shot(
           t,
-          name: 'draft_${locale}_$theme',
+          name: 'p7_review_${locale}_$theme',
           locale: locale,
           dark: dark,
-          route: Routes.draftPreview,
+          route: Routes.order('order-1006'),
+          orders: sampleOrders(),
         );
       });
     }
@@ -159,24 +168,138 @@ void main() {
     });
   }
 
-  testWidgets('draft preview, full length, ckb', (t) {
+  testWidgets('order review, full length, ckb', (t) {
     return _shot(
       t,
-      name: 'draft_ckb_full',
+      name: 'p7_review_ckb_full',
       locale: 'ckb',
-      route: Routes.draftPreview,
-      size: const Size(390, 1500),
+      route: Routes.order('order-1006'),
+      size: const Size(390, 1900),
+      orders: sampleOrders(),
     );
   });
 
-  testWidgets('draft preview at 200% text, ckb', (t) {
+  testWidgets('order review at 200% text, ckb', (t) {
     return _shot(
       t,
-      name: 'draft_ckb_text200',
+      name: 'p7_review_ckb_text200',
       locale: 'ckb',
-      route: Routes.draftPreview,
+      route: Routes.order('order-1006'),
       size: const Size(360, 780),
       textScale: 2.0,
+      orders: sampleOrders(),
+    );
+  });
+
+  testWidgets('order list, en', (t) {
+    return _shot(
+      t,
+      name: 'p7_list_en',
+      locale: 'en',
+      route: Routes.orders,
+      orders: sampleOrders(),
+    );
+  });
+
+  testWidgets('order list dark, ckb', (t) {
+    return _shot(
+      t,
+      name: 'p7_list_ckb_dark',
+      locale: 'ckb',
+      dark: true,
+      route: Routes.orders,
+      orders: sampleOrders(),
+    );
+  });
+
+  testWidgets('draft with missing details, en', (t) {
+    return _shot(
+      t,
+      name: 'p7_draft_missing_en',
+      locale: 'en',
+      route: Routes.order('order-1005'),
+      orders: sampleOrders(),
+    );
+  });
+
+  testWidgets('approved order detail, ckb', (t) {
+    return _shot(
+      t,
+      name: 'p7_detail_approved_ckb',
+      locale: 'ckb',
+      route: Routes.order('order-1004'),
+      orders: sampleOrders(),
+    );
+  });
+
+  testWidgets('delivered with cash due, en', (t) {
+    return _shot(
+      t,
+      name: 'p7_detail_delivered_en',
+      locale: 'en',
+      route: Routes.order('order-1002'),
+      size: const Size(390, 1400),
+      orders: sampleOrders(),
+    );
+  });
+
+  testWidgets('approve sheet, en', (t) {
+    return _shot(
+      t,
+      name: 'p7_approve_sheet_en',
+      locale: 'en',
+      route: Routes.order('order-1006'),
+      orders: sampleOrders(),
+      before: (t) async {
+        await t.tap(find.text('Approve order'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('order editor, new, en', (t) {
+    return _shot(
+      t,
+      name: 'p7_editor_new_en',
+      locale: 'en',
+      route: Routes.orderNew,
+      size: const Size(390, 1700),
+      orders: sampleOrders(),
+    );
+  });
+
+  testWidgets('order history, ckb', (t) {
+    return _shot(
+      t,
+      name: 'p7_history_ckb',
+      locale: 'ckb',
+      route: Routes.orderHistory('order-1002'),
+      orders: sampleOrders(),
+    );
+  });
+
+  testWidgets('tablet orders list and detail, en', (t) {
+    return _shot(
+      t,
+      name: 'p7_tablet_orders_en',
+      locale: 'en',
+      route: Routes.orders,
+      size: _tablet,
+      orders: sampleOrders(),
+      before: (t) async {
+        await t.tap(find.textContaining('Nzar Ahmad'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+
+  testWidgets('today from real orders, en', (t) {
+    return _shot(
+      t,
+      name: 'p7_today_real_en',
+      locale: 'en',
+      sampleData: false,
+      orders: sampleOrders(),
     );
   });
 

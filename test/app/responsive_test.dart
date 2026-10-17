@@ -43,7 +43,10 @@ void main() {
       await tester.pumpWidget(testApp(locale: locale));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      // Draft review: totals and actions remain present.
+      // Orders: the list, a draft review with totals and actions, the
+      // approval sheet and the editor all fit.
+      await tester.pumpWidget(testApp(locale: locale, orders: sampleOrders()));
+      await tester.pumpAndSettle();
       final ordersLabel = locale == 'en' ? 'Orders' : 'داواکاری';
       await tester.tap(
         find.descendant(
@@ -52,12 +55,14 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await tester.ensureVisible(find.textContaining('Nzar Ahmad'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Nzar Ahmad'));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
       await tester.tap(
-        find.byType(OutlinedButton).hitTestable().evaluate().isEmpty
-            ? find.textContaining(
-                locale == 'en' ? 'Preview the draft' : 'پێشبینینی',
-              )
-            : find.byType(OutlinedButton),
+        find.text(locale == 'en' ? 'Approve order' : 'پەسەندکردنی داواکاری'),
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

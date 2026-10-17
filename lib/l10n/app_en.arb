@@ -100,14 +100,6 @@
   "@deferredInboxBody": {
     "description": "Inbox placeholder body; must not imply any channel is connected."
   },
-  "deferredOrdersBody": "Creating, approving and tracking orders arrive in a later release. No orders are stored yet.",
-  "@deferredOrdersBody": {
-    "description": "Orders placeholder body."
-  },
-  "previewDraftReview": "Preview the draft review screen",
-  "@previewDraftReview": {
-    "description": "Link (sample-data builds only) to the design preview of the order draft review."
-  },
   "notFoundTitle": "This page isn't available",
   "@notFoundTitle": {
     "description": "Shown for unknown routes or deep links."
@@ -348,31 +340,12 @@
   "@draftBannerTitle": {
     "description": "Mandatory banner on every draft order."
   },
-  "draftBannerBody": "Prepared by Aisellia from an imported {source} chat. Nothing is confirmed until you approve.",
-  "@draftBannerBody": {
-    "description": "Draft banner description.",
-    "placeholders": {
-      "source": {
-        "type": "String",
-        "example": "Instagram"
-      }
-    }
-  },
   "issuesCount": "{count, plural, =1{1 thing to check} other{{count} things to check}}",
   "@issuesCount": {
     "description": "Issue summary title on a draft.",
     "placeholders": {
       "count": {
         "type": "int"
-      }
-    }
-  },
-  "issueInferredQuantity": "Quantity was inferred from “{quote}”.",
-  "@issueInferredQuantity": {
-    "description": "Issue explaining an inferred quantity.",
-    "placeholders": {
-      "quote": {
-        "type": "String"
       }
     }
   },
@@ -408,21 +381,9 @@
   "@fieldLandmark": {
     "description": "Field label: nearest landmark."
   },
-  "provFromCustomer": "From customer",
-  "@provFromCustomer": {
-    "description": "Provenance: value extracted from a customer message."
-  },
-  "provCatalogPrice": "Catalog price",
-  "@provCatalogPrice": {
-    "description": "Provenance: price from the catalog."
-  },
   "provFromSettings": "From your settings",
   "@provFromSettings": {
     "description": "Provenance: value from store settings."
-  },
-  "provInferred": "Inferred",
-  "@provInferred": {
-    "description": "Provenance: interpreted value the seller must confirm."
   },
   "provEditedByYou": "Edited by you",
   "@provEditedByYou": {
@@ -431,28 +392,6 @@
   "notProvidedOptional": "— Not provided (optional)",
   "@notProvidedOptional": {
     "description": "Optional field with no value; neutral, not an error."
-  },
-  "confirm": "Confirm",
-  "@confirm": {
-    "description": "Confirms an inferred value."
-  },
-  "quantityShort": "Qty {quantity}",
-  "@quantityShort": {
-    "description": "Quantity label on an order line.",
-    "placeholders": {
-      "quantity": {
-        "type": "String"
-      }
-    }
-  },
-  "sizeValue": "Size {size}",
-  "@sizeValue": {
-    "description": "Variant label for a size.",
-    "placeholders": {
-      "size": {
-        "type": "String"
-      }
-    }
   },
   "subtotal": "Subtotal",
   "@subtotal": {
@@ -474,10 +413,6 @@
   "@approveOrder": {
     "description": "Primary action on a draft order."
   },
-  "reasonConfirmQuantity": "Confirm the quantity to enable approval",
-  "@reasonConfirmQuantity": {
-    "description": "Reason line above a disabled Approve button."
-  },
   "approveSheetTitle": "Approve order {number}?",
   "@approveSheetTitle": {
     "description": "Approval confirmation sheet title.",
@@ -498,18 +433,6 @@
   "confirmApproval": "Confirm approval",
   "@confirmApproval": {
     "description": "Final approval button."
-  },
-  "previewNotConnectedTitle": "Not connected yet",
-  "@previewNotConnectedTitle": {
-    "description": "Title when an action is pressed in the design preview."
-  },
-  "previewApproveNotConnected": "This is a design preview with sample data. Nothing was approved and no stock changed.",
-  "@previewApproveNotConnected": {
-    "description": "Honest result of pressing Confirm approval in the preview."
-  },
-  "previewRejectNotConnected": "This is a design preview with sample data. Nothing was rejected.",
-  "@previewRejectNotConnected": {
-    "description": "Honest result of pressing Reject in the preview."
   },
   "storeMenuTitle": "Store",
   "@storeMenuTitle": {
@@ -1197,7 +1120,7 @@
   "@checklistLater": {
     "description": "Checklist item not available yet."
   },
-  "todayNothingYet": "Orders and conversations arrive in a later release. Your store is set up and ready for them.",
+  "todayNothingYet": "Finish setting up your store to see orders here.",
   "@todayNothingYet": {
     "description": "Today without sample data, after setup."
   },
@@ -2128,5 +2051,924 @@
   "sectionInventory": "Inventory",
   "@sectionInventory": {
     "description": "Store settings section."
+  },
+  "addItem": "Add item",
+  "@addItem": {
+    "description": "Opens the product picker (OR-07)."
+  },
+  "addToOrder": "Add to order",
+  "@addToOrder": {
+    "description": "Picker primary button."
+  },
+  "alreadyApproved": "This order was already approved. Nothing changed.",
+  "@alreadyApproved": {
+    "description": "Approval answered as already approved."
+  },
+  "approving": "Approving…",
+  "@approving": {
+    "description": "Approve button while in flight."
+  },
+  "cancelCustomerCancelled": "Customer cancelled",
+  "@cancelCustomerCancelled": {
+    "description": "Cancel reason."
+  },
+  "cancelNoStockBody": "The order is closed. No stock is held for it, so nothing goes back to stock.",
+  "@cancelNoStockBody": {
+    "description": "Cancel sheet statement."
+  },
+  "cancelOrder": "Cancel order",
+  "@cancelOrder": {
+    "description": "Cancel action."
+  },
+  "cancelRestockBody": "The order is closed and these go back to stock: {items}.",
+  "@cancelRestockBody": {
+    "description": "Cancel sheet statement with the restock effect.",
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelTitle": "Cancel order {number}?",
+  "@cancelTitle": {
+    "description": "Cancel sheet title.",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "cashCollected": "Collected",
+  "@cashCollected": {
+    "description": "Payment section row."
+  },
+  "cashCollectedQuestion": "Cash collected? {amount} is due.",
+  "@cashCollectedQuestion": {
+    "description": "Delivered sheet question.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cashDue": "Cash on delivery due",
+  "@cashDue": {
+    "description": "Payment section row."
+  },
+  "cashNotYet": "Not yet",
+  "@cashNotYet": {
+    "description": "Cash collected option."
+  },
+  "cashOutstanding": "Cash outstanding",
+  "@cashOutstanding": {
+    "description": "Payment section row and list hint."
+  },
+  "cashOutstandingIs": "Outstanding: {amount}",
+  "@cashOutstandingIs": {
+    "description": "Record cash helper.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cashPartly": "Partly",
+  "@cashPartly": {
+    "description": "Cash collected option."
+  },
+  "cashRecorded": "Cash recorded",
+  "@cashRecorded": {
+    "description": "Snackbar."
+  },
+  "cashYesAll": "Yes, all",
+  "@cashYesAll": {
+    "description": "Cash collected option."
+  },
+  "changeFeeForOrder": "Change the fee for this order",
+  "@changeFeeForOrder": {
+    "description": "Editor switch."
+  },
+  "chooseOption": "Choose an option",
+  "@chooseOption": {
+    "description": "Picker variant step."
+  },
+  "confirmationCod": "Please have {amount} ready for the courier.",
+  "@confirmationCod": {
+    "description": "Confirmation message (customer language).",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmationGreeting": "Hello {name},",
+  "@confirmationGreeting": {
+    "description": "Confirmation message (customer language).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmationLine": "your order {number} is confirmed:",
+  "@confirmationLine": {
+    "description": "Confirmation message (customer language).",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "confirmationMessage": "Message",
+  "@confirmationMessage": {
+    "description": "Confirmation text field label."
+  },
+  "confirmationNotSentNote": "Aisellia does not send this. Copy it and send it to the customer yourself.",
+  "@confirmationNotSentNote": {
+    "description": "OR-10 statement."
+  },
+  "confirmationThanks": "Thank you!",
+  "@confirmationThanks": {
+    "description": "Confirmation message (customer language)."
+  },
+  "confirmationTitle": "Confirmation message",
+  "@confirmationTitle": {
+    "description": "OR-10 title."
+  },
+  "copiedNotSent": "Copied — not confirmed as sent",
+  "@copiedNotSent": {
+    "description": "After copying (never \"Sent\", BR-46)."
+  },
+  "copyConfirmation": "Copy confirmation message",
+  "@copyConfirmation": {
+    "description": "Overflow item."
+  },
+  "copyMessage": "Copy message",
+  "@copyMessage": {
+    "description": "OR-10 primary."
+  },
+  "dayToday": "Today",
+  "@dayToday": {
+    "description": "List group header."
+  },
+  "dayYesterday": "Yesterday",
+  "@dayYesterday": {
+    "description": "List group header."
+  },
+  "decrease": "Decrease",
+  "@decrease": {
+    "description": "Quantity stepper."
+  },
+  "deliveryFailedAction": "Delivery failed",
+  "@deliveryFailedAction": {
+    "description": "Action label."
+  },
+  "discount": "Discount",
+  "@discount": {
+    "description": "Totals row."
+  },
+  "dispatchCheck": "Check the delivery details",
+  "@dispatchCheck": {
+    "description": "Dispatch sheet."
+  },
+  "draftRejected": "Draft rejected",
+  "@draftRejected": {
+    "description": "Snackbar."
+  },
+  "editApprovedNote": "This order is approved. Item changes move stock by the difference when you save.",
+  "@editApprovedNote": {
+    "description": "Editor banner in edit mode."
+  },
+  "editNotPossibleBody": "This order is {status}. Items can only be changed before it goes out for delivery.",
+  "@editNotPossibleBody": {
+    "description": "BR-33.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "editNotPossibleTitle": "This order can't be edited",
+  "@editNotPossibleTitle": {
+    "description": "BR-33."
+  },
+  "editOrder": "Edit order",
+  "@editOrder": {
+    "description": "Overflow item."
+  },
+  "editOrderTitle": "Edit order {number}",
+  "@editOrderTitle": {
+    "description": "Editor title.",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "errAmountInvalid": "Enter an amount greater than 0",
+  "@errAmountInvalid": {
+    "description": "Cash amount."
+  },
+  "errCashTooHigh": "More than the cash still due",
+  "@errCashTooHigh": {
+    "description": "Cash amount."
+  },
+  "errDiscountTooHigh": "The discount can’t be more than the items’ subtotal",
+  "@errDiscountTooHigh": {
+    "description": "BR-25."
+  },
+  "errEditShort": "Not enough stock: {items}",
+  "@errEditShort": {
+    "description": "Approved edit refused.",
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "errEmailNotVerifiedApprove": "Verify your email address before approving orders.",
+  "@errEmailNotVerifiedApprove": {
+    "description": "EMAIL_NOT_VERIFIED."
+  },
+  "errLinesShort": "{count, plural, =1{1 item doesn’t have enough stock. Nothing was approved.} other{{count} items don’t have enough stock. Nothing was approved.}}",
+  "@errLinesShort": {
+    "description": "INSUFFICIENT_STOCK.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "errLinesUnavailable": "{count, plural, =1{1 item is no longer sold. Nothing was changed.} other{{count} items are no longer sold. Nothing was changed.}}",
+  "@errLinesUnavailable": {
+    "description": "LINE_UNAVAILABLE.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "errOrderChangedStatus": "This order is now {status}. The screen shows it as it is.",
+  "@errOrderChangedStatus": {
+    "description": "INVALID_TRANSITION.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "errOrderIncomplete": "Some required details are missing.",
+  "@errOrderIncomplete": {
+    "description": "INCOMPLETE_ORDER."
+  },
+  "errOwnerOnly": "Only the store owner can do this.",
+  "@errOwnerOnly": {
+    "description": "FORBIDDEN."
+  },
+  "errPricesChanged": "Prices changed. Choose which price to use, then approve again.",
+  "@errPricesChanged": {
+    "description": "PRICE_CHANGED."
+  },
+  "errTooLong": "Too long",
+  "@errTooLong": {
+    "description": "Field error."
+  },
+  "errValueInvalid": "Check this value",
+  "@errValueInvalid": {
+    "description": "Field error."
+  },
+  "errZoneUnavailable": "This zone is no longer available. Choose another.",
+  "@errZoneUnavailable": {
+    "description": "Field error."
+  },
+  "eventCash": "Cash recorded",
+  "@eventCash": {
+    "description": "History."
+  },
+  "eventCreated": "Created as {status}",
+  "@eventCreated": {
+    "description": "History.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "eventEdited": "Edited",
+  "@eventEdited": {
+    "description": "History."
+  },
+  "eventFromTo": "{from} → {to}",
+  "@eventFromTo": {
+    "description": "History.",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "eventNote": "Internal note changed",
+  "@eventNote": {
+    "description": "History."
+  },
+  "eventStatus": "{status}",
+  "@eventStatus": {
+    "description": "History preview.",
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "failRefused": "Refused",
+  "@failRefused": {
+    "description": "Failure reason."
+  },
+  "failUnreachable": "Customer unreachable",
+  "@failUnreachable": {
+    "description": "Failure reason."
+  },
+  "failWrongAddress": "Wrong address",
+  "@failWrongAddress": {
+    "description": "Failure reason."
+  },
+  "feeSetByYou": "Set by you",
+  "@feeSetByYou": {
+    "description": "Provenance."
+  },
+  "fieldAddressDetails": "Address details",
+  "@fieldAddressDetails": {
+    "description": "Field."
+  },
+  "fieldAddressDetailsOptional": "Address details (optional)",
+  "@fieldAddressDetailsOptional": {
+    "description": "Field."
+  },
+  "fieldAmountCollected": "Amount collected",
+  "@fieldAmountCollected": {
+    "description": "Field."
+  },
+  "fieldArea": "Area or district",
+  "@fieldArea": {
+    "description": "Field."
+  },
+  "fieldCityPlace": "City or place",
+  "@fieldCityPlace": {
+    "description": "Field."
+  },
+  "fieldCourier": "Courier",
+  "@fieldCourier": {
+    "description": "Field."
+  },
+  "fieldCourierOptional": "Courier or driver (optional)",
+  "@fieldCourierOptional": {
+    "description": "Field."
+  },
+  "fieldCustomerNote": "Customer note",
+  "@fieldCustomerNote": {
+    "description": "Field."
+  },
+  "fieldCustomerNoteOptional": "Customer note (optional)",
+  "@fieldCustomerNoteOptional": {
+    "description": "Field."
+  },
+  "fieldDiscountOptional": "Discount (optional)",
+  "@fieldDiscountOptional": {
+    "description": "Field."
+  },
+  "fieldInternalNoteOptional": "Internal note (optional)",
+  "@fieldInternalNoteOptional": {
+    "description": "Field."
+  },
+  "fieldLandmarkOptional": "Nearest landmark (optional)",
+  "@fieldLandmarkOptional": {
+    "description": "Field."
+  },
+  "fieldNoteOptional": "Note (optional)",
+  "@fieldNoteOptional": {
+    "description": "Field."
+  },
+  "fieldNoteRequired": "Note (required for Other)",
+  "@fieldNoteRequired": {
+    "description": "Field."
+  },
+  "fieldPaymentMethod": "Payment method",
+  "@fieldPaymentMethod": {
+    "description": "Field."
+  },
+  "fieldPaymentNote": "How they pay (recorded only)",
+  "@fieldPaymentNote": {
+    "description": "Field."
+  },
+  "fieldPhone2": "Second phone",
+  "@fieldPhone2": {
+    "description": "Field."
+  },
+  "fieldPhone2Optional": "Second phone (optional)",
+  "@fieldPhone2Optional": {
+    "description": "Field."
+  },
+  "fieldQuantityOrder": "Quantity",
+  "@fieldQuantityOrder": {
+    "description": "Stepper semantics."
+  },
+  "fieldZone": "Delivery zone",
+  "@fieldZone": {
+    "description": "Field."
+  },
+  "filterActive": "Active",
+  "@filterActive": {
+    "description": "Order filter: approved, preparing, out for delivery."
+  },
+  "filterClosed": "Closed",
+  "@filterClosed": {
+    "description": "Order filter: rejected, cancelled, returned."
+  },
+  "filterDrafts": "Drafts",
+  "@filterDrafts": {
+    "description": "Order filter."
+  },
+  "filterProblems": "Problems",
+  "@filterProblems": {
+    "description": "Order filter."
+  },
+  "fullHistory": "Full history",
+  "@fullHistory": {
+    "description": "Link."
+  },
+  "historyTitle": "History of {number}",
+  "@historyTitle": {
+    "description": "OR-11 title.",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "iSentThis": "I sent this",
+  "@iSentThis": {
+    "description": "OR-10."
+  },
+  "increase": "Increase",
+  "@increase": {
+    "description": "Quantity stepper."
+  },
+  "internalNote": "Internal note",
+  "@internalNote": {
+    "description": "Field and action."
+  },
+  "internalNoteHelper": "Only you see this. It is never sent to the customer.",
+  "@internalNoteHelper": {
+    "description": "Helper."
+  },
+  "issueArea": "Area or district is missing",
+  "@issueArea": {
+    "description": "BR-36 issue."
+  },
+  "issueCustomerName": "Customer name is missing",
+  "@issueCustomerName": {
+    "description": "BR-36 issue."
+  },
+  "issueCustomerPhone": "Phone number is missing",
+  "@issueCustomerPhone": {
+    "description": "BR-36 issue."
+  },
+  "issueDeliveryFee": "Delivery fee is missing",
+  "@issueDeliveryFee": {
+    "description": "BR-36 issue."
+  },
+  "issueItemToResolve": "An item needs a product",
+  "@issueItemToResolve": {
+    "description": "BR-36 issue."
+  },
+  "issueNoItems": "No items yet",
+  "@issueNoItems": {
+    "description": "BR-36 issue."
+  },
+  "issuePaymentMethod": "Payment method is missing",
+  "@issuePaymentMethod": {
+    "description": "BR-36 issue."
+  },
+  "issueQuantityToConfirm": "A quantity needs your confirmation",
+  "@issueQuantityToConfirm": {
+    "description": "BR-36 issue."
+  },
+  "issueZone": "Delivery zone or place is missing",
+  "@issueZone": {
+    "description": "BR-36 issue."
+  },
+  "keepOrder": "Keep order",
+  "@keepOrder": {
+    "description": "Cancel sheet default."
+  },
+  "largeQuantityWarning": "That’s a large quantity. Check it before saving.",
+  "@largeQuantityWarning": {
+    "description": "Soft warning above 20 (BR-37)."
+  },
+  "lineNotSold": "No longer sold",
+  "@lineNotSold": {
+    "description": "Line state."
+  },
+  "linePriceChanged": "Price now {price}",
+  "@linePriceChanged": {
+    "description": "Line state.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "lineReturned": "Returned: {restock} to stock, {writeOff} written off",
+  "@lineReturned": {
+    "description": "Line state after return.",
+    "placeholders": {
+      "restock": {
+        "type": "String"
+      },
+      "writeOff": {
+        "type": "String"
+      }
+    }
+  },
+  "lineShort": "Only {count} in stock",
+  "@lineShort": {
+    "description": "Line state.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "linesBlockApproval": "{count, plural, =1{1 item can’t be approved as it is} other{{count} items can’t be approved as they are}}",
+  "@linesBlockApproval": {
+    "description": "Review banner.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "linesBlockApprovalBody": "Change the quantity, remove the item, or adjust stock first.",
+  "@linesBlockApprovalBody": {
+    "description": "Review banner."
+  },
+  "manualDraftBody": "Nothing is confirmed and no stock changes until you approve it.",
+  "@manualDraftBody": {
+    "description": "Draft banner."
+  },
+  "markDelivered": "Mark delivered",
+  "@markDelivered": {
+    "description": "Action."
+  },
+  "markDeliveryFailed": "Mark delivery failed",
+  "@markDeliveryFailed": {
+    "description": "Action."
+  },
+  "markOutForDelivery": "Mark out for delivery",
+  "@markOutForDelivery": {
+    "description": "Action."
+  },
+  "markPreparing": "Mark as preparing",
+  "@markPreparing": {
+    "description": "Action."
+  },
+  "markReturned": "Mark returned",
+  "@markReturned": {
+    "description": "Action."
+  },
+  "markedDelivered": "Marked as delivered",
+  "@markedDelivered": {
+    "description": "Snackbar."
+  },
+  "markedDeliveryFailed": "Marked as delivery failed",
+  "@markedDeliveryFailed": {
+    "description": "Snackbar."
+  },
+  "markedOutForDelivery": "Marked as out for delivery",
+  "@markedOutForDelivery": {
+    "description": "Snackbar."
+  },
+  "markedPreparing": "Marked as preparing",
+  "@markedPreparing": {
+    "description": "Snackbar."
+  },
+  "markedReturned": "Marked as returned",
+  "@markedReturned": {
+    "description": "Snackbar."
+  },
+  "markedSentByYou": "Confirmation marked as sent by you",
+  "@markedSentByYou": {
+    "description": "OR-10."
+  },
+  "missingValue": "Missing",
+  "@missingValue": {
+    "description": "Empty required value on a draft."
+  },
+  "newOrder": "New order",
+  "@newOrder": {
+    "description": "FAB and editor title."
+  },
+  "noActiveProducts": "No active products",
+  "@noActiveProducts": {
+    "description": "Picker empty."
+  },
+  "noCustomerName": "No name yet",
+  "@noCustomerName": {
+    "description": "List row."
+  },
+  "noItemsYet": "No items yet",
+  "@noItemsYet": {
+    "description": "Items empty."
+  },
+  "noOrdersFilter": "No orders match this filter",
+  "@noOrdersFilter": {
+    "description": "List empty with filter."
+  },
+  "notProvided": "— Not provided",
+  "@notProvided": {
+    "description": "Empty optional value."
+  },
+  "notSet": "Not set",
+  "@notSet": {
+    "description": "Empty fee."
+  },
+  "orderApproved": "Order approved",
+  "@orderApproved": {
+    "description": "Snackbar."
+  },
+  "orderApprovedStock": "Order approved · Stock: {changes}",
+  "@orderApprovedStock": {
+    "description": "Snackbar with the recorded stock change.",
+    "placeholders": {
+      "changes": {
+        "type": "String"
+      }
+    }
+  },
+  "orderCancelled": "Order cancelled",
+  "@orderCancelled": {
+    "description": "Snackbar."
+  },
+  "orderSavedNeedsApproval": "Order saved. It needs your approval.",
+  "@orderSavedNeedsApproval": {
+    "description": "Snackbar."
+  },
+  "orderUnavailableBody": "It may have been removed, or it belongs to another store.",
+  "@orderUnavailableBody": {
+    "description": "NOT_FOUND."
+  },
+  "orderUnavailableTitle": "This order isn’t available",
+  "@orderUnavailableTitle": {
+    "description": "NOT_FOUND."
+  },
+  "ordersCount": "{count, plural, =1{1 order} other{{count} orders}}",
+  "@ordersCount": {
+    "description": "List subtitle.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ordersEmptyBody": "Orders appear here when you create one. Nothing is confirmed until you approve it.",
+  "@ordersEmptyBody": {
+    "description": "OR-01 empty."
+  },
+  "ordersEmptyTitle": "No orders yet",
+  "@ordersEmptyTitle": {
+    "description": "OR-01 empty."
+  },
+  "otherPlace": "Other place",
+  "@otherPlace": {
+    "description": "Zone chips."
+  },
+  "priceCurrent": "Current {price}",
+  "@priceCurrent": {
+    "description": "Price choice.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "priceQuoted": "Quoted {price}",
+  "@priceQuoted": {
+    "description": "Price choice.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "pricesChangedBody": "Choose the price for each item. The approved price never changes afterwards.",
+  "@pricesChangedBody": {
+    "description": "BR-23."
+  },
+  "pricesChangedTitle": "Prices changed since this order was made",
+  "@pricesChangedTitle": {
+    "description": "BR-23."
+  },
+  "qtyTimesPrice": "{quantity} × {price}",
+  "@qtyTimesPrice": {
+    "description": "Line quantity and unit price.",
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonCannotDeliver": "Can’t deliver there",
+  "@reasonCannotDeliver": {
+    "description": "Reason."
+  },
+  "reasonCompleteFirst": "Complete the missing details to approve",
+  "@reasonCompleteFirst": {
+    "description": "Approve disabled reason."
+  },
+  "reasonDuplicate": "Duplicate",
+  "@reasonDuplicate": {
+    "description": "Reason."
+  },
+  "reasonFixItems": "Fix the items that can’t be sold to approve",
+  "@reasonFixItems": {
+    "description": "Approve disabled reason."
+  },
+  "reasonOutOfStock": "Out of stock",
+  "@reasonOutOfStock": {
+    "description": "Reason."
+  },
+  "recordCash": "Record cash",
+  "@recordCash": {
+    "description": "Action."
+  },
+  "rejectBody": "The draft is closed and kept in history. No stock changes.",
+  "@rejectBody": {
+    "description": "OR-04."
+  },
+  "rejectChangedMind": "Customer changed their mind",
+  "@rejectChangedMind": {
+    "description": "Reject reason."
+  },
+  "rejectDraft": "Reject draft",
+  "@rejectDraft": {
+    "description": "OR-04 primary."
+  },
+  "rejectNotSerious": "Not a real order",
+  "@rejectNotSerious": {
+    "description": "Reject reason."
+  },
+  "rejectTitle": "Reject {number}?",
+  "@rejectTitle": {
+    "description": "OR-04 title.",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "removeItem": "Remove item",
+  "@removeItem": {
+    "description": "Editor."
+  },
+  "restock": "Restock",
+  "@restock": {
+    "description": "Return decision."
+  },
+  "returnBody": "Decide for each item: back to stock (sellable) or written off (damaged or lost).",
+  "@returnBody": {
+    "description": "Return sheet."
+  },
+  "returnSummary": "{restock} back to stock, {writeOff} written off",
+  "@returnSummary": {
+    "description": "Return sheet summary.",
+    "placeholders": {
+      "restock": {
+        "type": "String"
+      },
+      "writeOff": {
+        "type": "String"
+      }
+    }
+  },
+  "saveAndApprove": "Save and approve…",
+  "@saveAndApprove": {
+    "description": "Editor primary for a new order (goes through the approval sheet)."
+  },
+  "saveAsDraft": "Save as draft",
+  "@saveAsDraft": {
+    "description": "Editor secondary."
+  },
+  "saveChanges": "Save changes",
+  "@saveChanges": {
+    "description": "Editor primary when editing."
+  },
+  "savedAsDraft": "Saved as draft",
+  "@savedAsDraft": {
+    "description": "Snackbar."
+  },
+  "searchOrdersHint": "Search number, name, phone or product",
+  "@searchOrdersHint": {
+    "description": "OR-01 search."
+  },
+  "sectionHistory": "History",
+  "@sectionHistory": {
+    "description": "Section."
+  },
+  "sectionNotes": "Notes",
+  "@sectionNotes": {
+    "description": "Section."
+  },
+  "sectionPayment": "Payment",
+  "@sectionPayment": {
+    "description": "Section."
+  },
+  "selectOrderHint": "Select an order to see it here",
+  "@selectOrderHint": {
+    "description": "Tablet detail pane empty."
+  },
+  "statusCancelled": "Cancelled",
+  "@statusCancelled": {
+    "description": "Order status."
+  },
+  "statusOutForDelivery": "Out for delivery",
+  "@statusOutForDelivery": {
+    "description": "Order status."
+  },
+  "statusPreparing": "Preparing",
+  "@statusPreparing": {
+    "description": "Order status."
+  },
+  "statusRejected": "Rejected",
+  "@statusRejected": {
+    "description": "Order status."
+  },
+  "statusReturned": "Returned",
+  "@statusReturned": {
+    "description": "Order status."
+  },
+  "stillMissing": "Still missing: {fields}",
+  "@stillMissing": {
+    "description": "Editor reason line.",
+    "placeholders": {
+      "fields": {
+        "type": "String"
+      }
+    }
+  },
+  "stockAdjustedCount": "{count, plural, =1{stock changed for 1 item} other{stock changed for {count} items}}",
+  "@stockAdjustedCount": {
+    "description": "After an approved edit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stockChangeOnSave": "Stock on save: {change}",
+  "@stockChangeOnSave": {
+    "description": "Approved edit preview.",
+    "placeholders": {
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "total": "Total",
+  "@total": {
+    "description": "Totals row."
+  },
+  "totalEstimate": "Total (estimate)",
+  "@totalEstimate": {
+    "description": "Editor totals."
+  },
+  "totalsByServer": "Prices and totals are checked and calculated when you save.",
+  "@totalsByServer": {
+    "description": "Editor note (BR-24)."
+  },
+  "trackerStep": "Step {step} of 4, {name}",
+  "@trackerStep": {
+    "description": "Tracker semantics.",
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tryAgain": "Try again",
+  "@tryAgain": {
+    "description": "Delivery failed next step."
+  },
+  "writeOff": "Write off",
+  "@writeOff": {
+    "description": "Return decision."
   }
 }

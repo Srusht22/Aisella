@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(91);
+select plan(92);
 
 create temp table ids (k text primary key, v uuid);
 create temp table res (k text primary key, v jsonb);
@@ -292,6 +292,13 @@ select is(api.mark_confirmation_sent(pg_temp.id('store'), pg_temp.id('o9')) #>> 
           pg_temp.r('m') #>> '{data,confirmation_marked_sent_at}', '… once');
 select is(api.update_order_note(pg_temp.id('store'), pg_temp.id('o8'), pg_temp.ver('o8'), 'Refunded nothing') #>> '{data,internal_note}',
           'Refunded nothing', 'the internal note stays editable after the order closes');
+
+-- ---- Today (Journey G): committed orders only; cancelled and returned ones are not sales --------
+select is((api.order_summary(pg_temp.id('store')) -> 'data') - 'currency' - 'all' - 'needs_approval' - 'drafts' - 'active'
+            - 'delivered' - 'problems' - 'closed' - 'test',
+          '{"to_dispatch": 1, "delivery_failed": 0, "cod_outstanding": 0, "approved_today": 2,
+            "value_approved_today": 116000, "delivered_today": 1}'::jsonb,
+          'Today counts: to dispatch, approved and delivered today, value approved');
 
 -- ---- Invariants (Phase 6 E §3) --------------------------------------------------------------------------
 select is(api.list_inventory_movements(pg_temp.id('store'), pg_temp.id('abaya'), pg_temp.id('v_M'), 1) #> '{data,items,0}' ->> 'order_number',

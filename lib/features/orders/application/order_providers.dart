@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/backend/api.dart';
 import '../../catalog/application/catalog_providers.dart';
+import '../../catalog/domain/catalog.dart';
 import '../../store/application/workspace_controller.dart'
     show noAutomaticRetry;
 import '../data/orders_repository.dart';
@@ -194,6 +195,27 @@ final orderHistoryProvider = FutureProvider.autoDispose
       final storeId = ref.watch(currentStoreIdProvider);
       if (storeId == null) throw const ApiException(ApiErrorCode.notFound);
       return ref.read(ordersRepositoryProvider).history(storeId, orderId);
+    });
+
+// ---------------------------------------------------------------------------
+// Product picker (OR-07): active products only; archived and inactive ones
+// are never offered for a new line.
+// ---------------------------------------------------------------------------
+
+final pickerProductsProvider = FutureProvider.autoDispose
+    .family<List<ProductSummary>, String>(retry: noAutomaticRetry, (
+      ref,
+      text,
+    ) async {
+      final storeId = ref.watch(currentStoreIdProvider);
+      if (storeId == null) return const [];
+      final page = await ref
+          .read(catalogRepositoryProvider)
+          .listProducts(storeId, CatalogQuery(text: text), limit: 50);
+      return [
+        for (final p in page.items)
+          if (p.status == ProductStatus.active) p,
+      ];
     });
 
 // ---------------------------------------------------------------------------
