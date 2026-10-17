@@ -79,5 +79,10 @@
 	</array>
 	<key>FlutterDeepLinkingEnabled</key>
 	<false/>
+	<!-- Product photos (Phase 6). Photos are re-encoded without location data before upload. -->
+	<key>NSCameraUsageDescription</key>
+	<string>Aisellia uses the camera to take photos of your products.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Aisellia uses your photos to add pictures to your products.</string>
 </dict>
 </plist>

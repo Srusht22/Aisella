@@ -10,9 +10,6 @@
 @Tags(['backend'])
 library;
 
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:aisellia/core/backend/api.dart';
 import 'package:aisellia/core/formatting/money.dart';
 import 'package:aisellia/features/auth/data/auth_repository.dart';
@@ -22,114 +19,7 @@ import 'package:aisellia/features/store/domain/store.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
 
-final _url = Platform.environment['SUPABASE_TEST_URL'] ?? '';
-final _key = Platform.environment['SUPABASE_TEST_PUBLISHABLE_KEY'] ?? '';
-final _mailpit = Platform.environment['MAILPIT_TEST_URL'] ?? '';
-
-String? get _skip {
-  if (_url.isEmpty || _key.isEmpty || _mailpit.isEmpty) {
-    return 'Set SUPABASE_TEST_URL, SUPABASE_TEST_PUBLISHABLE_KEY and '
-        'MAILPIT_TEST_URL to run against a local Supabase stack.';
-  }
-  final hosts = [Uri.parse(_url).host, Uri.parse(_mailpit).host];
-  if (hosts.any((h) => h != '127.0.0.1' && h != 'localhost')) {
-    return 'Backend tests only run against a local stack.';
-  }
-  return null;
-}
-
-class _MemoryStorage extends GotrueAsyncStorage {
-  final _values = <String, String>{};
-  @override
-  Future<String?> getItem({required String key}) async => _values[key];
-  @override
-  Future<void> setItem({required String key, required String value}) async =>
-      _values[key] = value;
-  @override
-  Future<void> removeItem({required String key}) async => _values.remove(key);
-}
-
-/// A client as the app builds it: publishable key, PKCE, `api` schema.
-SupabaseClient _client() => SupabaseClient(
-  _url,
-  _key,
-  authOptions: AuthClientOptions(pkceAsyncStorage: _MemoryStorage()),
-  postgrestOptions: const PostgrestClientOptions(schema: 'api'),
-);
-
-final _run = DateTime.now().millisecondsSinceEpoch;
-var _seq = 0;
-String _email(String who) => '$who-$_run-${_seq++}@example.test';
-const _password = 'correct-horse-battery';
-
-Future<Map<String, dynamic>> _getJson(Uri uri) async {
-  final client = HttpClient();
-  try {
-    final res = await (await client.getUrl(uri)).close();
-    return jsonDecode(await res.transform(utf8.decoder).join())
-        as Map<String, dynamic>;
-  } finally {
-    client.close();
-  }
-}
-
-/// Waits for the newest email to [to] and returns the first auth link in it.
-Future<Uri> _linkFromMail(String to, {String type = 'signup'}) async {
-  for (var attempt = 0; attempt < 30; attempt++) {
-    final list = await _getJson(
-      Uri.parse(
-        '$_mailpit/api/v1/search?query=${Uri.encodeQueryComponent('to:"$to"')}',
-      ),
-    );
-    final messages = (list['messages'] as List?) ?? const [];
-    if (messages.isNotEmpty) {
-      final id = (messages.first as Map)['ID'];
-      final message = await _getJson(Uri.parse('$_mailpit/api/v1/message/$id'));
-      final text = '${message['Text']}\n${message['HTML']}';
-      final match = RegExp(r'https?://[^\s"<>]+/auth/v1/verify\?[^\s"<>]+')
-          .allMatches(text)
-          .map((m) => m.group(0)!.replaceAll('&amp;', '&'));
-      final link = match.where((l) => l.contains('type=$type')).firstOrNull;
-      if (link != null) return Uri.parse(link);
-    }
-    await Future<void>.delayed(const Duration(milliseconds: 300));
-  }
-  throw StateError('No $type email for $to');
-}
-
-/// Opens an email link like a browser would, without following the redirect
-/// to the app; returns the redirect target (the deep link).
-Future<Uri> _openLink(Uri link) async {
-  final client = HttpClient();
-  try {
-    final req = await client.getUrl(link)
-      ..followRedirects = false;
-    final res = await req.close();
-    await res.drain<void>();
-    return Uri.parse(res.headers.value(HttpHeaders.locationHeader) ?? '');
-  } finally {
-    client.close();
-  }
-}
-
-/// Signs up and verifies through the real email, returning the signed-in
-/// client.
-Future<SupabaseClient> _verifiedSeller(String email) async {
-  final client = _client();
-  final auth = SupabaseAuthRepository(client);
-  expect(
-    await auth.signUp(
-      email: email,
-      password: _password,
-      termsVersion: '2026-10',
-    ),
-    SignUpOutcome.verificationRequired,
-  );
-  final redirect = await _openLink(await _linkFromMail(email));
-  expect(redirect.toString(), startsWith(AuthLinks.callback));
-  await auth.signIn(email: email, password: _password);
-  return client;
-}
+import 'backend_support.dart';
 
 StoreDraft _draft(String name) => StoreDraft(
   name: name,
@@ -149,20 +39,20 @@ Future<ApiErrorCode> _apiError(Future<Object?> call) async {
 }
 
 void main() {
-  group('Supabase Auth (real GoTrue)', skip: _skip, () {
+  group('Supabase Auth (real GoTrue)', skip: backendSkip, () {
     test('sign-up requires email verification before sign-in', () async {
-      final email = _email('verify');
-      final auth = SupabaseAuthRepository(_client());
+      final email = uniqueEmail('verify');
+      final auth = SupabaseAuthRepository(backendClient());
       expect(
         await auth.signUp(
           email: email,
-          password: _password,
+          password: testPassword,
           termsVersion: '2026-10',
         ),
         SignUpOutcome.verificationRequired,
       );
       await expectLater(
-        auth.signIn(email: email, password: _password),
+        auth.signIn(email: email, password: testPassword),
         throwsA(
           isA<AuthError>().having(
             (e) => e.failure,
@@ -171,17 +61,17 @@ void main() {
           ),
         ),
       );
-      final redirect = await _openLink(await _linkFromMail(email));
+      final redirect = await openLink(await linkFromMail(email));
       expect(redirect.toString(), startsWith(AuthLinks.callback));
-      await auth.signIn(email: email, password: _password);
+      await auth.signIn(email: email, password: testPassword);
     });
 
     test(
       'signing up an existing email is reported, without a second account',
       () async {
-        final email = _email('dup');
-        await _verifiedSeller(email);
-        final auth = SupabaseAuthRepository(_client());
+        final email = uniqueEmail('dup');
+        await verifiedSeller(email);
+        final auth = SupabaseAuthRepository(backendClient());
         await expectLater(
           auth.signUp(
             email: email,
@@ -197,22 +87,22 @@ void main() {
           ),
         );
         // The original password still works: nothing was overwritten.
-        await SupabaseAuthRepository(_client())
-            .signIn(email: email, password: _password);
+        await SupabaseAuthRepository(backendClient())
+            .signIn(email: email, password: testPassword);
       },
     );
 
     test(
       'wrong password and unknown account give the same generic failure',
       () async {
-        final email = _email('wrong');
-        await _verifiedSeller(email);
+        final email = uniqueEmail('wrong');
+        await verifiedSeller(email);
         for (final (who, pass) in [
           (email, 'wrong-password'),
-          (_email('nobody'), _password),
+          (uniqueEmail('nobody'), testPassword),
         ]) {
           await expectLater(
-            SupabaseAuthRepository(_client())
+            SupabaseAuthRepository(backendClient())
                 .signIn(email: who, password: pass),
             throwsA(
               isA<AuthError>().having(
@@ -230,8 +120,8 @@ void main() {
       'short passwords are rejected by the provider, not only the app',
       () async {
         await expectLater(
-          SupabaseAuthRepository(_client()).signUp(
-            email: _email('short'),
+          SupabaseAuthRepository(backendClient()).signUp(
+            email: uniqueEmail('short'),
             password: '1234567',
             termsVersion: '2026-10',
           ),
@@ -242,18 +132,18 @@ void main() {
 
     test('password reset: same answer for unknown emails; the link sets a new password', () async {
       // Unknown address: completes normally (no enumeration).
-      await SupabaseAuthRepository(_client())
-          .requestPasswordReset(_email('ghost'));
+      await SupabaseAuthRepository(backendClient())
+          .requestPasswordReset(uniqueEmail('ghost'));
 
-      final email = _email('reset');
-      await _verifiedSeller(email);
-      final client = _client();
+      final email = uniqueEmail('reset');
+      await verifiedSeller(email);
+      final client = backendClient();
       final auth = SupabaseAuthRepository(client);
       final events = <AuthEventKind>[];
       final sub = auth.events.listen((e) => events.add(e.kind));
       await auth.requestPasswordReset(email);
-      final redirect = await _openLink(
-        await _linkFromMail(email, type: 'recovery'),
+      final redirect = await openLink(
+        await linkFromMail(email, type: 'recovery'),
       );
       expect(redirect.toString(), startsWith(AuthLinks.passwordReset));
       final code = redirect.queryParameters['code'];
@@ -265,21 +155,21 @@ void main() {
       await sub.cancel();
 
       await expectLater(
-        SupabaseAuthRepository(_client())
-            .signIn(email: email, password: _password),
+        SupabaseAuthRepository(backendClient())
+            .signIn(email: email, password: testPassword),
         throwsA(isA<AuthError>()),
       );
-      await SupabaseAuthRepository(_client())
+      await SupabaseAuthRepository(backendClient())
           .signIn(email: email, password: 'a-brand-new-password');
     });
 
     test('sign-out revokes the refresh token on the server', () async {
-      final client = await _verifiedSeller(_email('signout'));
+      final client = await verifiedSeller(uniqueEmail('signout'));
       final refresh = client.auth.currentSession!.refreshToken!;
       await SupabaseAuthRepository(client).signOut();
       expect(client.auth.currentSession, isNull);
       await expectLater(
-        _client().auth.refreshSession(refresh),
+        backendClient().auth.refreshSession(refresh),
         throwsA(isA<AuthException>()),
       );
     });
@@ -287,10 +177,10 @@ void main() {
 
   group(
     'Stores through PostgREST (real RLS and api functions)',
-    skip: _skip,
+    skip: backendSkip,
     () {
       test('create, replay, one store per user, update, zones', () async {
-        final client = await _verifiedSeller(_email('store'));
+        final client = await verifiedSeller(uniqueEmail('store'));
         final repo = SupabaseStoreRepository(client);
 
         final before = await repo.loadContext();
@@ -370,7 +260,7 @@ void main() {
       test(
         'tenant isolation: seller B cannot see or change seller A\'s store',
         () async {
-          final a = await _verifiedSeller(_email('tenant-a'));
+          final a = await verifiedSeller(uniqueEmail('tenant-a'));
           final storeA = await SupabaseStoreRepository(a).createStore(
             _draft('Store A'),
             idempotencyKey: 'be1c2b4e-8d3a-4f5b-9c7d-0e1f2a3b4c5d',
@@ -382,7 +272,7 @@ void main() {
             idempotencyKey: 'cf1c2b4e-8d3a-4f5b-9c7d-0e1f2a3b4c5d',
           );
 
-          final b = await _verifiedSeller(_email('tenant-b'));
+          final b = await verifiedSeller(uniqueEmail('tenant-b'));
           final repoB = SupabaseStoreRepository(b);
           expect((await repoB.loadContext()).store, isNull);
           expect(
@@ -433,7 +323,7 @@ void main() {
       );
 
       test('direct table writes and unexposed schemas are refused', () async {
-        final client = await _verifiedSeller(_email('direct'));
+        final client = await verifiedSeller(uniqueEmail('direct'));
         final store = await SupabaseStoreRepository(client).createStore(
           _draft('Direct'),
           idempotencyKey: 'e11c2b4e-8d3a-4f5b-9c7d-0e1f2a3b4c5d',
@@ -459,7 +349,7 @@ void main() {
       });
 
       test('anonymous callers and forged tokens are rejected', () async {
-        final anon = _client();
+        final anon = backendClient();
         expect(
           await _apiError(callApi(anon, 'get_my_context')),
           isIn([ApiErrorCode.unauthenticated, ApiErrorCode.forbidden]),
@@ -482,8 +372,8 @@ void main() {
           isIn([ApiErrorCode.unauthenticated, ApiErrorCode.forbidden]),
         );
         final forged = SupabaseClient(
-          _url,
-          _key,
+          backendUrl,
+          backendKey,
           accessToken: () async => 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ4Iiwicm9sZSI6ImF1dGhlbnRpY2F0ZWQifQ.forged',
           postgrestOptions: const PostgrestClientOptions(schema: 'api'),
         );
@@ -495,12 +385,12 @@ void main() {
     },
   );
 
-  group('Account deletion (real JWT re-authentication)', skip: _skip, () {
+  group('Account deletion (real JWT re-authentication)', skip: backendSkip, () {
     test(
       'a fresh password sign-in can request deletion; access ends at once',
       () async {
-        final email = _email('delete');
-        final client = await _verifiedSeller(email);
+        final email = uniqueEmail('delete');
+        final client = await verifiedSeller(email);
         final repo = SupabaseStoreRepository(client);
         final store = await repo.createStore(
           _draft('Closing Shop'),

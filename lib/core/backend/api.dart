@@ -26,6 +26,19 @@ enum ApiErrorCode {
   /// A destructive account action needs a fresh password sign-in.
   reauthenticationRequired,
 
+  /// A variant that has stock or history cannot be removed; archive it.
+  /// `details['variant_ids']` lists them.
+  variantInUse,
+
+  /// The stock changed since the seller looked (`details['current_stock']`).
+  stockChanged,
+
+  /// The result would be negative (`details['current_stock']`).
+  insufficientStock,
+
+  /// The product does not track stock.
+  stockNotTracked,
+
   /// The request could not be sent (offline, DNS, connection refused).
   /// Nothing reached the server.
   network,
@@ -46,6 +59,7 @@ class ApiException implements Exception {
     this.fields = const {},
     this.currentVersion,
     this.ref,
+    this.details = const {},
   });
 
   final ApiErrorCode code;
@@ -58,6 +72,15 @@ class ApiException implements Exception {
 
   /// Support reference for [ApiErrorCode.internal].
   final String? ref;
+
+  /// The error's other details (for example `current_stock`).
+  final Map<String, dynamic> details;
+
+  /// For stock errors: the server's current stock.
+  int? get currentStock => switch (details['current_stock']) {
+    final int v => v,
+    _ => null,
+  };
 
   /// Whether the outcome of a mutation is unknown and must be reconciled.
   bool get outcomeUnknown => code == ApiErrorCode.timeout;
@@ -77,6 +100,10 @@ const _codes = <String, ApiErrorCode>{
   'IDEMPOTENCY_KEY_REUSED': ApiErrorCode.idempotencyKeyReused,
   'RATE_LIMITED': ApiErrorCode.rateLimited,
   'REAUTHENTICATION_REQUIRED': ApiErrorCode.reauthenticationRequired,
+  'VARIANT_IN_USE': ApiErrorCode.variantInUse,
+  'STOCK_CHANGED': ApiErrorCode.stockChanged,
+  'INSUFFICIENT_STOCK': ApiErrorCode.insufficientStock,
+  'STOCK_NOT_TRACKED': ApiErrorCode.stockNotTracked,
   'INTERNAL': ApiErrorCode.internal,
 };
 
@@ -130,6 +157,7 @@ Map<String, dynamic> unwrapEnvelope(Object? raw) {
     fields: fields,
     currentVersion: version is int ? version : null,
     ref: details['ref'] is String ? details['ref'] as String : null,
+    details: details,
   );
 }
 
