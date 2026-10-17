@@ -164,7 +164,7 @@ select is(pg_temp.r('o2f') #>> '{data,lines,1,quoted_unit_price}', '2000', 'a ne
 select is((select jsonb_build_array(before ->> 'customer_phone', after ->> 'customer_phone', after ? 'area')
              from app.audit_events where entity_id = pg_temp.id('o2') and action = 'order.update_draft'
              order by id desc limit 1),
-          '["+9647501112244", null, false]'::jsonb,
+          '["+964750***2244", null, false]'::jsonb,
           'the audit records before and after of what changed only');
 
 -- Zone snapshot survives a zone rename.

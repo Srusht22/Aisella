@@ -87,6 +87,7 @@ select is(
     'api.adjust_stock(uuid,uuid,text,integer,text,text,integer,uuid)',
     'api.advance_onboarding(uuid,text)',
     'api.ai_upsert_draft(text,text,jsonb,uuid)',
+    'api.anonymize_customer(uuid,text,uuid)',
     'api.approve_order(uuid,uuid,integer,jsonb,uuid)',
     'api.cancel_order(uuid,uuid,integer,text,text,uuid)',
     'api.catalog_summary(uuid)',
