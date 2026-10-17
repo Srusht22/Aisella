@@ -5,7 +5,7 @@
 **No message reaches a customer unless a seller with `messages.send` authorized that exact text, in that conversation, at that moment.**
 - The AI may propose text and prepare unapproved order drafts. It cannot send, schedule, approve or authorize.
 - There is no auto-send, no scheduled send and no bulk send in Phase 9 (BR-47, D-06).
-- Order confirmations are sendable only for an **approved** order (BR-04), and only by the same explicit action.
+- Order confirmations are sendable only for an **approved** order (BR-04), and only by the same explicit action. A confirmation is never queued by an approval event, a status change or the AI: only the seller's Send creates it (owner condition 4).
 
 ## 2. States
 
@@ -55,11 +55,18 @@ These reduce, but do not remove, the risk. The evaluation gate (Phase 8.5 G1 / G
 
 The function stores the text exactly as authorized, its SHA-256, and whether it came from a suggestion unedited, edited, or not at all. **The sender sends that stored text and nothing else.**
 
+**Exact-text guarantee (owner condition 3):**
+1. `send_requests` stores the authorized text's SHA-256 next to the message, which is immutable once queued. The database refuses updates to the body of a `seller_sent` message.
+2. `api.channel_claim_send` returns the stored text and its hash.
+3. `channel-send` recomputes the SHA-256 of the exact string it is about to submit. On any mismatch it **does not call the provider** and fails the request with `TEXT_INTEGRITY`.
+4. The adapter submits the string unmodified: no trimming, templating, signature or translation.
+5. A test asserts that the provider stub received byte-identical text, including Sorani and Arabic.
+
 ## 5. Reply windows
 
 - **Instagram and Messenger:** 24 h from the customer's last message. The composer shows "Reply window closes in 3 h". After it closes, Send is disabled with an explanation.
 - **WhatsApp:** 24 h. Outside it, only approved templates can be sent. Phase 9 sends **no templates** (no marketing, no cost). A closed window means "Ask the customer to message you again" or using the phone.
-- **Human Agent tag (Meta):** proposed for Phase 9b, only after the permission is approved. Allowed only for seller-written text, never for unedited AI text. Up to 7 days, per the docs, to be verified.
+- **Human Agent tag (Meta): deferred to Phase 9b by owner decision.** Phase 9 never sends with a tag. In 9b it would need the permission approved by Meta, be allowed only for seller-written text, and be limited to the 7 days in the official docs (I I4).
 
 ## 6. The manual paths stay
 

@@ -32,6 +32,8 @@ Platforms deliver webhooks **at least once, possibly out of order**, and retry f
 |---|---|
 | Token rejected (401 or 190-type errors) | State `needs_attention`; sends paused for that connection; the owner is notified |
 | No webhook events for 24 h on an active connection | Informational health warning, not an error |
+| Meta reports the app **unsubscribed** after persistent webhook failures (I M2), or no events arrive after a known send | Connection `needs_attention`; the owner is prompted to re-subscribe, and a re-subscribe call is attempted automatically once |
+| WhatsApp free service-message tier used up and no payment method (I W1) | Connection `needs_attention: payment_required`; sends refused with a clear reason |
 | Signature failures above 10 per hour | Alert; possible secret rotation or attack |
 | Webhook backlog above 500 or oldest event over 5 min | Alert; processing lag shown in health |
 
@@ -51,7 +53,7 @@ Limits live in `app.ai_limits`, renamed `app.limits` or a sibling table. Operato
 
 ## 4. Unknown outcomes and reconciliation
 
-A timeout or reset **after** the request left gives state `unknown`. The rule from Phase 3 stands: **never resend automatically**, because a duplicate message to a customer is worse than a delay.
+A timeout or reset **after** the request left gives state `unknown`. **This rule has no exception and no configuration switch (owner condition 3):** no job, retry policy or reconciliation outcome resubmits an unknown send. Only a new seller authorization can. The rule from Phase 3 stands: **never resend automatically**, because a duplicate message to a customer is worse than a delay.
 
 1. Wait up to 5 minutes for evidence:
    - an echo or `message_echoes` event carrying our text and recipient (Meta);

@@ -84,27 +84,37 @@ Real sellers connect only after M9-5, the platform's approval, and the Phase 8.5
 |---|---|---|---|
 | **Non-numeric fabricated promises reach customers faster with a Send button** | Medium | High | Two-step "Use this reply" → Send; AI-origin label; order-text confirmation step; Phase 8.5 G1–G3 before pilot use; candidate second-pass classifier. **Not solved.** |
 | Meta app review or business verification rejected or slow, including for the legal entity's country | Medium | High (blocks real sellers) | Design and test in dev mode first; prepare review material early; the owner decides the legal entity; keep manual import as a fallback |
-| WhatsApp costs higher than expected (service-message charging from 2026-10-01 is unverified; Iraq rates unknown) | Medium | Medium | Instagram first; verify the rate card before choosing WhatsApp; no templates in Phase 9 |
-| WhatsApp policy on AI chatbots interpreted against an assistant product | Low–medium | High | Aisellia is a business-specific assistant; humans send every message; review the terms with Meta's current text |
+| WhatsApp reply costs: **confirmed charged since 2026-10-01** beyond 1,000 per number per month; Iraq amounts unknown (I W1–W2) | High (now certain to apply) | Medium | Decide who pays; retrieve the Iraq rate card; a `payment_required` connection state; no templates in Phase 9 |
+| WhatsApp coexistence probably unavailable for Iraqi numbers (I W7), so sellers may need a separate business number | Medium | High for WhatsApp adoption | Interview question J-7; confirm with Meta before choosing WhatsApp |
+| WhatsApp Business Solution Terms: the AI-provider clause, the human-escalation requirement, and the ban on using data to train models (I W15) | Low–medium | High | Humans send every message, with escalation to the seller built in; Anthropic API data is not used for training; **legal review before choosing WhatsApp** |
 | Webhook delivery gaps (platform outage, our downtime) | Medium | Medium | Platform retries plus our idempotent ingestion; health alerts; replay; the seller can always use the native app |
 | Duplicate or lost sends on timeouts | Medium | Medium | `unknown` state, reconciliation, no automatic resend |
 | Cross-store attribution bug | Low | Very high | Account-id resolution, a unique active account, composite foreign keys, dedicated isolation tests |
 | Inbound flooding raises AI cost | Medium | Medium | AI opt-in, debounce, per-contact caps, cost brakes |
 | Token leakage | Low | High | Vault, a single definer function, log tests, no tokens in the client |
-| Platform facts in B are wrong or outdated (gathered via search; official sites unreachable here) | Medium | Medium | The B §5 verification list must be completed before M9-3 |
+| Platform facts wrong or outdated: official sites blocked here, checked via an official-domain search index (I) | Medium | Medium | A direct read of every source in I, dated, before any implementation milestone; unverified items stay labelled |
+| **Model quality unvalidated:** the Phase 8.5 real-model evaluation and native review have not run | Certain until done | High | Separate open gate (Phase 8.5 H, G1–G2). No claim of model quality, and no pilot use of live sending, until it closes. |
 | Sorani and Arabic UI and AI quality | Medium | High | Native review (Phase 8.5 H §3) covers the new strings too |
 
-## 4. Decisions needed from the owner
+## 4. Decisions
 
-1. **D-02:** the first channel. The recommendation is Instagram, subject to the M0 interviews. B §4.
-2. **Approve this design**, or request changes, before any implementation.
-3. **The legal entity and Meta business portfolio** that will own the Meta app.
-4. **Staging:** create the staging project (AD-09), then later authorize deployment and provide the G §3 credentials.
-5. **AI auto-suggestion for live messages:** keep it opt-in and off by default, as proposed.
-6. **Human Agent tag:** defer to Phase 9b, as proposed, or include it.
+**Taken by the owner** (approval in principle):
+- The architecture, under the 10 conditions in the [README](README.md).
+- AI suggestions for live messages are opt-in and off by default.
+- The Human Agent tag is deferred to Phase 9b.
+
+**Outstanding:**
+1. **First channel (D-02).** Run the seller interviews ([J](j-seller-interview-questionnaire.md)), then decide with the owner. Instagram is the provisional lead; WhatsApp depends on the number model, cost and coexistence.
+2. **First implementation milestone.** Proposed: M9-1, data model and roles, local only, after D-02. Needs explicit approval.
+3. **The legal entity and Meta business portfolio** that will own the Meta app, and its eligibility for Business Verification (I I12, unverified).
+4. **Who pays WhatsApp message charges** (seller or Aisellia), if WhatsApp is chosen.
+5. **Legal review** of the WhatsApp Business Solution Terms AI clauses (I W15) and of platform data-retention terms, before WhatsApp is chosen.
+6. **Staging:** create the project (AD-09) and the K §1 assets; later, authorize deployment and enter the K §2 credentials yourself.
+7. **Network access** for this environment to the official documentation domains, if you want direct verification done here; otherwise someone reads the sources in I directly.
+8. **Phase 8.5 gates:** a dedicated Anthropic staging key (G1), native reviewers (G2), and acceptance of the non-numeric fabrication risk or a decision to add a second-pass check (G3).
 
 ## 5. What was done in this design step
 
 - No code, migration, connection, webhook, message, deployment or provider charge.
-- Documents A–H in `docs/architecture/phase-9/`.
+- Documents A–H in `docs/architecture/phase-9/`, revised after the owner's review; I (official verification), J (interview questionnaire) and K (staging checklist) added.
 - Phase 8.5 open gates and protocols in `docs/implementation/phase-8.5/h-validation-gates-and-review.md`.
