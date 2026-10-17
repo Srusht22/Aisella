@@ -30,7 +30,14 @@ class SectionHeader extends StatelessWidget {
               ),
             ),
           ),
-          ?action,
+          // The action shrinks and wraps at large text instead of overflowing.
+          if (action case final action?)
+            Flexible(
+              child: Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: action,
+              ),
+            ),
         ],
       ),
     );

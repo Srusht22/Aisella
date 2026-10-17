@@ -928,7 +928,7 @@ class _EditorState extends ConsumerState<_Editor> {
             const SizedBox(height: Space.s16),
             SectionHeader(
               l10n.combinationsTitle,
-              action: Text(
+              action: _HeaderNote(
                 l10n.variantsLimit(active.length),
                 style: type.caption.copyWith(
                   color: active.length > maxVariants
@@ -938,35 +938,26 @@ class _EditorState extends ConsumerState<_Editor> {
               ),
             ),
             if (active.length > 1) ...[
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: AppTextField(
-                      label: l10n.priceForAll,
-                      controller: _priceForAll,
-                      ltr: true,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ),
-                  if (_draft.trackStock && active.any((v) => v.isNew)) ...[
-                    const SizedBox(width: Space.s8),
-                    Expanded(
-                      child: AppTextField(
+              _SetForAll(
+                price: AppTextField(
+                  label: l10n.priceForAll,
+                  controller: _priceForAll,
+                  ltr: true,
+                  keyboardType: TextInputType.number,
+                ),
+                stock: _draft.trackStock && active.any((v) => v.isNew)
+                    ? AppTextField(
                         label: l10n.stockForAll,
                         controller: _stockForAll,
                         ltr: true,
                         keyboardType: TextInputType.number,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(width: Space.s8),
-                  AppButton(
-                    label: l10n.apply,
-                    variant: AppButtonVariant.secondary,
-                    onPressed: _applyForAll,
-                  ),
-                ],
+                      )
+                    : null,
+                apply: AppButton(
+                  label: l10n.apply,
+                  variant: AppButtonVariant.secondary,
+                  onPressed: _applyForAll,
+                ),
               ),
               const SizedBox(height: Space.s12),
             ],
@@ -1079,23 +1070,21 @@ class _CombinationRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              // Wraps at large text sizes instead of overflowing.
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                alignment: WrapAlignment.spaceBetween,
+                spacing: Space.s8,
                 children: [
-                  Expanded(
-                    child: Text(
-                      variant.label,
-                      textDirection: Bidi.detect(variant.label),
-                      style: type.bodyStrong.copyWith(color: p.textPrimary),
-                    ),
+                  Text(
+                    Bidi.auto(variant.label),
+                    style: type.bodyStrong.copyWith(color: p.textPrimary),
                   ),
                   if (custom)
-                    Padding(
-                      padding: const EdgeInsetsDirectional.only(end: Space.s8),
-                      child: StatusBadge(
-                        label: l10n.customPrice,
-                        icon: AppIcons.pencilSimple,
-                        tone: Tone.info,
-                      ),
+                    StatusBadge(
+                      label: l10n.customPrice,
+                      icon: AppIcons.pencilSimple,
+                      tone: Tone.info,
                     ),
                   AppButton(
                     label: variant.hasHistory
@@ -1280,9 +1269,16 @@ class _PhotoStrip extends StatelessWidget {
                 children: [
                   Icon(AppIcons.camera, color: p.textBrand),
                   const SizedBox(height: Space.s4),
-                  Text(
-                    l10n.addPhoto,
-                    style: context.type.caption.copyWith(color: p.textBrand),
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        l10n.addPhoto,
+                        style: context.type.caption.copyWith(
+                          color: p.textBrand,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -1295,7 +1291,7 @@ class _PhotoStrip extends StatelessWidget {
       children: [
         SectionHeader(
           l10n.sectionPhotos,
-          action: Text(
+          action: _HeaderNote(
             l10n.photosLimit(photos.length),
             style: context.type.caption.copyWith(color: p.textSecondary),
           ),
@@ -1422,6 +1418,55 @@ class _PhotoTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// A section header's trailing note (end-aligned when it wraps).
+class _HeaderNote extends StatelessWidget {
+  const _HeaderNote(this.text, {required this.style});
+
+  final String text;
+  final TextStyle style;
+
+  @override
+  Widget build(BuildContext context) =>
+      Text(text, textAlign: TextAlign.end, style: style);
+}
+
+/// "Set for all" fields and Apply: one row, or stacked at large text sizes
+/// (Phase 2 §7: rows stack at a text scale of 1.3 or more).
+class _SetForAll extends StatelessWidget {
+  const _SetForAll({required this.price, required this.apply, this.stock});
+
+  final Widget price;
+  final Widget? stock;
+  final Widget apply;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MediaQuery.textScalerOf(context).scale(1) >= 1.3) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          price,
+          if (stock != null) ...[const SizedBox(height: Space.s8), stock!],
+          const SizedBox(height: Space.s8),
+          Align(alignment: AlignmentDirectional.centerEnd, child: apply),
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(child: price),
+        if (stock != null) ...[
+          const SizedBox(width: Space.s8),
+          Expanded(child: stock!),
+        ],
+        const SizedBox(width: Space.s8),
+        apply,
+      ],
     );
   }
 }

@@ -545,6 +545,44 @@ void main() {
     });
   });
 
+  group('Large text', () {
+    for (final locale in ['en', 'ckb']) {
+      testWidgets('catalog screens at 200% on a small phone, $locale', (
+        tester,
+      ) async {
+        setScreen(tester, size: const Size(360, 640), textScale: 2.0);
+        await tester.pumpWidget(
+          testApp(
+            catalog: FakeCatalogRepository(products: sampleCatalog()),
+            sampleData: false,
+            locale: locale,
+          ),
+        );
+        await tester.pumpAndSettle();
+        for (final route in [
+          Routes.products,
+          Routes.product('p-shirt'),
+          Routes.productEdit('p-shirt'),
+          Routes.productHistory('p-abaya'),
+          Routes.productNew,
+          Routes.storeInventory,
+        ]) {
+          _go(tester, route);
+          await tester.pumpAndSettle();
+          expect(tester.takeException(), isNull, reason: route);
+        }
+        _go(tester, Routes.product('p-abaya'));
+        await tester.pumpAndSettle();
+        final adjust = find.text(locale == 'en' ? 'Adjust' : 'ڕێکخستن').first;
+        await tester.ensureVisible(adjust);
+        await tester.pumpAndSettle();
+        await tester.tap(adjust);
+        await tester.pumpAndSettle();
+        expect(tester.takeException(), isNull, reason: 'adjust sheet');
+      });
+    }
+  });
+
   group('Sorani', () {
     testWidgets('the list is RTL; prices stay LTR isolates', (tester) async {
       await _pumpApp(
