@@ -125,7 +125,7 @@ select is(api.anonymize_customer(pg_temp.id('store_a'), '0750 111 2233', gen_ran
 -- ---- Anonymise --------------------------------------------------------------------------------------------
 insert into ids values ('k_anon', gen_random_uuid());
 insert into res select 'anon', api.anonymize_customer(pg_temp.id('store_a'), '+9647501112233', pg_temp.id('k_anon'));
-select is((pg_temp.r('anon') -> 'data') - 'order_ids', '{"anonymized": 2, "skipped_in_progress": 1}'::jsonb,
+select is((pg_temp.r('anon') -> 'data') - 'order_ids', '{"anonymized": 2, "skipped_in_progress": 1, "notes_redacted": 0}'::jsonb,
           'the delivered and the rejected order are anonymised; the pending one is skipped and reported');
 select is((select jsonb_agg(x order by x) from jsonb_array_elements_text(pg_temp.r('anon') #> '{data,order_ids}') x),
           (select jsonb_agg(x order by x) from unnest(array[pg_temp.id('delivered')::text, pg_temp.id('rejected')::text]) x),
@@ -164,14 +164,14 @@ select is((select customer_name from app.orders where id = pg_temp.id('other')),
 select is((select customer_name from app.orders where id = pg_temp.id('b_order')), 'Nzar Ahmad',
           'seller B''s order for the same phone is untouched');
 select is((select after from app.audit_events where store_id = pg_temp.id('store_a') and action = 'customer.anonymize'),
-          '{"orders": 2, "skipped_in_progress": 1}'::jsonb, 'the anonymisation itself is audited, without the phone');
+          '{"orders": 2, "skipped_in_progress": 1, "notes_redacted": 0}'::jsonb, 'the anonymisation itself is audited, without the phone');
 
 -- Replay and repeat.
 select pg_temp.act_as(pg_temp.id('a'));
 select is(api.anonymize_customer(pg_temp.id('store_a'), '+9647501112233', pg_temp.id('k_anon')), pg_temp.r('anon'),
           'a retry with the same key replays the answer');
 select is((api.anonymize_customer(pg_temp.id('store_a'), '+9647501112233', gen_random_uuid()) -> 'data') - 'order_ids',
-          '{"anonymized": 0, "skipped_in_progress": 1}'::jsonb, 'a second request finds nothing more to anonymise');
+          '{"anonymized": 0, "skipped_in_progress": 1, "notes_redacted": 0}'::jsonb, 'a second request finds nothing more to anonymise');
 select pg_temp.act_as_admin();
 select ok(not exists (select 1 from app.idempotency_keys where key = pg_temp.id('k_anon') and request_hash like '%2233%'),
           'the stored request does not hold the phone');
