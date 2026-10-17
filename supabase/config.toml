@@ -117,9 +117,12 @@ port = 54324
 # sender_name = "Admin"
 
 [storage]
-enabled = false
-# The maximum file size allowed (e.g. "5MB", "500KB").
-file_size_limit = "50MiB"
+# Phase 6: product images (Phase 3 authorization §3, ADR-003). The private
+# `store-media` bucket, its limits and its policies are created by migration
+# 20261017090000 so a hosted project gets exactly the same setup.
+enabled = true
+# Upper bound for any upload; the bucket's own limit is lower (see migration).
+file_size_limit = "5MiB"
 
 # Uncomment to configure local storage buckets
 # [storage.buckets.images]
@@ -130,7 +133,7 @@ file_size_limit = "50MiB"
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]
-enabled = true
+enabled = false
 
 # Image transformation API is available to Supabase Pro plan.
 # [storage.image_transformation]
