@@ -1,6 +1,6 @@
 # Aisellia — Phase 8.5: validation and staging readiness
 
-**Status:** done as far as this environment allows. **Waiting for owner approval. Phase 9 has not started.**
+**Status:** provisionally accepted by the owner on local test results. Open gates (real-model evaluation, native review, hosted staging, consented samples) are tracked in [H](h-validation-gates-and-review.md). Phase 9 is authorized for **planning and design only**.
 
 **Scope:** a limited milestone between Phase 8 and Phase 9, authorized by the owner after Phase 8 was accepted.
 - **In scope:** validation, safety tests, cost and provider-terms review, staging preparation, the customer-data fixes.
@@ -25,6 +25,7 @@
 | E | [Customer data](e-customer-data.md) | Notes redaction on anonymisation, retention jobs, remaining gaps |
 | F | [Consented samples](f-consented-samples.md) | Collection template, consent text (en / ckb / ar), file format |
 | G | [Validation report](g-validation-report.md) | What was verified, what was not, safety failures and fixes, Phase 9 readiness |
+| H | [Open gates, native review and sample collection](h-validation-gates-and-review.md) | Status of each open gate, the evaluation approval procedure, the native-review protocol, the unsolved non-numeric fabrication risk |
 
 | Commit | Contents |
 |---|---|
