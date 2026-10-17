@@ -1,5 +1,7 @@
 # F. Integration contract for Phase 8 (AI drafting) and messaging
 
+> **Updated by [I. Security hardening](i-security-hardening.md):** the AI draft path now exists as `api.ai_upsert_draft`, run by the dedicated `aisellia_ai` role with an owner-issued grant. It never uses a seller's JWT. Item 1 and item 4 below describe the original plan.
+
 ## 1. What an AI draft may and may not do
 Phase 8 creates and updates **drafts only**. It must:
 

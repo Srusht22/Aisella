@@ -27,3 +27,4 @@ Everything is persisted in the local Supabase stack and scoped to the seller's s
 | F | [Future integration contract](f-integration-contract.md) | What Phase 8 (AI drafting) and messaging must use and respect |
 | G | [Test report](g-test-report.md) | Commands, results, failures found and fixed, what could not be run |
 | H | [Completion report](h-phase-7-completion-report.md) | Summary, files, commits, limitations, decisions, next steps |
+| I | [Security hardening](i-security-hardening.md) | AI execution role, grants and quotas; retention jobs; customer privacy (added after acceptance) |
