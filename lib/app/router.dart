@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,6 +12,10 @@ import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/auth/presentation/terms_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
+import '../features/catalog/presentation/inventory_history_screen.dart';
+import '../features/catalog/presentation/product_detail_screen.dart';
+import '../features/catalog/presentation/product_editor_screen.dart';
+import '../features/catalog/presentation/product_list_screen.dart';
 import '../features/common/deferred_feature_screen.dart';
 import '../features/common/not_found_screen.dart';
 import '../features/inbox/inbox_screen.dart';
@@ -19,7 +23,6 @@ import '../features/onboarding/language_selection_screen.dart';
 import '../features/onboarding/presentation/setup_screens.dart';
 import '../features/orders/presentation/draft_review_preview_screen.dart';
 import '../features/orders/presentation/orders_home_screen.dart';
-import '../features/products/presentation/products_screen.dart';
 import '../features/settings/language_display_screen.dart';
 import '../features/settings/store_menu_screen.dart';
 import '../features/settings/store_settings_screens.dart';
@@ -154,6 +157,41 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.products,
                 builder: (_, _) => const ProductsScreen(),
+                routes: [
+                  // PR-03 editor: a full-screen modal above the tabs.
+                  GoRoute(
+                    path: 'new',
+                    parentNavigatorKey: _rootKey,
+                    pageBuilder: (_, _) => const MaterialPage(
+                      fullscreenDialog: true,
+                      child: ProductEditorScreen(),
+                    ),
+                  ),
+                  GoRoute(
+                    path: ':productId',
+                    builder: (_, s) => ProductDetailScreen(
+                      productId: s.pathParameters['productId']!,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'edit',
+                        parentNavigatorKey: _rootKey,
+                        pageBuilder: (_, s) => MaterialPage(
+                          fullscreenDialog: true,
+                          child: ProductEditorScreen(
+                            productId: s.pathParameters['productId'],
+                          ),
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'history',
+                        builder: (_, s) => InventoryHistoryScreen(
+                          productId: s.pathParameters['productId']!,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
@@ -173,6 +211,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, _) => const DeliveryZonesScreen(),
           ),
           GoRoute(path: 'payments', builder: (_, _) => const PaymentsScreen()),
+          GoRoute(
+            path: 'inventory',
+            builder: (_, _) => const InventorySettingsScreen(),
+          ),
           GoRoute(
             path: 'account',
             builder: (_, _) => const AccountScreen(),

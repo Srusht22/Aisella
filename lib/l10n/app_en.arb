@@ -234,7 +234,7 @@
   "@ordersTitle": {
     "description": "Title of the Orders tab's page (may be longer than the tab label navOrders)."
   },
-  "searchProductsHint": "Search products by name or SKU",
+  "searchProductsHint": "Search by name or SKU",
   "@searchProductsHint": {
     "description": "Placeholder of the product search field."
   },
@@ -1225,7 +1225,7 @@
   "@saved": {
     "description": "Snackbar after a successful save."
   },
-  "currencyLockedNote": "The currency can't change after your first approved order.",
+  "currencyLockedNote": "The currency can't change once you have products or approved orders: prices are never converted.",
   "@currencyLockedNote": {
     "description": "Currency lock (US-005)."
   },
@@ -1315,7 +1315,7 @@
   "@deleteAccount": {
     "description": "ST-07 danger row and ST-08 title/action."
   },
-  "deleteAccountWhat": "Deleting your account removes your store, its settings and delivery zones, and your sign-in. This cannot be undone.",
+  "deleteAccountWhat": "Deleting your account removes your store, its products, photos, stock history, settings and delivery zones, and your sign-in. This cannot be undone.",
   "@deleteAccountWhat": {
     "description": "ST-08 step 1: what will be deleted."
   },
@@ -1360,5 +1360,773 @@
         "type": "String"
       }
     }
+  },
+  "productsCount": "{count, plural, =1{1 product} other{{count} products}}",
+  "@productsCount": {
+    "description": "Number of products matching the list.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filterInactive": "Inactive",
+  "@filterInactive": {
+    "description": "Filter chip."
+  },
+  "filterArchived": "Archived",
+  "@filterArchived": {
+    "description": "Filter chip."
+  },
+  "filterAndSort": "Filter and sort",
+  "@filterAndSort": {
+    "description": "Button and sheet title."
+  },
+  "sortTitle": "Sort by",
+  "@sortTitle": {
+    "description": "Section title."
+  },
+  "sortUpdated": "Recently updated",
+  "@sortUpdated": {
+    "description": "Sort option."
+  },
+  "sortName": "Name (A–Z)",
+  "@sortName": {
+    "description": "Sort option."
+  },
+  "sortPriceAsc": "Price: low to high",
+  "@sortPriceAsc": {
+    "description": "Sort option."
+  },
+  "sortPriceDesc": "Price: high to low",
+  "@sortPriceDesc": {
+    "description": "Sort option."
+  },
+  "sortStockAsc": "Stock: lowest first",
+  "@sortStockAsc": {
+    "description": "Sort option."
+  },
+  "categoryAll": "All categories",
+  "@categoryAll": {
+    "description": "Category filter option."
+  },
+  "showResults": "Show results",
+  "@showResults": {
+    "description": "Button in the filter sheet."
+  },
+  "stockAvailable": "Available",
+  "@stockAvailable": {
+    "description": "Untracked product that can be sold."
+  },
+  "stockUnavailable": "Unavailable",
+  "@stockUnavailable": {
+    "description": "Untracked product that cannot be sold now."
+  },
+  "optionsLow": "{count, plural, =1{1 option low} other{{count} options low}}",
+  "@optionsLow": {
+    "description": "Stock summary of a product with several options.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statusInactive": "Inactive",
+  "@statusInactive": {
+    "description": "Product status badge."
+  },
+  "statusArchived": "Archived",
+  "@statusArchived": {
+    "description": "Product status badge."
+  },
+  "loadMoreFailed": "Couldn't load more products.",
+  "@loadMoreFailed": {
+    "description": "Shown at the end of the list."
+  },
+  "selectProductHint": "Select a product to see its details",
+  "@selectProductHint": {
+    "description": "Tablet detail pane before a selection."
+  },
+  "priceRange": "{from} – {to}",
+  "@priceRange": {
+    "description": "Price range; both values are LTR-isolated.",
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "productUnavailableTitle": "This product isn't available",
+  "@productUnavailableTitle": {
+    "description": "Detail error."
+  },
+  "productUnavailableBody": "It may have been removed, or it belongs to another store.",
+  "@productUnavailableBody": {
+    "description": "Detail error."
+  },
+  "sectionStock": "Stock",
+  "@sectionStock": {
+    "description": "Section title."
+  },
+  "sectionDetails": "Details",
+  "@sectionDetails": {
+    "description": "Section title."
+  },
+  "fieldDescription": "Description",
+  "@fieldDescription": {
+    "description": "Field label."
+  },
+  "fieldCategory": "Category",
+  "@fieldCategory": {
+    "description": "Field label."
+  },
+  "fieldPrice": "Price",
+  "@fieldPrice": {
+    "description": "Field label."
+  },
+  "fieldSku": "SKU",
+  "@fieldSku": {
+    "description": "Stock-keeping unit code."
+  },
+  "adjust": "Adjust",
+  "@adjust": {
+    "description": "Button that opens the stock adjustment sheet."
+  },
+  "adjustStockTitle": "Adjust stock",
+  "@adjustStockTitle": {
+    "description": "Sheet title."
+  },
+  "inventoryHistory": "Inventory history",
+  "@inventoryHistory": {
+    "description": "Row and screen title."
+  },
+  "lowStockAt": "Low stock at {count} or fewer",
+  "@lowStockAt": {
+    "description": "Threshold explanation.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Button."
+  },
+  "moreActions": "More actions",
+  "@moreActions": {
+    "description": "Tooltip of the overflow menu."
+  },
+  "makeInactive": "Make inactive",
+  "@makeInactive": {
+    "description": "Menu item."
+  },
+  "makeActive": "Make active",
+  "@makeActive": {
+    "description": "Menu item."
+  },
+  "archiveProduct": "Archive",
+  "@archiveProduct": {
+    "description": "Menu item."
+  },
+  "restoreProduct": "Restore",
+  "@restoreProduct": {
+    "description": "Menu item."
+  },
+  "archiveProductTitle": "Archive {name}?",
+  "@archiveProductTitle": {
+    "description": "Dialog title; name is bidi-isolated.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "archiveProductBody": "It leaves your catalog and Aisellia's answers. Its stock history is kept, and you can restore it from Archived.",
+  "@archiveProductBody": {
+    "description": "Dialog body."
+  },
+  "productArchived": "Product archived",
+  "@productArchived": {
+    "description": "Snackbar."
+  },
+  "productRestored": "Product restored",
+  "@productRestored": {
+    "description": "Snackbar."
+  },
+  "productNowInactive": "Product is now inactive",
+  "@productNowInactive": {
+    "description": "Snackbar."
+  },
+  "productNowActive": "Product is now active",
+  "@productNowActive": {
+    "description": "Snackbar."
+  },
+  "stockNotTrackedNote": "Stock isn't counted for this product. Customers are told it is available or unavailable.",
+  "@stockNotTrackedNote": {
+    "description": "Detail note for untracked products."
+  },
+  "stockUpdated": "Stock updated · {before} → {after}",
+  "@stockUpdated": {
+    "description": "Snackbar after an adjustment.",
+    "placeholders": {
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveBanner": "Inactive — hidden from Aisellia's answers and new orders.",
+  "@inactiveBanner": {
+    "description": "Detail banner."
+  },
+  "archivedBanner": "Archived — restore it to sell it again.",
+  "@archivedBanner": {
+    "description": "Detail banner."
+  },
+  "archivedOptions": "{count, plural, =1{1 archived option} other{{count} archived options}}",
+  "@archivedOptions": {
+    "description": "Collapsed list of archived variants.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "photoCount": "Photo {index} of {count}",
+  "@photoCount": {
+    "description": "Gallery page semantics.",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newProductTitle": "New product",
+  "@newProductTitle": {
+    "description": "Editor title."
+  },
+  "editProductTitle": "Edit product",
+  "@editProductTitle": {
+    "description": "Editor title."
+  },
+  "sectionPhotos": "Photos",
+  "@sectionPhotos": {
+    "description": "Section title."
+  },
+  "photosLimit": "{count} of 5",
+  "@photosLimit": {
+    "description": "Photo count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "addPhoto": "Add photo",
+  "@addPhoto": {
+    "description": "Tile and sheet title."
+  },
+  "takePhoto": "Take photo",
+  "@takePhoto": {
+    "description": "Sheet option."
+  },
+  "chooseFromGallery": "Choose from gallery",
+  "@chooseFromGallery": {
+    "description": "Sheet option."
+  },
+  "photoUploading": "Uploading photo",
+  "@photoUploading": {
+    "description": "Semantics of an uploading tile."
+  },
+  "photoNotUploaded": "Not uploaded — Retry",
+  "@photoNotUploaded": {
+    "description": "Failed upload tile."
+  },
+  "photoUnavailable": "Image unavailable",
+  "@photoUnavailable": {
+    "description": "Image that failed to load."
+  },
+  "mainPhoto": "Main photo",
+  "@mainPhoto": {
+    "description": "Badge on the first photo."
+  },
+  "setAsMain": "Set as main",
+  "@setAsMain": {
+    "description": "Viewer action."
+  },
+  "replacePhoto": "Replace",
+  "@replacePhoto": {
+    "description": "Viewer action."
+  },
+  "removePhoto": "Remove",
+  "@removePhoto": {
+    "description": "Viewer action."
+  },
+  "removePhotoTitle": "Remove this photo?",
+  "@removePhotoTitle": {
+    "description": "Dialog title."
+  },
+  "removePhotoBody": "It is removed from the product when you save.",
+  "@removePhotoBody": {
+    "description": "Dialog body."
+  },
+  "photoTooLarge": "This photo is larger than 10 MB. Choose a smaller one.",
+  "@photoTooLarge": {
+    "description": "Error."
+  },
+  "photoUnsupported": "This file isn't a photo Aisellia can use. Choose a JPEG or PNG photo.",
+  "@photoUnsupported": {
+    "description": "Error."
+  },
+  "photoUploadFailed": "The photo didn't upload. Check your connection and tap it to retry.",
+  "@photoUploadFailed": {
+    "description": "Error."
+  },
+  "photosStillUploading": "Wait for the photos to finish uploading.",
+  "@photosStillUploading": {
+    "description": "Reason the Save button is disabled."
+  },
+  "photosFailedSaveAnyway": "{count, plural, =1{1 photo didn't upload and won't be saved.} other{{count} photos didn't upload and won't be saved.}}",
+  "@photosFailedSaveAnyway": {
+    "description": "Note under Save.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldProductName": "Name (required)",
+  "@fieldProductName": {
+    "description": "Field label."
+  },
+  "descriptionHelper": "Aisellia uses this to answer questions.",
+  "@descriptionHelper": {
+    "description": "Field helper."
+  },
+  "categoryHelper": "Choose one or type your own.",
+  "@categoryHelper": {
+    "description": "Field helper."
+  },
+  "catClothing": "Clothing and fashion",
+  "@catClothing": {
+    "description": "Category suggestion."
+  },
+  "catShoesBags": "Shoes and bags",
+  "@catShoesBags": {
+    "description": "Category suggestion."
+  },
+  "catCosmetics": "Cosmetics and skincare",
+  "@catCosmetics": {
+    "description": "Category suggestion."
+  },
+  "catPerfumes": "Perfumes",
+  "@catPerfumes": {
+    "description": "Category suggestion."
+  },
+  "catElectronics": "Electronics and accessories",
+  "@catElectronics": {
+    "description": "Category suggestion."
+  },
+  "catHome": "Home goods",
+  "@catHome": {
+    "description": "Category suggestion."
+  },
+  "catGifts": "Gifts",
+  "@catGifts": {
+    "description": "Category suggestion."
+  },
+  "catOther": "Other",
+  "@catOther": {
+    "description": "Category suggestion."
+  },
+  "fieldPriceRequired": "Price (required)",
+  "@fieldPriceRequired": {
+    "description": "Field label."
+  },
+  "hasOptions": "This product has options",
+  "@hasOptions": {
+    "description": "Switch label."
+  },
+  "hasOptionsBody": "Sizes, colours or other choices, each with its own stock.",
+  "@hasOptionsBody": {
+    "description": "Switch description."
+  },
+  "optionName": "Option name, like Size",
+  "@optionName": {
+    "description": "Field label."
+  },
+  "optionValues": "Values",
+  "@optionValues": {
+    "description": "Label above value chips."
+  },
+  "addValue": "Add value",
+  "@addValue": {
+    "description": "Field label and button."
+  },
+  "removeValue": "Remove {value}",
+  "@removeValue": {
+    "description": "Tooltip on a value chip.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "addOptionType": "Add another option",
+  "@addOptionType": {
+    "description": "Button."
+  },
+  "removeOptionType": "Remove this option",
+  "@removeOptionType": {
+    "description": "Button."
+  },
+  "optionTypesLimit": "{count} of 2 options",
+  "@optionTypesLimit": {
+    "description": "Live limit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "variantsLimit": "{count} of 100 combinations",
+  "@variantsLimit": {
+    "description": "Live limit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "combinationsTitle": "Combinations",
+  "@combinationsTitle": {
+    "description": "Section title."
+  },
+  "doesNotExist": "Doesn't exist",
+  "@doesNotExist": {
+    "description": "Button to drop a combination."
+  },
+  "addBack": "Add back",
+  "@addBack": {
+    "description": "Button to restore a dropped combination."
+  },
+  "customPrice": "Custom",
+  "@customPrice": {
+    "description": "Marks an overridden variant price."
+  },
+  "setForAll": "Set for all",
+  "@setForAll": {
+    "description": "Bulk action."
+  },
+  "priceForAll": "Price for all",
+  "@priceForAll": {
+    "description": "Bulk action field."
+  },
+  "stockForAll": "Stock for all",
+  "@stockForAll": {
+    "description": "Bulk action field."
+  },
+  "apply": "Apply",
+  "@apply": {
+    "description": "Button."
+  },
+  "fieldVariantSku": "SKU (optional)",
+  "@fieldVariantSku": {
+    "description": "Field label."
+  },
+  "fieldStock": "Stock",
+  "@fieldStock": {
+    "description": "Field label."
+  },
+  "archiveOption": "Archive this option",
+  "@archiveOption": {
+    "description": "Button."
+  },
+  "optionArchivedNote": "Archived: it has stock or history, so it is kept but not sold.",
+  "@optionArchivedNote": {
+    "description": "Note on an archived variant."
+  },
+  "trackStock": "Track stock",
+  "@trackStock": {
+    "description": "Switch label."
+  },
+  "trackStockBody": "Count units. Stock never goes below zero.",
+  "@trackStockBody": {
+    "description": "Switch description."
+  },
+  "fieldQuantity": "Quantity in stock",
+  "@fieldQuantity": {
+    "description": "Field label."
+  },
+  "availableSwitch": "Available",
+  "@availableSwitch": {
+    "description": "Switch for untracked products."
+  },
+  "availableBody": "Turn off when you can't sell it right now.",
+  "@availableBody": {
+    "description": "Switch description."
+  },
+  "stockEditNote": "To change stock, use Adjust on the product page. Every change is recorded.",
+  "@stockEditNote": {
+    "description": "Editor note for existing products."
+  },
+  "sectionVisibility": "Visibility",
+  "@sectionVisibility": {
+    "description": "Section title."
+  },
+  "activeSwitch": "Active",
+  "@activeSwitch": {
+    "description": "Switch label."
+  },
+  "activeBody": "Inactive products are hidden from Aisellia's answers and new orders.",
+  "@activeBody": {
+    "description": "Switch description."
+  },
+  "fieldLowStockAt": "Low-stock alert at",
+  "@fieldLowStockAt": {
+    "description": "Field label."
+  },
+  "lowStockAtHelper": "Leave empty to use your store default ({count}).",
+  "@lowStockAtHelper": {
+    "description": "Field helper.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "productAdded": "Product added",
+  "@productAdded": {
+    "description": "Snackbar."
+  },
+  "changesSaved": "Changes saved",
+  "@changesSaved": {
+    "description": "Snackbar."
+  },
+  "errProductNameRequired": "Enter a product name",
+  "@errProductNameRequired": {
+    "description": "Validation."
+  },
+  "errTooLongMax": "Too long — use {max} characters or fewer",
+  "@errTooLongMax": {
+    "description": "Validation.",
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "errPriceRequired": "Enter a price",
+  "@errPriceRequired": {
+    "description": "Validation."
+  },
+  "errPriceInvalid": "Enter a whole number above 0",
+  "@errPriceInvalid": {
+    "description": "Validation."
+  },
+  "errQuantityInvalid": "Enter a whole number, 0 or more",
+  "@errQuantityInvalid": {
+    "description": "Validation."
+  },
+  "errSkuDuplicate": "Another product or option already uses this SKU",
+  "@errSkuDuplicate": {
+    "description": "Validation."
+  },
+  "errOptionNameRequired": "Name this option",
+  "@errOptionNameRequired": {
+    "description": "Validation."
+  },
+  "errOptionValuesRequired": "Add at least one value",
+  "@errOptionValuesRequired": {
+    "description": "Validation."
+  },
+  "errOptionDuplicate": "Use a different name for each option",
+  "@errOptionDuplicate": {
+    "description": "Validation."
+  },
+  "errValueDuplicate": "This value is already there",
+  "@errValueDuplicate": {
+    "description": "Validation."
+  },
+  "errNeedOneVariant": "Keep at least one combination",
+  "@errNeedOneVariant": {
+    "description": "Validation."
+  },
+  "errVariantInUse": "Some options have stock or history, so they can't be removed. Archive them instead.",
+  "@errVariantInUse": {
+    "description": "Save error."
+  },
+  "errFormIssues": "{count, plural, =1{1 field needs attention} other{{count} fields need attention}}",
+  "@errFormIssues": {
+    "description": "Summary banner on submit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "modeAdd": "Add",
+  "@modeAdd": {
+    "description": "Segment."
+  },
+  "modeRemove": "Remove",
+  "@modeRemove": {
+    "description": "Segment."
+  },
+  "modeSet": "Set count",
+  "@modeSet": {
+    "description": "Segment."
+  },
+  "fieldAdjustQuantity": "Quantity",
+  "@fieldAdjustQuantity": {
+    "description": "Field label."
+  },
+  "fieldNewCount": "New count",
+  "@fieldNewCount": {
+    "description": "Field label in Set count mode."
+  },
+  "reasonTitle": "Reason",
+  "@reasonTitle": {
+    "description": "Section title."
+  },
+  "reasonReceived": "Received stock",
+  "@reasonReceived": {
+    "description": "Reason."
+  },
+  "reasonSoldInShop": "Sold in shop",
+  "@reasonSoldInShop": {
+    "description": "Reason."
+  },
+  "reasonDamaged": "Damaged",
+  "@reasonDamaged": {
+    "description": "Reason."
+  },
+  "reasonCountCorrection": "Count correction",
+  "@reasonCountCorrection": {
+    "description": "Reason."
+  },
+  "reasonOther": "Other",
+  "@reasonOther": {
+    "description": "Reason."
+  },
+  "reasonInitial": "Initial stock",
+  "@reasonInitial": {
+    "description": "History reason."
+  },
+  "reasonOrderApproved": "Order approved",
+  "@reasonOrderApproved": {
+    "description": "History reason."
+  },
+  "reasonOrderEdited": "Order edited",
+  "@reasonOrderEdited": {
+    "description": "History reason."
+  },
+  "reasonOrderCancelled": "Order cancelled",
+  "@reasonOrderCancelled": {
+    "description": "History reason."
+  },
+  "reasonOrderReturned": "Returned to stock",
+  "@reasonOrderReturned": {
+    "description": "History reason."
+  },
+  "fieldNote": "Note",
+  "@fieldNote": {
+    "description": "Field label."
+  },
+  "errNoteRequired": "Add a short note for Other",
+  "@errNoteRequired": {
+    "description": "Validation."
+  },
+  "errReasonRequired": "Choose a reason",
+  "@errReasonRequired": {
+    "description": "Validation."
+  },
+  "saveAdjustment": "Save adjustment",
+  "@saveAdjustment": {
+    "description": "Button."
+  },
+  "errOnlyInStock": "Only {count} in stock",
+  "@errOnlyInStock": {
+    "description": "Validation.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "errNoChange": "This doesn't change the stock",
+  "@errNoChange": {
+    "description": "Validation."
+  },
+  "stockChangedWhileEditing": "Stock changed to {count} while you were editing",
+  "@stockChangedWhileEditing": {
+    "description": "Concurrency message.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "errStockNotTracked": "This product doesn't track stock.",
+  "@errStockNotTracked": {
+    "description": "Error."
+  },
+  "stockAfter": "After saving",
+  "@stockAfter": {
+    "description": "Label of the result preview."
+  },
+  "historyEmpty": "No stock changes yet",
+  "@historyEmpty": {
+    "description": "Empty state."
+  },
+  "allOptions": "All options",
+  "@allOptions": {
+    "description": "History filter."
+  },
+  "actorYou": "You",
+  "@actorYou": {
+    "description": "Who made the change."
+  },
+  "actorMember": "Team member",
+  "@actorMember": {
+    "description": "Who made the change."
+  },
+  "actorSystem": "Aisellia",
+  "@actorSystem": {
+    "description": "Who made the change."
+  },
+  "resultingStock": "Stock {count}",
+  "@resultingStock": {
+    "description": "Resulting quantity after a movement.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "loadMore": "Load more",
+  "@loadMore": {
+    "description": "Button."
+  },
+  "fieldLowStockDefault": "Low-stock alert at",
+  "@fieldLowStockDefault": {
+    "description": "Store setting label."
+  },
+  "lowStockDefaultHelper": "Products show \"Low stock\" at this number or fewer, unless an option has its own.",
+  "@lowStockDefaultHelper": {
+    "description": "Store setting helper."
+  },
+  "sectionInventory": "Inventory",
+  "@sectionInventory": {
+    "description": "Store settings section."
   }
 }

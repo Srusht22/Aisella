@@ -6,6 +6,7 @@ import '../../../core/formatting/money.dart';
 
 /// Counts for the Today screen (Phase 1 Journey G). Phase 7 replaces the
 /// sample source with the `v_today_attention` read (Phase 3 contracts §3.8).
+/// Low stock is not here: it is real since Phase 6 (catalog summary).
 @immutable
 class TodaySnapshot {
   const TodaySnapshot({
@@ -16,7 +17,6 @@ class TodaySnapshot {
     required this.toDispatch,
     required this.deliveryProblems,
     required this.cashToCollect,
-    required this.lowStock,
     required this.approvedToday,
     required this.deliveredToday,
     required this.valueApprovedToday,
@@ -29,7 +29,6 @@ class TodaySnapshot {
   final int toDispatch;
   final int deliveryProblems;
   final int cashToCollect;
-  final int lowStock;
   final int approvedToday;
   final int deliveredToday;
   final int valueApprovedToday;
@@ -40,8 +39,7 @@ class TodaySnapshot {
           draftsMissing +
           toDispatch +
           deliveryProblems +
-          cashToCollect +
-          lowStock ==
+          cashToCollect ==
       0;
 }
 
@@ -97,7 +95,6 @@ class SampleTodayRepository implements TodayRepository {
         toDispatch: 4,
         deliveryProblems: 1,
         cashToCollect: 420000,
-        lowStock: 5,
         approvedToday: 6,
         deliveredToday: 4,
         valueApprovedToday: 455000,

@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../settings/app_settings.dart';
+import 'bidi.dart';
 import 'digits.dart';
 
 /// Localised dates (Gregorian calendar).
@@ -81,5 +82,14 @@ abstract final class Dates {
       return '$dayی ${_ckbMonths[date.month - 1]}ی $year';
     }
     return '$day ${_enMonths[date.month - 1]} $year';
+  }
+
+  /// Time of day on the 24-hour clock, "14:05", in the chosen digit style
+  /// and LTR-isolated.
+  static String time(DateTime date, {required DigitStyle digits}) {
+    String two(int v) => v.toString().padLeft(2, '0');
+    return Bidi.ltr(
+      Digits.display('${two(date.hour)}:${two(date.minute)}', digits),
+    );
   }
 }

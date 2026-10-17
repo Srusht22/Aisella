@@ -26,6 +26,7 @@ class Store {
     required this.onboardingStep,
     required this.currencyLocked,
     required this.version,
+    this.lowStockDefault = 3,
   });
 
   factory Store.fromJson(Map<String, dynamic> json) => Store(
@@ -43,6 +44,7 @@ class Store {
     ),
     currencyLocked: json['currency_locked'] as bool? ?? false,
     version: json['version'] as int,
+    lowStockDefault: json['low_stock_default'] as int? ?? 3,
   );
 
   final String id;
@@ -61,11 +63,16 @@ class Store {
   final bool otherPaymentEnabled;
   final OnboardingStep onboardingStep;
 
-  /// True after the first approved order: the currency can no longer change.
+  /// True once the store has products or an approved order: the currency can
+  /// no longer change (prices are never converted).
   final bool currencyLocked;
 
   /// Optimistic-concurrency version, sent back with every update.
   final int version;
+
+  /// Stock at or below this is "Low stock" unless a variant has its own
+  /// threshold (Phase 1 BR-18; Phase 6 decision P6-D2: default 3).
+  final int lowStockDefault;
 
   @override
   bool operator ==(Object other) =>

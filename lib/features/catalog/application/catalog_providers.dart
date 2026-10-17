@@ -17,6 +17,7 @@ export '../data/media_store.dart'
         MediaException,
         MediaFailure,
         PhotoSource,
+        imagePreparerProvider,
         mediaStoreProvider,
         photoPickerProvider;
 
@@ -390,7 +391,7 @@ class CatalogActions {
   /// Uploads a prepared photo for [productId]; returns its storage path.
   Future<String> uploadImage(String productId, Uint8List sourceBytes) async {
     final storeId = _requireStore(_ref);
-    final jpeg = await prepareProductImage(sourceBytes);
+    final jpeg = await _ref.read(imagePreparerProvider)(sourceBytes);
     final path = productImagePath(storeId, productId);
     await _ref.read(mediaStoreProvider).upload(path, jpeg);
     return path;

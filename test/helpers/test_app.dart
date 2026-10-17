@@ -3,7 +3,8 @@ import 'package:aisellia/core/clock.dart';
 import 'package:aisellia/core/config/app_config.dart';
 import 'package:aisellia/core/settings/key_value_store.dart';
 import 'package:aisellia/features/auth/application/auth_controller.dart';
-import 'package:aisellia/features/products/data/products_repository.dart';
+import 'package:aisellia/features/catalog/data/catalog_repository.dart';
+import 'package:aisellia/features/catalog/data/media_store.dart';
 import 'package:aisellia/features/store/application/workspace_controller.dart';
 import 'package:aisellia/features/store/domain/store.dart';
 import 'package:aisellia/features/today/data/today_repository.dart';
@@ -12,8 +13,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'catalog_fakes.dart';
 import 'fakes.dart';
 
+export 'catalog_fakes.dart';
 export 'fakes.dart';
 
 /// Builds the real app with test overrides: in-memory preferences, chosen
@@ -27,7 +30,9 @@ Widget testApp({
   AppEnvironment environment = AppEnvironment.dev,
   Map<String, String> extraPrefs = const {},
   TodayRepository? today,
-  ProductsRepository? products,
+  FakeCatalogRepository? catalog,
+  FakeMediaStore? media,
+  FakePhotoPicker? picker,
   FakeAuthRepository? auth,
   FakeStoreRepository? storeBackend,
   bool signedIn = true,
@@ -54,11 +59,16 @@ Widget testApp({
                 ? const SampleTodayRepository(latency: Duration.zero)
                 : const NotConnectedTodayRepository()),
       ),
-      productsRepositoryProvider.overrideWithValue(
-        products ??
-            (sampleData
-                ? const SampleProductsRepository(latency: Duration.zero)
-                : const NotConnectedProductsRepository()),
+      catalogRepositoryProvider.overrideWithValue(
+        catalog ?? FakeCatalogRepository(),
+      ),
+      mediaStoreProvider.overrideWithValue(media ?? FakeMediaStore()),
+      photoPickerProvider.overrideWithValue(picker ?? FakePhotoPicker()),
+      // The real pipeline, run synchronously (no isolates in widget tests).
+      imagePreparerProvider.overrideWithValue(
+        (bytes) async =>
+            prepareProductImageSync(bytes) ??
+            (throw const MediaException(MediaFailure.unsupported)),
       ),
     ],
     child: const AiselliaApp(),

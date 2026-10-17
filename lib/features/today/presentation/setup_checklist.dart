@@ -10,6 +10,7 @@ import '../../../design_system/components/rows.dart';
 import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
+import '../../catalog/application/catalog_providers.dart';
 import '../../store/application/workspace_controller.dart';
 
 /// TD-01 setup checklist (Phase 1 US-008, Journey A step 8). Completion comes
@@ -30,7 +31,9 @@ class SetupChecklist extends ConsumerWidget {
     if (store == null) return const SizedBox.shrink();
     final zones = ref.watch(zonesProvider);
     final hasZones = zones.value?.isNotEmpty ?? false;
-    final done = 1 + (hasZones ? 1 : 0);
+    final hasProduct =
+        (ref.watch(catalogSummaryProvider).value?.total ?? 0) > 0;
+    final done = 1 + (hasZones ? 1 : 0) + (hasProduct ? 1 : 0);
 
     Widget item({
       required String label,
@@ -77,7 +80,11 @@ class SetupChecklist extends ConsumerWidget {
                 complete: hasZones,
                 onTap: () => context.push(Routes.storeZones),
               ),
-              item(label: l10n.checklistProduct, complete: false, later: true),
+              item(
+                label: l10n.checklistProduct,
+                complete: hasProduct,
+                onTap: () => context.push(Routes.productNew),
+              ),
               item(label: l10n.checklistSandbox, complete: false, later: true),
               item(label: l10n.checklistImport, complete: false, later: true),
             ],

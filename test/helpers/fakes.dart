@@ -226,6 +226,7 @@ class FakeStoreRepository implements StoreRepository {
       onboardingStep: step ?? s.onboardingStep,
       currencyLocked: s.currencyLocked,
       version: s.version + 1,
+      lowStockDefault: c['low_stock_default'] as int? ?? s.lowStockDefault,
     );
   }
 

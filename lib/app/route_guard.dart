@@ -33,10 +33,15 @@ abstract final class Routes {
   static const orders = '/orders';
   static const draftPreview = '/orders/preview-draft';
   static const products = '/products';
+  static const productNew = '/products/new';
+  static String product(String id) => '/products/$id';
+  static String productEdit(String id) => '/products/$id/edit';
+  static String productHistory(String id) => '/products/$id/history';
   static const store = '/store';
   static const storeProfile = '/store/profile';
   static const storeZones = '/store/zones';
   static const storePayments = '/store/payments';
+  static const storeInventory = '/store/inventory';
   static const storeAccount = '/store/account';
   static const storeDeleteAccount = '/store/account/delete';
   static const storeLanguage = '/store/language';

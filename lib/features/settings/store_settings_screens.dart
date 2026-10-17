@@ -7,6 +7,7 @@ import '../../app/route_guard.dart';
 import '../../core/backend/api.dart';
 import '../../core/backend/idempotency.dart';
 import '../../core/formatting/bidi.dart';
+import '../../core/formatting/digits.dart';
 import '../../core/formatting/money.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/settings/app_settings.dart';
@@ -21,6 +22,7 @@ import '../../design_system/theme/theme_ext.dart';
 import '../../design_system/tokens/tokens.g.dart';
 import '../auth/application/auth_controller.dart';
 import '../auth/domain/auth_status.dart';
+import '../catalog/application/catalog_providers.dart';
 import '../common/api_error_text.dart';
 import '../common/form_page.dart';
 import '../common/form_widgets.dart';
@@ -708,6 +710,100 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
             onChanged: (_) => setState(() {}),
           ),
         ],
+      ],
+    );
+  }
+}
+
+/// Store inventory setting (Phase 1 BR-18): the default low-stock threshold.
+/// Variants may override it; this is the store-wide default (P6-D2).
+class InventorySettingsScreen extends ConsumerStatefulWidget {
+  const InventorySettingsScreen({super.key});
+
+  @override
+  ConsumerState<InventorySettingsScreen> createState() =>
+      _InventorySettingsScreenState();
+}
+
+class _InventorySettingsScreenState
+    extends ConsumerState<InventorySettingsScreen> {
+  TextEditingController? _value;
+  final _intent = IntentKey();
+  bool _busy = false;
+  bool _invalid = false;
+  ApiException? _error;
+
+  @override
+  void dispose() {
+    _value?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save(Store store) async {
+    final raw = Digits.normalize(_value!.text).trim();
+    final n = int.tryParse(raw);
+    setState(() {
+      _invalid =
+          n == null || n < 0 || n > 9999 || !RegExp(r'^\d+$').hasMatch(raw);
+      _error = null;
+    });
+    if (_invalid || _busy || n == store.lowStockDefault) return;
+    setState(() => _busy = true);
+    final messenger = ScaffoldMessenger.of(context);
+    final saved = context.l10n.saved;
+    try {
+      await ref
+          .read(workspaceProvider.notifier)
+          .updateStore(
+            changes: {'low_stock_default': n!},
+            idempotencyKey: _intent.forPayload('low_stock_default/$n'),
+          );
+      _intent.reset();
+      // Product stock states depend on it.
+      ref.invalidate(catalogListProvider);
+      ref.invalidate(catalogSummaryProvider);
+      showSnackOn(messenger, saved);
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      if (e.code == ApiErrorCode.conflictVersion) await _refreshQuietly(ref);
+      setState(() => _error = e);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final store = ref.watch(workspaceProvider).value?.store;
+    if (store == null) return const SizedBox.shrink();
+    final value = _value ??= TextEditingController(
+      text: '${store.lowStockDefault}',
+    );
+    return FormPage(
+      title: l10n.sectionInventory,
+      bottom: formActions(
+        primary: AppButton(
+          label: l10n.save,
+          expand: true,
+          loading: _busy,
+          onPressed: () => _save(store),
+        ),
+      ),
+      children: [
+        if (_error case final e?) ...[
+          FormErrorBanner(message: apiErrorText(l10n, e)),
+          const SizedBox(height: Space.s16),
+        ],
+        AppTextField(
+          label: l10n.fieldLowStockDefault,
+          helper: l10n.lowStockDefaultHelper,
+          controller: value,
+          ltr: true,
+          keyboardType: TextInputType.number,
+          enabled: !_busy,
+          error: _invalid ? l10n.errQuantityInvalid : null,
+        ),
       ],
     );
   }

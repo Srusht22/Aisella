@@ -1,9 +1,9 @@
 import 'package:aisellia/app/router.dart';
 import 'package:aisellia/core/config/app_config.dart';
+import 'package:aisellia/features/catalog/presentation/product_list_screen.dart';
 import 'package:aisellia/features/inbox/inbox_screen.dart';
 import 'package:aisellia/features/onboarding/language_selection_screen.dart';
 import 'package:aisellia/features/orders/presentation/orders_home_screen.dart';
-import 'package:aisellia/features/products/presentation/products_screen.dart';
 import 'package:aisellia/features/today/presentation/today_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

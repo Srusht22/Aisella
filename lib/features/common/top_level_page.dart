@@ -27,6 +27,7 @@ class TopLevelPage extends ConsumerStatefulWidget {
     this.subtitle,
     this.floatingActionButton,
     this.contentMaxWidth = LayoutTokens.maxWidthReading,
+    this.onRefresh,
   });
 
   final String title;
@@ -36,6 +37,9 @@ class TopLevelPage extends ConsumerStatefulWidget {
 
   /// Must match the [ContentWidth] the slivers use, so the title aligns.
   final double contentMaxWidth;
+
+  /// Pull-to-refresh (Phase 2 P-LOAD-LIST); none when null.
+  final Future<void> Function()? onRefresh;
 
   @override
   ConsumerState<TopLevelPage> createState() => _TopLevelPageState();
@@ -77,86 +81,91 @@ class _TopLevelPageState extends ConsumerState<TopLevelPage> {
             gutter: gutter,
             maxWidth: widget.contentMaxWidth,
           );
-          return NotificationListener<ScrollNotification>(
-            onNotification: _onScroll,
-            child: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  pinned: true,
-                  backgroundColor: p.bgCanvas,
-                  surfaceTintColor: Colors.transparent,
-                  automaticallyImplyLeading: false,
-                  titleSpacing: inset,
-                  // The large title below is the heading for assistive
-                  // technology; this compact copy is decorative.
-                  title: ExcludeSemantics(
-                    child: AnimatedOpacity(
-                      opacity: _collapsed ? 1 : 0,
-                      duration: fade,
-                      child: Text(
-                        widget.title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+          final scrollView = CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                pinned: true,
+                backgroundColor: p.bgCanvas,
+                surfaceTintColor: Colors.transparent,
+                automaticallyImplyLeading: false,
+                titleSpacing: inset,
+                // The large title below is the heading for assistive
+                // technology; this compact copy is decorative.
+                title: ExcludeSemantics(
+                  child: AnimatedOpacity(
+                    opacity: _collapsed ? 1 : 0,
+                    duration: fade,
+                    child: Text(
+                      widget.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  actions: [
-                    StoreButton(
-                      initials: storeName == null || storeName.isEmpty
-                          ? null
-                          : storeName.characters.first,
-                      tooltip: l10n.storeMenuTooltip,
-                      onPressed: () => context.push(Routes.store),
-                    ),
-                    SizedBox(width: (inset - Space.s8).clamp(Space.s8, inset)),
-                  ],
                 ),
-                SliverToBoxAdapter(
-                  child: ContentWidth(
-                    maxWidth: widget.contentMaxWidth,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        top: Space.s4,
-                        bottom: Space.s16,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Semantics(
-                            header: true,
-                            child: Text(
-                              widget.title,
-                              style: type.titleLarge.copyWith(
-                                color: p.textPrimary,
-                              ),
+                actions: [
+                  StoreButton(
+                    initials: storeName == null || storeName.isEmpty
+                        ? null
+                        : storeName.characters.first,
+                    tooltip: l10n.storeMenuTooltip,
+                    onPressed: () => context.push(Routes.store),
+                  ),
+                  SizedBox(width: (inset - Space.s8).clamp(Space.s8, inset)),
+                ],
+              ),
+              SliverToBoxAdapter(
+                child: ContentWidth(
+                  maxWidth: widget.contentMaxWidth,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: Space.s4,
+                      bottom: Space.s16,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            widget.title,
+                            style: type.titleLarge.copyWith(
+                              color: p.textPrimary,
                             ),
                           ),
-                          if (widget.subtitle case final subtitle?) ...[
-                            const SizedBox(height: Space.s4),
-                            Text(
-                              subtitle,
-                              style: type.label.copyWith(
-                                color: p.textSecondary,
-                              ),
-                            ),
-                          ],
+                        ),
+                        if (widget.subtitle case final subtitle?) ...[
+                          const SizedBox(height: Space.s4),
+                          Text(
+                            subtitle,
+                            style: type.label.copyWith(color: p.textSecondary),
+                          ),
                         ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
-                ...widget.slivers,
-                // Clearance so a floating action button never hides the
-                // last row.
-                SliverToBoxAdapter(
-                  child: SizedBox(
-                    height: widget.floatingActionButton == null
-                        ? Space.s32
-                        : Space.s32 + _fabClearance,
-                  ),
+              ),
+              ...widget.slivers,
+              // Clearance so a floating action button never hides the
+              // last row.
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: widget.floatingActionButton == null
+                      ? Space.s32
+                      : Space.s32 + _fabClearance,
                 ),
-              ],
-            ),
+              ),
+            ],
+          );
+          return NotificationListener<ScrollNotification>(
+            onNotification: _onScroll,
+            child: widget.onRefresh == null
+                ? scrollView
+                : RefreshIndicator(
+                    onRefresh: widget.onRefresh!,
+                    color: p.brandPrimary,
+                    child: scrollView,
+                  ),
           );
         },
       ),

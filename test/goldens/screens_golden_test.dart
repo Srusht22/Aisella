@@ -32,6 +32,7 @@ Future<void> _shot(
   Future<void> Function(WidgetTester)? before,
   bool signedIn = true,
   FakeStoreRepository? storeBackend,
+  FakeCatalogRepository? catalog,
 }) async {
   await loadAppFonts();
   // flutter_test paints elevation as a solid black outline by default;
@@ -50,6 +51,7 @@ Future<void> _shot(
       before,
       signedIn,
       storeBackend,
+      catalog,
     );
   } finally {
     debugDisableShadows = true;
@@ -67,6 +69,7 @@ Future<void> _render(
   Future<void> Function(WidgetTester)? before,
   bool signedIn,
   FakeStoreRepository? storeBackend,
+  FakeCatalogRepository? catalog,
 ) async {
   // 2x keeps the committed PNGs small while staying legible for review.
   setScreen(tester, size: size, textScale: textScale, devicePixelRatio: 2);
@@ -76,6 +79,7 @@ Future<void> _render(
       extraPrefs: {if (dark) 'settings.theme': 'dark'},
       signedIn: signedIn,
       storeBackend: storeBackend,
+      catalog: catalog,
     ),
   );
   await tester.pumpAndSettle();
@@ -86,6 +90,15 @@ Future<void> _render(
     await tester.pumpAndSettle();
   }
   if (before != null) await before(tester);
+  // Image decoding runs outside the fake clock: finish it before capturing
+  // so product photos are always in the picture.
+  await tester.runAsync(() async {
+    for (final element in find.byType(Image).evaluate()) {
+      final image = element.widget as Image;
+      await precacheImage(image.image, element);
+    }
+  });
+  await tester.pumpAndSettle();
   await expectLater(
     find.byType(MaterialApp),
     matchesGoldenFile('goldens/$name.png'),
@@ -125,6 +138,7 @@ void main() {
         name: 'products_${locale}_light',
         locale: locale,
         route: Routes.products,
+        catalog: FakeCatalogRepository(products: sampleCatalog()),
       );
     });
     testWidgets('language and display $locale', (t) {
@@ -182,6 +196,7 @@ void main() {
       name: 'products_en_320',
       locale: 'en',
       route: Routes.products,
+      catalog: FakeCatalogRepository(products: sampleCatalog()),
       size: const Size(320, 568),
     );
   });
@@ -270,6 +285,67 @@ void main() {
       locale: 'ckb',
       route: '',
       storeBackend: FakeStoreRepository(store: testStore()),
+    );
+  });
+
+  // Phase 6: catalog and inventory.
+  testWidgets('product detail with options, ckb', (t) {
+    return _shot(
+      t,
+      name: 'p6_detail_shirt_ckb',
+      locale: 'ckb',
+      route: Routes.product('p-shirt'),
+      catalog: FakeCatalogRepository(products: sampleCatalog()),
+    );
+  });
+  testWidgets('product editor with options, en', (t) {
+    return _shot(
+      t,
+      name: 'p6_editor_options_en',
+      locale: 'en',
+      route: Routes.productEdit('p-shirt'),
+      size: const Size(390, 1400),
+      catalog: FakeCatalogRepository(products: sampleCatalog()),
+    );
+  });
+  testWidgets('adjust stock sheet, en', (t) {
+    return _shot(
+      t,
+      name: 'p6_adjust_sheet_en',
+      locale: 'en',
+      route: Routes.product('p-abaya'),
+      catalog: FakeCatalogRepository(products: sampleCatalog()),
+      before: (t) async {
+        await t.tap(find.text('Adjust'));
+        await t.pumpAndSettle();
+        await t.enterText(find.byType(TextField).first, '3');
+        await t.tap(find.text('Received stock'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+  testWidgets('tablet catalog list and detail, en', (t) {
+    return _shot(
+      t,
+      name: 'p6_tablet_products_en',
+      locale: 'en',
+      route: Routes.products,
+      size: _tablet,
+      catalog: FakeCatalogRepository(products: sampleCatalog()),
+      before: (t) async {
+        await t.tap(find.text('Linen Shirt'));
+        await t.pumpAndSettle();
+      },
+    );
+  });
+  testWidgets('products dark, ckb', (t) {
+    return _shot(
+      t,
+      name: 'p6_products_ckb_dark',
+      locale: 'ckb',
+      dark: true,
+      route: Routes.products,
+      catalog: FakeCatalogRepository(products: sampleCatalog()),
     );
   });
 }

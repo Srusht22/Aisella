@@ -214,3 +214,9 @@ final mediaStoreProvider = Provider<MediaStore>(
 );
 
 final photoPickerProvider = Provider<PhotoPicker>((ref) => DevicePhotoPicker());
+
+/// Prepares a photo for upload ([prepareProductImage]; replaceable in tests,
+/// where background isolates do not run).
+final imagePreparerProvider = Provider<Future<Uint8List> Function(Uint8List)>(
+  (ref) => prepareProductImage,
+);

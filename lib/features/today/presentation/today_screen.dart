@@ -16,6 +16,8 @@ import '../../../design_system/layout/responsive.dart';
 import '../../../design_system/motion/primitives.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
+import '../../catalog/application/catalog_providers.dart';
+import '../../catalog/domain/catalog.dart';
 import '../../common/top_level_page.dart';
 import '../data/today_repository.dart';
 import 'setup_checklist.dart';
@@ -41,14 +43,24 @@ class TodayScreen extends ConsumerWidget {
     final Widget content = switch (today) {
       // No orders exist yet (they arrive in a later phase): say so honestly
       // instead of showing zero counts.
-      AsyncData(value: TodayNoStore()) => Padding(
-        padding: const EdgeInsets.only(top: Space.s8),
-        child: Text(
-          l10n.todayNothingYet,
-          style: context.type.body.copyWith(
-            color: context.palette.textSecondary,
+      AsyncData(value: TodayNoStore()) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (catalogAttentionRow(context, ref) case final row?) ...[
+            SectionHeader(l10n.needsAttention),
+            RowGroup(children: [row]),
+            const SizedBox(height: Space.s16),
+          ],
+          Padding(
+            padding: const EdgeInsets.only(top: Space.s8),
+            child: Text(
+              l10n.todayNothingYet,
+              style: context.type.body.copyWith(
+                color: context.palette.textSecondary,
+              ),
+            ),
           ),
-        ),
+        ],
       ),
       AsyncData(value: final TodayData data) => _TodayContent(data: data),
       AsyncError() => ErrorState(
@@ -98,7 +110,6 @@ class _TodayContent extends ConsumerWidget {
 
     void openOrders() => context.go(Routes.orders);
     void openInbox() => context.go(Routes.inbox);
-    void openProducts() => context.go(Routes.products);
 
     final rows = <Widget>[
       if (s.needsApproval > 0)
@@ -155,22 +166,14 @@ class _TodayContent extends ConsumerWidget {
           text: money(s.cashToCollect),
           onTap: openOrders,
         ),
-      if (s.lowStock > 0)
-        _AttentionRow(
-          icon: AppIcons.trendDown,
-          color: p.warningFg,
-          label: l10n.attnLowStock,
-          value: s.lowStock,
-          text: count(s.lowStock),
-          onTap: openProducts,
-        ),
+      ?catalogAttentionRow(context, ref),
     ];
 
     final attention = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         SectionHeader(l10n.needsAttention),
-        if (s.allCaughtUp)
+        if (rows.isEmpty)
           RowGroup(
             children: [
               NavRow(
@@ -324,4 +327,24 @@ class _TodaySkeleton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "Low or out of stock" from the real catalog (Phase 6): the same count as
+/// the product list's Low stock and Out of stock chips (PR-01 #19). Null when
+/// nothing needs attention.
+Widget? catalogAttentionRow(BuildContext context, WidgetRef ref) {
+  final n = ref.watch(catalogSummaryProvider).value?.attention ?? 0;
+  if (n == 0) return null;
+  final digits = ref.watch(settingsProvider).digits;
+  return _AttentionRow(
+    icon: AppIcons.trendDown,
+    color: context.palette.warningFg,
+    label: context.l10n.attnLowStock,
+    value: n,
+    text: Digits.display('$n', digits),
+    onTap: () {
+      ref.read(catalogQueryProvider.notifier).setFilter(CatalogFilter.low);
+      context.go(Routes.products);
+    },
+  );
 }

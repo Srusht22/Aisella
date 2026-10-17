@@ -98,6 +98,11 @@ class StoreMenuScreen extends ConsumerWidget {
                       icon: AppIcons.money,
                       onTap: () => context.push(Routes.storePayments),
                     ),
+                    NavRow(
+                      label: l10n.sectionInventory,
+                      icon: AppIcons.package,
+                      onTap: () => context.push(Routes.storeInventory),
+                    ),
                     later(DeferredFeature.policies, AppIcons.scales),
                     later(DeferredFeature.channels, AppIcons.chatsCircle),
                   ],

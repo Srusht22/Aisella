@@ -51,57 +51,6 @@ void main() {
     );
   });
 
-  group('Products', () {
-    testWidgets('search and filters work on the sample list', (tester) async {
-      setScreen(tester);
-      await tester.pumpWidget(testApp());
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.descendant(
-          of: find.byType(NavigationBar),
-          matching: find.text('Products'),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Beige Abaya'), findsOneWidget);
-
-      await tester.tap(find.text('Out of stock').first);
-      await tester.pumpAndSettle();
-      expect(find.text('Beige Abaya'), findsNothing);
-
-      await tester.tap(find.text('All'));
-      await tester.enterText(find.byType(TextField), 'case-i15');
-      await tester.pumpAndSettle();
-      expect(find.text('Phone case — iPhone 15'), findsOneWidget);
-      expect(find.text('Beige Abaya'), findsNothing);
-
-      await tester.enterText(find.byType(TextField), 'zzz');
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Clear filters'));
-      await tester.pumpAndSettle();
-      expect(find.text('Beige Abaya'), findsOneWidget);
-    });
-
-    testWidgets('empty catalog explains itself; Add product is honest', (
-      tester,
-    ) async {
-      setScreen(tester);
-      await tester.pumpWidget(testApp(sampleData: false));
-      await tester.pumpAndSettle();
-      await tester.tap(
-        find.descendant(
-          of: find.byType(NavigationBar),
-          matching: find.text('Products'),
-        ),
-      );
-      await tester.pumpAndSettle();
-      expect(find.text('Add your first product'), findsOneWidget);
-      await tester.tap(find.text('Add product'));
-      await tester.pump();
-      expect(find.textContaining('Nothing was created'), findsOneWidget);
-    });
-  });
-
   group('Draft review preview (OR-02/OR-03)', () {
     testWidgets(
       'Approve is disabled until the inferred quantity is confirmed',
