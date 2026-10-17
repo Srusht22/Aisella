@@ -1,55 +1,133 @@
-# J. Seller interview: Instagram DMs or WhatsApp first? (owner condition 8)
+# J. Seller interview: which messaging platforms matter, and in what order?
 
-**Purpose:** decide the first live channel (D-02) from how pilot sellers actually take orders. **The weighted score in [B §3](b-channel-comparison.md#3-scoring) is an input, not the decision.**
+**Revision 2:** this covers every target platform plus "other". It replaces the Instagram-vs-WhatsApp version at commit `61833a3`.
+
+**Purpose:** learn where sellers find customers and finalise orders, so the owner can choose the **order of provider integrations**.
+- The research matrix ([M](m-platform-matrix.md)) and any score are inputs, not the decision.
+- **No platform is selected by this document.**
+
+## 1. Who and how
+
+**Initial discovery: at least 5 sellers.** This is the existing minimum. It is enough to find the dominant patterns and surprises, not to size a market.
+
+**Why broader validation is needed before a public launch:**
+- **Five sellers cannot represent many.** Categories (clothing, cosmetics, electronics, food), cities (Erbil, Sulaymaniyah, Duhok, Halabja, others), seller size, and language mix (Sorani, Badini, Arabic) will differ.
+- A public launch commits Aisellia to provider approvals and contracts, to per-provider costs (WhatsApp per message, Viber per bot), and to support for each provider. A wrong order is expensive.
+- **Proposed second stage, before public launch:** a short structured survey (sections A, B, D and F below, multiple choice) with **at least 30 sellers** across categories and the three governorates, plus follow-up interviews with sellers whose answers differ from the first five. Sample sizes are an ASSUMPTION, to be confirmed by the owner.
 
 **Format:**
-- 15–20 minutes per seller, at least 5 sellers.
-- Conducted in Sorani, Arabic or English, as the seller prefers.
-- Notes only, with **no customer names, numbers or screenshots** collected.
-- The Sorani and Arabic wording is left to a native interviewer, who should translate the meaning, not word for word.
+- 20–25 minutes, in Sorani, Badini, Arabic or English, as the seller prefers.
+- A native interviewer translates the meaning; the Sorani and Arabic wording needs native review.
+- **Notes only:** no customer names, phone numbers, account handles, screenshots or message text.
 
-**Consent line (read first):** "We are asking how you sell, to decide which app Aisellia should connect to first. We won't record your customers' details. You can skip any question."
+**Consent line (read first):** "We are asking how you sell, to decide which apps Aisellia should connect to and in which order. We won't record any customer's details or your passwords. You can skip any question or stop at any time."
 
-## A. How orders arrive (the core)
-1. In the last 7 days, roughly how many customer conversations did you have on each app? (Instagram DMs, WhatsApp, Facebook Messenger, Telegram, Viber, phone calls, other)
-2. Where do customers **find** your products, and where do they **place the order**? Is it the same app? If they move from Instagram to WhatsApp, at what point and why?
-3. Of your last 10 orders, how many were agreed on Instagram, on WhatsApp, or elsewhere?
-4. Which app takes most of your time replying? Which questions repeat most (price, size, delivery, stock)?
+## 2. Questions
 
-## B. Accounts and devices
-5. Is your Instagram a **professional** (business or creator) account? Who can log in to it?
-6. For WhatsApp, do you use the **WhatsApp Business app**, ordinary WhatsApp, or both? Is the number personal or only for the shop?
-7. Would you accept connecting a **separate business number** for Aisellia if your current number could not be shared with the app? (Coexistence is probably unavailable for Iraqi numbers: [I W7](i-official-verification.md#1-whatsapp-business-platform).)
-8. Do you use broadcast lists, groups, WhatsApp Catalog or status updates for selling? (Some stop working with coexistence: [I W6](i-official-verification.md#1-whatsapp-business-platform).)
+The platforms are referred to by these codes:
 
-## C. Timing and windows
-9. How quickly do you usually reply? Do you ever reply more than 24 hours later? How often? (Both platforms only allow free-form replies within 24 h of the customer's last message.)
-10. Do customers come back days later about the same order (for example "where is my order")? On which app?
+| Code | Platform |
+|---|---|
+| IG | Instagram |
+| WA | WhatsApp |
+| FB | Facebook Messenger |
+| TG | Telegram |
+| VB | Viber |
+| TT | TikTok |
+| SC | Snapchat |
+| PH | Phone calls |
+| OT | Other: write the name |
 
-## D. Cost and trust
-11. Would you pay a small amount per message for WhatsApp replies through Aisellia beyond a free monthly allowance, or should that be included? (WhatsApp now charges for replies beyond 1,000 per number per month: [I W1](i-official-verification.md#1-whatsapp-business-platform).)
-12. Would you be comfortable letting Aisellia connect to your Instagram or WhatsApp account? What worries you?
-13. You would review and tap **Send** on every message, and nothing is sent automatically. Is that acceptable, or too slow?
+**A. Where customers come from and where orders close**
+1. Where do customers first **discover** your products? Rank the top three (IG, WA, FB, TG, VB, TT, SC, other, and offline or word of mouth).
+2. Where do customers **message** you? Approximately how many conversations per week on each? (0 / 1–10 / 11–50 / 51–200 / 200+)
+3. Where are orders **finalised**, meaning price, size, address and payment agreed? Of your last 10 orders, how many on each platform?
+4. Do customers move between apps during one order (for example TikTok → WhatsApp)? At what point, and why?
+5. Approximately how many **orders per week** do you take in total? In your busiest week?
 
-## E. Customers
-14. Which language do most customers write in (Sorani, Badini, Arabic, English, mixed)? In which script?
-15. Do customers send voice notes or photos more than text? On which app? (Phase 9 shows these as placeholders only.)
+**B. Accounts and willingness to connect**
+6. For each platform you use for selling, what account type do you have?
+   - IG: professional (business or creator) or personal;
+   - FB: Page or profile;
+   - WA: Business app or ordinary WhatsApp, on a shop or personal number;
+   - TG: bot, business account or personal;
+   - VB: bot / business or personal;
+   - TT: business or personal.
+7. Who can log in to each account? Is any shared with staff or family?
+8. Would you connect each account to Aisellia so messages appear in one inbox? (Yes / Maybe / No for each.) Why not, where No?
+9. For WhatsApp: would you use a **separate business number** if your current number could not be connected? (Sharing a number with the WhatsApp Business app is probably unavailable in Iraq: [M §3](m-platform-matrix.md#3-whatsapp-business-platform-cloud-api).)
+10. For Telegram or Viber: would your customers message a **shop bot** instead of you personally?
 
-## Summary sheet (one per seller, filled by the interviewer)
+**C. Features and languages**
+11. Which features matter most? Rank them:
+    - one inbox for all apps;
+    - suggested replies;
+    - order drafts from chats;
+    - order status messages;
+    - reply-time reminders;
+    - seeing photos and voice notes;
+    - working with staff.
+12. Do customers send **voice notes** or **photos** more than text? On which platform? (Early versions show these as placeholders only.)
+13. Which languages and scripts do customers write in (Sorani in Arabic script, Sorani in Latin script, Badini, Arabic, English, mixed)?
+14. Do you ever reply more than 24 hours after a customer's last message? How often? (Several platforms block free replies after 24 h.)
+
+**D. Willingness to pay**
+15. Would you pay a monthly subscription for Aisellia? Roughly how much is reasonable? (Ranges in IQD; the owner sets them.)
+16. Some platforms charge per message (WhatsApp beyond a free monthly allowance) or per month (Viber bots). Should such costs be **included** in the price, **passed through** at cost, or would that make the platform not worth connecting?
+
+**E. Security and privacy**
+17. What worries you about connecting your accounts (losing access, account bans, privacy, staff misuse, cost surprises)?
+18. Are you comfortable with an AI **suggesting** replies, as long as you review and tap Send on every message and nothing is sent automatically?
+19. Would your customers expect to be told that a tool helps you reply?
+
+**F. Priorities**
+20. If Aisellia could connect only **one** platform first, which would save you the most time? Second? Third?
+21. Is there any platform not listed that you or your customers use for selling? (Other)
+
+## 3. Results sheet (one per seller)
 
 | Field | Answer |
 |---|---|
-| Share of order conversations: Instagram / WhatsApp / other (%) | |
-| Where orders are **finalised** | |
-| Instagram professional account? | Yes / No |
-| WhatsApp: Business app / ordinary; shared or separate number; would accept a separate number? | |
+| Seller code (no name), category, city, team size | |
+| Interview language | |
+| Weekly conversations: IG / WA / FB / TG / VB / TT / SC / PH / other | |
+| Last 10 orders finalised on: IG / WA / FB / TG / VB / TT / other | |
+| Orders per week (typical / peak) | |
+| Account types per platform | |
+| Willing to connect (Y / M / N) per platform, with the reason for N | |
+| WhatsApp: would use a separate number? Telegram or Viber: customers would use a bot? | |
+| Top 3 features (Q11) | |
+| Voice notes or photos heavy? On which platform? | |
+| Languages and scripts | |
 | Replies after 24 h: never / sometimes / often | |
-| Comfortable with per-message WhatsApp cost? | Yes / No / Only if included |
-| Main concern | |
+| Subscription willingness (range); provider costs included / passed through / deal-breaker | |
+| Main security or privacy concern | |
+| AI suggestion comfort (Y / M / N) | |
+| Priority 1 / 2 / 3 platform | |
+| Other platforms named | |
 
-## How the answers decide (qualitative, with the owner)
+## 4. Aggregation sheet (across sellers, filled by the owner or interviewer)
 
-- **Instagram first** if most sellers finalise orders in Instagram DMs and have professional accounts. App Review and Business Verification are then the critical path ([I I1–I2](i-official-verification.md#2-instagram-messaging-instagram-api-with-instagram-login)).
-- **WhatsApp first** if most orders are finalised on WhatsApp **and** sellers accept a separate business number (or coexistence is confirmed for Iraq) **and** the per-message cost model is accepted.
-- **Neither yet** if sellers split evenly or reject both connection models. Keep Stage A (copy and paste) and revisit.
-- Any seller concern about account access, privacy or speed of reply goes into the design review before implementation, whichever channel wins.
+| Platform | Sellers using it for selling | Sellers finalising most orders there | Sellers willing to connect | Rank-1 votes | Blocking concerns |
+|---|---|---|---|---|---|
+| IG | | | | | |
+| WA | | | | | |
+| FB | | | | | |
+| TG | | | | | |
+| VB | | | | | |
+| TT | | | | | |
+| Other | | | | | |
+
+## 5. How the results feed the decision (qualitative, owner decides)
+
+For each platform, combine three things:
+- **seller demand**: finalised orders, rank-1 votes, willingness to connect;
+- **feasibility**: the evidence in [M](m-platform-matrix.md), with the UNRESOLVED items resolved or accepted;
+- **cost and approval effort**.
+
+A platform is a candidate for the first integration only if:
+- sellers would connect it;
+- Aisellia can obtain the provider approval for its legal entity;
+- its cost model is acceptable.
+
+**"None yet"** is a valid outcome: sellers keep the manual paste-in inbox.

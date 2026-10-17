@@ -1,6 +1,9 @@
 # Aisellia — Phase 9: messaging integration (design)
 
-**Status:** **Architecture approved in principle by the owner, with conditions (below). Implementation is NOT authorized.** The first channel and the first implementation milestone await the owner's explicit approval.
+**Status:**
+- The single-channel architecture was approved in principle with conditions (below). The docs milestone at `61833a3` was provisionally accepted, subject to direct verification.
+- **Scope revised to a multi-channel public launch:** provider-neutral architecture [L](l-multichannel-architecture.md), platform matrix [M](m-platform-matrix.md), all-platform questionnaire [J](j-seller-interview-questionnaire.md), and milestones [N](n-milestones-public-launch.md). These are **proposals for review, not approved**.
+- **No platform is selected. No milestone is authorized; MC-2 (formerly M9-1) remains proposed.**
 - No channel account is connected.
 - No webhook is configured.
 - No message has been sent.
@@ -48,8 +51,11 @@ Where this design differs from Phase 3, the difference is stated and the stronge
 | G | [Test plan and staging needs](g-test-plan-and-staging.md) | Fixtures, sandbox-only tests, minimum staging infrastructure and credentials |
 | H | [Specification, risks and next steps](h-specification-risks-next-steps.md) | Phase 9 user stories, acceptance criteria, risks, decisions needed, plan |
 | I | [Official-source verification](i-official-verification.md) | Each platform fact against official pages, with its status (confirmed, partly, unverified, changed) |
-| J | [Seller-interview questionnaire](j-seller-interview-questionnaire.md) | How to decide Instagram or WhatsApp first from sellers' real practice |
+| J | [Seller-interview questionnaire](j-seller-interview-questionnaire.md) | Revision 2: all target platforms plus other; results and aggregation sheets; why broader validation is needed |
 | K | [Staging setup checklist](k-staging-setup-checklist.md) | Accounts, credential names (no values), steps, constraints |
+| L | [Multi-channel architecture](l-multichannel-architecture.md) | Provider-neutral core, adapters, capability registry, credentials, queues, isolation, quotas, monitoring, public multi-tenant changes |
+| M | [Platform matrix](m-platform-matrix.md) | Instagram, WhatsApp, Messenger, Telegram, Viber, TikTok, others: every claim labelled VERIFIED / ASSUMPTION / UNRESOLVED with sources |
+| N | [Milestones to public launch](n-milestones-public-launch.md) | MC-0 to MC-6 with acceptance criteria and dependencies (proposed only) |
 
 **About the sources:**
 - Platform facts were gathered by web search on **2026-10-17**.

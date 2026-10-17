@@ -67,6 +67,8 @@ Sends pause while a connection needs attention.
 
 ## 2. Proposed implementation milestones (after approval)
 
+> **Superseded for planning by [N](n-milestones-public-launch.md)** (multi-channel, public launch). M9-1 maps to the provider-neutral MC-2 and **remains proposed and unauthorized**. The table below is kept for traceability.
+
 | # | Milestone | Contents | Gate |
 |---|---|---|---|
 | M9-1 | Data model and roles | Migrations for connections, webhook events, contacts, send requests and the message extensions; ingest and sender roles; pgTAP for isolation, deduplication, send rules and guards | Local only |
@@ -104,8 +106,10 @@ Real sellers connect only after M9-5, the platform's approval, and the Phase 8.5
 - The Human Agent tag is deferred to Phase 9b.
 
 **Outstanding:**
-1. **First channel (D-02).** Run the seller interviews ([J](j-seller-interview-questionnaire.md)), then decide with the owner. Instagram is the provisional lead; WhatsApp depends on the number model, cost and coexistence.
-2. **First implementation milestone.** Proposed: M9-1, data model and roles, local only, after D-02. Needs explicit approval.
+1. **First provider (D-02) and integration order.** Run the seller interviews ([J](j-seller-interview-questionnaire.md), revision 2, all platforms), then the owner decides. **No platform is selected or favoured**; the evidence is in [M](m-platform-matrix.md).
+2. **First implementation milestone.** Proposed: MC-2, the local-only provider-neutral foundation (formerly M9-1). **Not authorized.**
+2a. **Public-launch scope** ([L §13](l-multichannel-architecture.md#13-what-public-multi-tenant-operation-adds-beyond-the-pilot-design), [N MC-6](n-milestones-public-launch.md#mc-6-public-launch-readiness-and-operational-scaling)): billing and plans, provider-cost pass-through (WhatsApp per message, Viber per bot), the broader seller validation size, launch providers.
+2b. **Provider approvals and contracts** for the owner's legal entity: Meta App Review and Business Verification, WhatsApp Tech Provider, Viber commercial contract, TikTok developer reviews. Eligibility is UNRESOLVED for each.
 3. **The legal entity and Meta business portfolio** that will own the Meta app, and its eligibility for Business Verification (I I12, unverified).
 4. **Who pays WhatsApp message charges** (seller or Aisellia), if WhatsApp is chosen.
 5. **Legal review** of the WhatsApp Business Solution Terms AI clauses (I W15) and of platform data-retention terms, before WhatsApp is chosen.
