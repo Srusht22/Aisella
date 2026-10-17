@@ -39,6 +39,24 @@ enum ApiErrorCode {
   /// The product does not track stock.
   stockNotTracked,
 
+  /// The order is not in a status that allows this change
+  /// (`details['current_status']`). For a repeated approval this means it
+  /// is already approved.
+  invalidTransition,
+
+  /// Required order fields are missing (`details['issues']`).
+  incompleteOrder,
+
+  /// Catalog prices changed since the quote (`details['items']`: item_id,
+  /// quoted, current). The seller chooses per line (BR-23).
+  priceChanged,
+
+  /// Lines that can no longer be sold (`details['lines']`: item_id, reason).
+  lineUnavailable,
+
+  /// The account's email is not confirmed; approval needs it.
+  emailNotVerified,
+
   /// The request could not be sent (offline, DNS, connection refused).
   /// Nothing reached the server.
   network,
@@ -82,6 +100,15 @@ class ApiException implements Exception {
     _ => null,
   };
 
+  /// For order errors: the order's current status (wire value).
+  String? get currentStatus => details['current_status'] as String?;
+
+  /// Entries of a list detail (`lines`, `items`, `issues`).
+  List<Map<String, dynamic>> detailList(String key) => [
+    for (final e in details[key] as List? ?? const [])
+      if (e is Map) e.cast<String, dynamic>(),
+  ];
+
   /// Whether the outcome of a mutation is unknown and must be reconciled.
   bool get outcomeUnknown => code == ApiErrorCode.timeout;
 
@@ -104,6 +131,11 @@ const _codes = <String, ApiErrorCode>{
   'STOCK_CHANGED': ApiErrorCode.stockChanged,
   'INSUFFICIENT_STOCK': ApiErrorCode.insufficientStock,
   'STOCK_NOT_TRACKED': ApiErrorCode.stockNotTracked,
+  'INVALID_TRANSITION': ApiErrorCode.invalidTransition,
+  'INCOMPLETE_ORDER': ApiErrorCode.incompleteOrder,
+  'PRICE_CHANGED': ApiErrorCode.priceChanged,
+  'LINE_UNAVAILABLE': ApiErrorCode.lineUnavailable,
+  'EMAIL_NOT_VERIFIED': ApiErrorCode.emailNotVerified,
   'INTERNAL': ApiErrorCode.internal,
 };
 

@@ -16,7 +16,7 @@ import '../../../design_system/components/status.dart';
 import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
-import '../data/sample_draft.dart';
+import 'sample_draft.dart';
 
 /// Time after presentation during which Confirm ignores taps, so a double
 /// tap on Approve cannot pass through (Phase 2 §5.5).

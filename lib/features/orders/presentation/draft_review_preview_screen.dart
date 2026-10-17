@@ -20,8 +20,8 @@ import '../../../design_system/motion/motion.dart';
 import '../../../design_system/motion/primitives.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
-import '../data/sample_draft.dart';
 import 'approve_sheet.dart';
+import 'sample_draft.dart';
 
 /// OR-02 Draft review — DESIGN PREVIEW on sample data (Phase 2 §5).
 ///

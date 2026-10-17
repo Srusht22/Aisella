@@ -282,6 +282,7 @@ class InventoryMovement {
     required this.createdAt,
     required this.actor,
     this.note,
+    this.orderNumber,
   });
 
   factory InventoryMovement.fromJson(Map<String, dynamic> j) =>
@@ -293,6 +294,7 @@ class InventoryMovement {
         resultingQty: (j['resulting_qty'] as num).toInt(),
         reason: StockReason.parse(j['reason']),
         note: j['note'] as String?,
+        orderNumber: (j['order_number'] as num?)?.toInt(),
         createdAt: DateTime.parse(j['created_at'] as String).toLocal(),
         actor: switch (j['actor']) {
           'you' => MovementActor.you,
@@ -310,6 +312,9 @@ class InventoryMovement {
   final String? note;
   final DateTime createdAt;
   final MovementActor actor;
+
+  /// The order behind an order movement (approval, edit, cancel, return).
+  final int? orderNumber;
 }
 
 /// Result of a confirmed stock adjustment.
