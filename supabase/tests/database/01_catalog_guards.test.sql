@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(12);
+select plan(17);
 
 select is(
   (select array_agg(c.relname order by c.relname) from pg_class c
@@ -78,23 +78,38 @@ select is(
   'every api view is security_invoker, so RLS applies to the caller'
 );
 
--- Every api function must appear here AND be covered by 02_tenant_isolation. Adding a
--- function without updating both fails this test.
+-- Every api function must appear here AND be covered by an isolation suite (02, 07 or 10).
+-- Adding a function without updating both fails this test.
 select is(
   (select array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text) from pg_proc p
      join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'api'),
   array[
     'api.adjust_stock(uuid,uuid,text,integer,text,text,integer,uuid)',
     'api.advance_onboarding(uuid,text)',
+    'api.approve_order(uuid,uuid,integer,jsonb,uuid)',
+    'api.cancel_order(uuid,uuid,integer,text,text,uuid)',
     'api.catalog_summary(uuid)',
+    'api.create_order(uuid,jsonb,uuid)',
     'api.create_store(text,text,text,text,text,uuid)',
     'api.deactivate_zone(uuid,uuid,integer)',
+    'api.edit_approved_order(uuid,uuid,integer,jsonb,uuid)',
     'api.get_my_context()',
+    'api.get_order(uuid,uuid)',
     'api.get_product(uuid,uuid)',
     'api.list_inventory_movements(uuid,uuid,uuid,integer,bigint)',
+    'api.list_orders(uuid,text,text,integer,integer)',
     'api.list_products(uuid,text,text,text,text,integer,integer)',
+    'api.mark_confirmation_sent(uuid,uuid)',
+    'api.order_history(uuid,uuid)',
+    'api.order_summary(uuid)',
+    'api.record_cod(uuid,uuid,bigint,uuid)',
+    'api.record_return(uuid,uuid,integer,jsonb,text,uuid)',
+    'api.reject_draft(uuid,uuid,integer,text,text,uuid)',
     'api.request_account_deletion(text)',
     'api.set_product_status(uuid,uuid,integer,text)',
+    'api.transition_order(uuid,uuid,integer,text,jsonb,uuid)',
+    'api.update_draft(uuid,uuid,integer,jsonb,uuid)',
+    'api.update_order_note(uuid,uuid,integer,text)',
     'api.update_store(uuid,integer,jsonb,uuid)',
     'api.upsert_product(uuid,uuid,integer,jsonb,uuid)',
     'api.upsert_zone(uuid,uuid,integer,text,integer,text,uuid)'
@@ -117,6 +132,20 @@ select is(
 select ok(exists (select 1 from pg_trigger where tgname = 'inventory_movements_append_only'
                    and tgrelid = 'app.inventory_movements'::regclass),
           'inventory_movements has the append-only trigger');
+
+-- Orders (Phase 7): history append-only, transitions fixed and enforced on every write.
+select ok(exists (select 1 from pg_trigger where tgname = 'order_status_events_append_only'
+                   and tgrelid = 'app.order_status_events'::regclass),
+          'order_status_events has the append-only trigger');
+select ok(exists (select 1 from pg_trigger where tgname = 'orders_status_guard'
+                   and tgrelid = 'app.orders'::regclass),
+          'orders has the transition guard trigger');
+select is((select count(*)::integer from app.order_transitions), 15,
+          'the transition table holds exactly the 15 transitions of BR-30');
+select is((select array_agg(from_status order by from_status) from app.order_transitions where to_status = 'approved'),
+          array['pending_approval'], 'approved is reachable only from pending_approval');
+select is((select array_agg(distinct via) from app.order_transitions where to_status = 'approved'),
+          array['approve'], '… and only through approve_order');
 
 select * from finish();
 rollback;

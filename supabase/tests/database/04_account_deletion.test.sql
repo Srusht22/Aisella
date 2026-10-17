@@ -2,7 +2,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(19);
+select plan(21);
 
 create temp table ids (k text primary key, v uuid);
 create temp table res (k text primary key, v jsonb);
@@ -14,15 +14,26 @@ select pg_temp.act_as((select v from ids where k = 'a'), interval '10 seconds');
 insert into ids select 'store_a', (api.create_store('Leaving Shop', '+9647501234567', 'IQD', 'ckb', 'Erbil',
                                                     gen_random_uuid()) #>> '{data,id}')::uuid;
 -- Phase 6: the leaving seller has a catalog with stock history (the ledger is append-only).
-select api.upsert_product((select v from ids where k = 'store_a'), gen_random_uuid(), null,
+insert into res select 'pa', api.upsert_product((select v from ids where k = 'store_a'), gen_random_uuid(), null,
   '{"name": "Old stock", "base_price": 1000, "track_stock": true, "status": "active", "option_types": [],
-    "variants": [{"option_values": [], "initial_stock": 3}], "images": []}', gen_random_uuid()) is not null as created;
+    "variants": [{"option_values": [], "initial_stock": 3}], "images": []}', gen_random_uuid());
+-- Phase 7: … and an approved order (status history, order movements).
+insert into res select 'oa', api.create_order((select v from ids where k = 'store_a'), jsonb_build_object(
+  'customer_name', 'Nzar Ahmad', 'customer_phone', '+9647501112233', 'city_text', 'Erbil', 'delivery_fee', 0,
+  'area', 'Ankawa', 'payment_method', 'cod',
+  'lines', jsonb_build_array(jsonb_build_object('variant_id', (select v #>> '{data,variants,0,id}' from res where k = 'pa'),
+                                                'quantity', 1))), gen_random_uuid());
+select api.approve_order((select v from ids where k = 'store_a'), (select (v #>> '{data,id}')::uuid from res where k = 'oa'),
+                         (select (v #>> '{data,version}')::integer from res where k = 'oa'), '{}', gen_random_uuid())
+       #>> '{data,status}' as approved;
 select pg_temp.act_as((select v from ids where k = 'b'), interval '10 seconds');
 insert into ids select 'store_b', (api.create_store('Staying Shop', '+9647701234567', 'IQD', 'ckb', 'Duhok',
                                                     gen_random_uuid()) #>> '{data,id}')::uuid;
 select api.upsert_product((select v from ids where k = 'store_b'), gen_random_uuid(), null,
   '{"name": "Kept stock", "base_price": 1000, "track_stock": true, "status": "active", "option_types": [],
     "variants": [{"option_values": [], "initial_stock": 2}], "images": []}', gen_random_uuid()) is not null as created;
+select api.create_order((select v from ids where k = 'store_b'), '{"customer_name": "Kept draft"}', gen_random_uuid())
+       is not null as created;
 
 -- Re-authentication is required.
 select pg_temp.act_as((select v from ids where k = 'a'));
@@ -82,6 +93,13 @@ select ok(
   'the catalog and its stock history are purged too');
 select throws_ok($$ delete from app.inventory_movements $$, 'AS002', null,
                  'outside the purge the ledger is still append-only (the other seller''s history stays)');
+select ok(
+  not exists (select 1 from app.orders where store_id = (select v from ids where k = 'store_a'))
+  and not exists (select 1 from app.order_items where store_id = (select v from ids where k = 'store_a'))
+  and not exists (select 1 from app.order_status_events where store_id = (select v from ids where k = 'store_a')),
+  'orders, their lines and their status history are purged too');
+select throws_ok($$ delete from app.order_status_events $$, 'AS002', null,
+                 'outside the purge order history is still append-only');
 select ok(
   exists (select 1 from app.stores where id = (select v from ids where k = 'store_b'))
   and exists (select 1 from auth.users where id = (select v from ids where k = 'b')),
