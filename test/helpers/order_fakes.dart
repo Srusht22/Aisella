@@ -32,6 +32,9 @@ class FakeOrdersRepository implements OrdersRepository {
   /// The next call fails with this error (then it is cleared).
   ApiException? failNext;
 
+  /// Only calls starting with this prefix consume [failNext].
+  String failOn = '';
+
   /// Lets a test answer a call only after a check (in-flight states).
   Future<void>? gate;
 
@@ -40,7 +43,7 @@ class FakeOrdersRepository implements OrdersRepository {
     final g = gate;
     if (g != null) await g;
     final f = failNext;
-    if (f != null) {
+    if (f != null && call.startsWith(failOn)) {
       failNext = null;
       throw f;
     }
