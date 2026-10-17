@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(17);
+select plan(24);
 
 select is(
   (select array_agg(c.relname order by c.relname) from pg_class c
@@ -86,9 +86,11 @@ select is(
   array[
     'api.adjust_stock(uuid,uuid,text,integer,text,text,integer,uuid)',
     'api.advance_onboarding(uuid,text)',
+    'api.ai_upsert_draft(text,text,jsonb,uuid)',
     'api.approve_order(uuid,uuid,integer,jsonb,uuid)',
     'api.cancel_order(uuid,uuid,integer,text,text,uuid)',
     'api.catalog_summary(uuid)',
+    'api.create_ai_draft_grant(uuid,text,text,integer)',
     'api.create_order(uuid,jsonb,uuid)',
     'api.create_store(text,text,text,text,text,uuid)',
     'api.deactivate_zone(uuid,uuid,integer)',
@@ -96,6 +98,7 @@ select is(
     'api.get_my_context()',
     'api.get_order(uuid,uuid)',
     'api.get_product(uuid,uuid)',
+    'api.list_ai_draft_grants(uuid)',
     'api.list_inventory_movements(uuid,uuid,uuid,integer,bigint)',
     'api.list_orders(uuid,text,text,integer,integer)',
     'api.list_products(uuid,text,text,text,text,integer,integer)',
@@ -106,6 +109,7 @@ select is(
     'api.record_return(uuid,uuid,integer,jsonb,text,uuid)',
     'api.reject_draft(uuid,uuid,integer,text,text,uuid)',
     'api.request_account_deletion(text)',
+    'api.revoke_ai_draft_grant(uuid,uuid)',
     'api.set_product_status(uuid,uuid,integer,text)',
     'api.transition_order(uuid,uuid,integer,text,jsonb,uuid)',
     'api.update_draft(uuid,uuid,integer,jsonb,uuid)',
@@ -146,6 +150,43 @@ select is((select array_agg(from_status order by from_status) from app.order_tra
           array['pending_approval'], 'approved is reachable only from pending_approval');
 select is((select array_agg(distinct via) from app.order_transitions where to_status = 'approved'),
           array['approve'], '… and only through approve_order');
+
+-- The AI execution role (Phase 8 hardening): one function, no tables, no inherited rights.
+select is((select row(rolcanlogin, rolinherit, rolsuper, rolbypassrls, rolcreaterole, rolcreatedb)::text
+             from pg_roles where rolname = 'aisellia_ai'),
+          row(false, false, false, false, false, false)::text,
+          'aisellia_ai cannot log in, inherits nothing and has no special attributes');
+select is((select array_agg(b.rolname::text order by b.rolname) from pg_auth_members m
+             join pg_roles b on b.oid = m.roleid where m.member = 'aisellia_ai'::regrole),
+          null, 'aisellia_ai is a member of no other role (not authenticated, not service_role)');
+select is(
+  (select array_agg(p.oid::regprocedure::text) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname in ('api', 'app', 'internal') and has_function_privilege('aisellia_ai', p.oid, 'EXECUTE')),
+  array['api.ai_upsert_draft(text,text,jsonb,uuid)'],
+  'aisellia_ai can execute exactly one function: api.ai_upsert_draft');
+select is(
+  (select array_agg(format('%s.%s:%s', n.nspname, c.relname, p.priv) order by 1) from pg_class c
+     join pg_namespace n on n.oid = c.relnamespace
+     cross join (values ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE'), ('TRUNCATE')) p(priv)
+    where n.nspname not in ('pg_catalog', 'information_schema') and n.nspname not like 'pg_t%'
+      and c.relkind in ('r', 'v', 'm', 'p', 'f')
+      -- Effective access needs both: some extensions grant tables to PUBLIC in schemas the role can't enter.
+      and has_schema_privilege('aisellia_ai', n.oid, 'USAGE')
+      and has_table_privilege('aisellia_ai', c.oid, p.priv)),
+  null,
+  'aisellia_ai can reach no table or view in any schema (including storage and auth)');
+select is(
+  (select array_agg(n.nspname::text order by n.nspname) from pg_namespace n
+    where has_schema_privilege('aisellia_ai', n.oid, 'USAGE')
+      and n.nspname not in ('pg_catalog', 'information_schema') and n.nspname not like 'pg_t%'),
+  array['api', 'public'],
+  'aisellia_ai can enter only api (and public, which holds no tables)');
+select is(
+  (select array_agg(r order by r) from unnest(array['anon', 'authenticated', 'service_role']) r
+    where has_function_privilege(r, 'api.ai_upsert_draft(text,text,jsonb,uuid)', 'EXECUTE')),
+  null, 'no other role can execute the AI draft function');
+select ok(pg_has_role('authenticator', 'aisellia_ai', 'member'),
+          'PostgREST (authenticator) can switch to aisellia_ai for an AI token');
 
 select * from finish();
 rollback;
