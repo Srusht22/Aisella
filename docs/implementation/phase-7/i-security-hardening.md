@@ -118,6 +118,7 @@ The HTTP test refuses any non-local URL. Unlike pgTAP, it leaves its two test se
 ## 5. Open points for Phase 8
 
 > Phase 8 resolved points 1 and 3, and part of 4 and 5: see [Phase 8 H §2](../phase-8/h-phase-8-completion-report.md#2-known-risks-from-the-hardening-report-and-how-this-phase-addresses-them).
+> Phase 8.5 resolved point 4 (order notes are now redacted on anonymisation): see [Phase 8.5 E](../phase-8.5/e-customer-data.md).
 
 1. **Issuing AI tokens in production.** The local test mints `aisellia_ai` JWTs with the project's JWT secret. In production that secret must stay in the server-side AI worker only, never in the app. A short-lived token or asymmetric signing keys are preferable. This has not been decided or deployed.
 2. **Refused calls count toward the per-minute rate**, including validation failures. This is intentional, against probing, but should be revisited with real traffic.

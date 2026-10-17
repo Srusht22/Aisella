@@ -46,7 +46,7 @@
 ## 3. Real-provider evaluation (prepared, not run)
 
 **Set:** `supabase/functions/ai-assist/eval/scenarios.json`, version `e8.1`, with 24 synthetic conversations:
-- 17 in English, 4 in Sorani, 3 in Arabic;
+- 18 in English, 3 in Sorani, 3 in Arabic (corrected in Phase 8.5; this line previously said 17 / 4 / 3);
 - covering price, a missing variant, out of stock, comparison, budget, missing and existing policy, delivery, start order, follow-up quantity, change variant, corrected phone, contradiction, not in catalog, "approve my order", another store's data, Arabic and English injection, a health question, a full Sorani order, an incomplete Arabic order, and order status.
 
 **Checks (no model grading):**
