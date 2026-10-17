@@ -399,6 +399,12 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# Phase 8 AI assistant. The gateway verifies the seller's JWT before the function runs; the function
+# forwards that JWT to api.request_ai_assist. Secrets (ANTHROPIC_API_KEY, AISELLIA_AI_WORKER_DB_URL)
+# are set with `supabase secrets set`, never here.
+[functions.ai-assist]
+verify_jwt = true
+
 [analytics]
 enabled = false
 port = 54327

@@ -1,0 +1,16 @@
+{
+  "imports": {
+    "@anthropic-ai/sdk": "npm:@anthropic-ai/sdk@0.131.0",
+    "postgres": "npm:postgres@3.4.9"
+  },
+  "compilerOptions": {
+    "strict": true
+  },
+  "lint": {
+    "rules": { "tags": ["recommended"] }
+  },
+  "fmt": {
+    "lineWidth": 110,
+    "singleQuote": false
+  }
+}
