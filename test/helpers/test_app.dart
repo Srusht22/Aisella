@@ -1,4 +1,5 @@
 import 'package:aisellia/app/app.dart';
+import 'package:aisellia/core/clock.dart';
 import 'package:aisellia/core/config/app_config.dart';
 import 'package:aisellia/core/settings/key_value_store.dart';
 import 'package:aisellia/features/auth/application/auth_controller.dart';
@@ -18,6 +19,8 @@ export 'fakes.dart';
 /// Builds the real app with test overrides: in-memory preferences, chosen
 /// language, fake auth and store backends, zero-latency repositories.
 /// By default a verified seller is signed in with a fully set-up store.
+/// The clock is fixed so screens that show today's date render identically
+/// on every day (the goldens depend on it).
 Widget testApp({
   String? locale = 'en',
   bool sampleData = true,
@@ -38,6 +41,7 @@ Widget testApp({
   final prefs = InMemoryStore({'settings.locale': ?locale, ...extraPrefs});
   return ProviderScope(
     overrides: [
+      clockProvider.overrideWithValue(() => testNow),
       appConfigProvider.overrideWithValue(
         AppConfig(environment: environment, sampleData: sampleData),
       ),
@@ -60,6 +64,9 @@ Widget testApp({
     child: const AiselliaApp(),
   );
 }
+
+/// The fixed "now" of widget and golden tests: Thursday, 15 October 2026.
+final testNow = DateTime(2026, 10, 15, 10);
 
 /// Sets the logical screen size and text scale for one test.
 void setScreen(

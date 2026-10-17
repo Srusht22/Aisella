@@ -117,11 +117,4 @@ class AuthController extends Notifier<AuthStatus> {
     if (current is! SignedIn) throw const AuthError(AuthFailure.unknown);
     await _repo.signIn(email: current.user.email, password: password);
   }
-
-  /// Re-reads the user (for example to notice a verified email on resume).
-  Future<void> refreshUser() async {
-    if (state is! SignedIn) return;
-    final user = await _repo.reloadUser();
-    if (user != null && state is SignedIn) state = SignedIn(user);
-  }
 }

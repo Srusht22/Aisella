@@ -57,10 +57,6 @@ abstract interface class AuthRepository {
   Future<void> requestPasswordReset(String email);
 
   Future<void> updatePassword(String newPassword);
-
-  /// Fresh user data from the server (for example after the email was
-  /// verified on another device).
-  Future<AuthUser?> reloadUser();
 }
 
 const _authTimeout = Duration(seconds: 20);
@@ -161,16 +157,6 @@ class SupabaseAuthRepository implements AuthRepository {
   @override
   Future<void> updatePassword(String newPassword) =>
       _guard(() => _auth.updateUser(UserAttributes(password: newPassword)));
-
-  @override
-  Future<AuthUser?> reloadUser() async {
-    try {
-      final res = await _auth.getUser().timeout(_authTimeout);
-      return _toUser(res.user);
-    } on Object {
-      return null;
-    }
-  }
 
   static AuthUser? _toUser(User? user) => user == null
       ? null

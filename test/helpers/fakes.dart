@@ -133,9 +133,6 @@ class FakeAuthRepository implements AuthRepository {
     calls.add('updatePassword');
     _maybeFail();
   }
-
-  @override
-  Future<AuthUser?> reloadUser() async => initialUser;
 }
 
 /// In-memory store backend enforcing the same rules the tests rely on

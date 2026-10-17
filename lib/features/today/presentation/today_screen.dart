@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
+import '../../../core/clock.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/formatting/digits.dart';
 import '../../../core/formatting/money.dart';
@@ -32,7 +33,7 @@ class TodayScreen extends ConsumerWidget {
     final locale = Localizations.localeOf(context);
     final today = ref.watch(todayProvider);
     final date = Dates.weekdayDayMonth(
-      DateTime.now(),
+      ref.watch(clockProvider)(),
       locale: locale,
       digits: settings.digits,
     );
