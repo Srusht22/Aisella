@@ -70,6 +70,26 @@ Deno.test("the request carries the key, the version, the schema, the effort and 
   }
 });
 
+Deno.test("inference_geo is sent only when configured, and the served region is reported", async () => {
+  const bodies: Record<string, unknown>[] = [];
+  const { server, url } = stub((_req, body) => {
+    bodies.push(body);
+    const m = message('{"ok":true}');
+    return Response.json({ ...m, usage: { ...m.usage, inference_geo: body.inference_geo ?? "global" } });
+  });
+  try {
+    const provider = new AnthropicProvider({ apiKey: KEY, baseURL: url, maxRetries: 0 });
+    const plain = await provider.generate(request());
+    const us = await provider.generate({ ...request(), inferenceGeo: "us" });
+    assertFalse("inference_geo" in bodies[0], "no region parameter by default (workspace default applies)");
+    assertEquals(bodies[1].inference_geo, "us");
+    assertEquals(plain.inferenceGeo, "global");
+    assertEquals(us.inferenceGeo, "us");
+  } finally {
+    await server.shutdown();
+  }
+});
+
 for (
   const [status, kind, code] of [
     [429, "rate_limited", "provider_rate_limited"],

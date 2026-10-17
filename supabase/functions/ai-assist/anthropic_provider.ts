@@ -40,6 +40,7 @@ export class AnthropicProvider implements AiProvider {
           ),
           messages: [{ role: "user", content: request.user }],
           output_config: { effort: request.effort, format: { type: "json_schema", schema: request.schema } },
+          ...(request.inferenceGeo ? { inference_geo: request.inferenceGeo } : {}),
         },
         { timeout: request.timeoutMs },
       );
@@ -55,6 +56,7 @@ export class AnthropicProvider implements AiProvider {
       text: text === "" ? null : text,
       stopReason: response.stop_reason ?? null,
       servedModel: response.model ?? null,
+      inferenceGeo: usage?.inference_geo ?? null,
       requestId: (response as { _request_id?: string | null })._request_id ?? null,
       usage: {
         input_tokens: usage?.input_tokens ?? 0,

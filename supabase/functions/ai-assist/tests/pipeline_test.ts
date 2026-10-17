@@ -22,6 +22,27 @@ Deno.test("a valid answer is handed to the database once", async () => {
   assertEquals((meta.usage as Record<string, number>).input_tokens, 100);
 });
 
+Deno.test("the inference region is requested and recorded for costing", async () => {
+  const db = new MemoryWorkerDb();
+  const provider = new ScriptedProvider([{ ...response(JSON.stringify(validOutput())), inferenceGeo: "us" }]);
+  await runAssist("run", {
+    db,
+    provider,
+    settings: { ...settings, inferenceGeo: "us" },
+    log: () => {},
+    correlationId: "corr",
+  });
+  assertEquals(provider.requests[0].inferenceGeo, "us");
+  assertEquals((db.calls[1].args[2] as Record<string, unknown>).inference_geo, "us");
+  const db2 = new MemoryWorkerDb();
+  await run(db2, new ScriptedProvider([response(JSON.stringify(validOutput()))]));
+  assertEquals(
+    (db2.calls[1].args[2] as Record<string, unknown>).inference_geo,
+    null,
+    "unknown region is recorded as null",
+  );
+});
+
 Deno.test("the provider receives the schema, the effort and the run's context only", async () => {
   const db = new MemoryWorkerDb();
   const provider = new ScriptedProvider([response(JSON.stringify(validOutput()))]);

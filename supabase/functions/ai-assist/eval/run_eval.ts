@@ -6,7 +6,15 @@
 //
 //   ANTHROPIC_API_KEY=... AISELLIA_EVAL=1 SUPABASE_TEST_URL=http://127.0.0.1:54321 \
 //   SUPABASE_TEST_PUBLISHABLE_KEY=... SUPABASE_TEST_JWT_SECRET=... \
-//   deno run --allow-net --allow-env --allow-read --allow-write=./eval/out eval/run_eval.ts [scenario-id ...]
+//   deno run --allow-net --allow-env --allow-read --allow-write=./eval/out eval/run_eval.ts \
+//     [--max-cost-usd=5] [--set=/path/outside/the/repo/consented.json] [--plan] [scenario-id ...]
+//
+// --plan prints what would run and the spending cap, and calls nothing (no key needed).
+// --max-cost-usd stops before the next scenario once the recorded cost reaches the cap
+//   (default USD 5; the overshoot is at most one scenario, two model calls).
+// --set reads another scenario file of the same shape, e.g. consented real conversations. It must
+//   live outside the repository so customer text is never committed; reports go to eval/out/
+//   (ignored by git).
 import { AnthropicProvider } from "../anthropic_provider.ts";
 import { createHandler } from "../handler.ts";
 import { PostgrestSellerApi } from "../seller_api.ts";
@@ -23,6 +31,7 @@ import {
   uuid,
   withWorker,
 } from "../tests/local_stack.ts";
+import { ArgsError, type EvalResult, parseArgs, report } from "./summary.ts";
 
 interface Expect {
   intent_any?: string[];
@@ -51,18 +60,64 @@ interface Scenario {
   expect: Expect;
 }
 
+let args;
+try {
+  args = parseArgs(Deno.args);
+} catch (e) {
+  console.error(e instanceof ArgsError ? e.message : "invalid arguments");
+  Deno.exit(2);
+}
+let setUrl = new URL("./scenarios.json", import.meta.url);
+if (args.setPath) {
+  const repoRoot = await Deno.realPath(new URL("../../../../", import.meta.url));
+  const real = await Deno.realPath(args.setPath).catch(() => null);
+  if (!real) {
+    console.error("Not run: the --set file does not exist.");
+    Deno.exit(2);
+  }
+  if (real.startsWith(repoRoot + "/")) {
+    console.error("Not run: keep consented conversations outside the repository (--set points inside it).");
+    Deno.exit(2);
+  }
+  setUrl = new URL(`file://${real}`);
+}
+const spec = JSON.parse(await Deno.readTextFile(setUrl));
+const only = new Set(args.ids);
+const scenarios = (spec.scenarios as Scenario[]).filter((s) => only.size === 0 || only.has(s.id));
+const model = Deno.env.get("AI_MODEL") ?? "claude-opus-5-5";
+const effort = (Deno.env.get("AI_EFFORT") ?? "low") as "low" | "medium" | "high";
+const geoRaw = Deno.env.get("AI_INFERENCE_GEO")?.trim() || null;
+if (geoRaw !== null && geoRaw !== "global" && geoRaw !== "us") {
+  console.error("Not run: AI_INFERENCE_GEO must be global or us.");
+  Deno.exit(2);
+}
+const inferenceGeo = geoRaw as "global" | "us" | null;
+
+if (args.plan) {
+  const perLang: Record<string, number> = {};
+  for (const s of scenarios) perLang[s.lang] = (perLang[s.lang] ?? 0) + 1;
+  console.log(JSON.stringify(
+    {
+      set: spec.version,
+      scenarios: scenarios.length,
+      per_language: perLang,
+      model,
+      effort,
+      inference_geo: inferenceGeo,
+      max_cost_usd: args.maxCostUsd,
+    },
+    null,
+    2,
+  ));
+  Deno.exit(0);
+}
+
 const apiKey = Deno.env.get("ANTHROPIC_API_KEY")?.trim();
 if (Deno.env.get("AISELLIA_EVAL") !== "1" || !apiKey) {
   console.error("Not run: set AISELLIA_EVAL=1 and ANTHROPIC_API_KEY (this evaluation calls the paid API).");
   Deno.exit(2);
 }
 assertLocal();
-
-const spec = JSON.parse(await Deno.readTextFile(new URL("./scenarios.json", import.meta.url)));
-const only = new Set(Deno.args);
-const scenarios = (spec.scenarios as Scenario[]).filter((s) => only.size === 0 || only.has(s.id));
-const model = Deno.env.get("AI_MODEL") ?? "claude-opus-5-5";
-const effort = (Deno.env.get("AI_EFFORT") ?? "low") as "low" | "medium" | "high";
 
 const results = await withWorker(async (admin, workerUrl) => {
   const seller: Seller = await createSeller(admin, { tag: "eval", ...spec.store });
@@ -76,13 +131,35 @@ const results = await withWorker(async (admin, workerUrl) => {
     sellerApi: new PostgrestSellerApi(API, KEY),
     db: new PostgresWorkerDb(workerUrl),
     provider: new AnthropicProvider({ apiKey }),
-    settings: { model, effort, maxTokens: 8000, providerTimeoutMs: 60000, budgetMs: 110000 },
+    settings: { model, effort, maxTokens: 8000, providerTimeoutMs: 60000, budgetMs: 110000, inferenceGeo },
     allowedOrigins: [],
     log: () => {},
   });
 
-  const out = [];
+  const out: (EvalResult & Record<string, unknown>)[] = [];
+  let spentMicro = 0;
   for (const s of scenarios) {
+    if (spentMicro >= args.maxCostUsd * 1e6) {
+      out.push({
+        id: s.id,
+        lang: s.lang,
+        pass: false,
+        failures: ["not run: spending cap reached"],
+        run_status: "not_run",
+        expected_escalated: s.expect.escalated ?? null,
+        escalated: false,
+        grounding_expected: (s.expect.facts_include ?? []).length > 0,
+        grounding_ok: false,
+        flags: [],
+        is_holding: false,
+        order_status: null,
+        approved: false,
+        latency_ms: null,
+        cost_micro_usd: null,
+      });
+      console.log(`SKIP ${s.id} (spending cap of USD ${args.maxCostUsd} reached)`);
+      continue;
+    }
     const conv = await createConversation(seller, s.messages);
     const started = Date.now();
     const res = await handler(
@@ -111,16 +188,25 @@ const results = await withWorker(async (admin, workerUrl) => {
                                      output_json -> 'clarification' as clarification
                                 from app.ai_runs where conversation_id = ${conv} order by created_at desc limit 1`;
     const failures = check(s.expect, { c, order, run, seller });
+    spentMicro += Number(run?.cost_micro_usd ?? 0);
+    const facts: string[] = (c.suggestion?.facts_used ?? []).map((u: { fact: string }) => u.fact);
+    const flags: string[] = c.suggestion?.flags ?? [];
     out.push({
       id: s.id,
       lang: s.lang,
       pass: call.ok && run?.status === "succeeded" && failures.length === 0,
       failures: run?.status === "succeeded" ? failures : [`run ${run?.status ?? call.error?.code}`],
-      run_status: run?.status,
+      run_status: run?.status ?? "missing",
+      expected_escalated: s.expect.escalated ?? null,
+      escalated: (c.escalation_reasons ?? []).length > 0,
+      grounding_expected: (s.expect.facts_include ?? []).length > 0,
+      grounding_ok: (s.expect.facts_include ?? []).every((f) => facts.includes(f)) && flags.length === 0,
+      flags,
+      is_holding: c.suggestion?.is_holding === true,
+      approved: (order?.events ?? []).some((ev: { to: string }) => ev.to === "approved"),
       intent: run?.intent,
       escalation: c.escalation_reasons,
       reply: c.suggestion?.text ?? null,
-      flags: c.suggestion?.flags ?? [],
       order_status: order?.status ?? null,
       latency_ms: Date.now() - started,
       tokens: run
@@ -202,18 +288,26 @@ const summary = {
   version: spec.version,
   model,
   effort,
+  inference_geo: inferenceGeo,
+  max_cost_usd: args.maxCostUsd,
   ran_at: new Date().toISOString(),
   passed: results.filter((r) => r.pass).length,
   total: results.length,
-  auto_approved: 0,
-  unsupported_claims_shown:
-    results.filter((r) =>
-      (r.flags as string[]).length > 0 && r.reply && !r.reply.startsWith("Thank you for your message")
-    ).length,
-  total_cost_micro_usd: results.reduce((a, r) => a + Number(r.cost_micro_usd ?? 0), 0),
+  // Deterministic checks only. Whether a Sorani or Arabic reply is natural, polite and correct
+  // is NOT measured here: it needs a native speaker's review of the replies below.
+  language_quality: "not assessed by this script; native review required",
+  by_language: report(results),
   results,
 };
 await Deno.mkdir(new URL("./out/", import.meta.url), { recursive: true });
 const file = new URL(`./out/eval-${summary.ran_at.replace(/[:.]/g, "-")}.json`, import.meta.url);
 await Deno.writeTextFile(file, JSON.stringify(summary, null, 2));
+for (const [lang, r] of Object.entries(summary.by_language)) {
+  console.log(
+    `${lang}: ${r.passed}/${r.ran} passed (of ${r.scenarios}); grounded ${r.grounded.ok}/${r.grounded.expected}; ` +
+      `fabrication caught ${r.fabrication.attempts_caught}, shown ${r.fabrication.shown_to_seller}; ` +
+      `escalation ${r.escalation.caught}/${r.escalation.expected} (missed ${r.escalation.missed}, false ${r.escalation.false_alarms}); ` +
+      `approved ${r.orders.approved}; p50 ${r.latency_ms.p50} ms, p95 ${r.latency_ms.p95} ms; USD ${r.cost_usd.total}`,
+  );
+}
 console.log(`${summary.passed}/${summary.total} passed; report: ${file.pathname}`);

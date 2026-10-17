@@ -12,6 +12,8 @@ export interface AssistConfig {
   model: string;
   effort: "low" | "medium" | "high";
   maxTokens: number;
+  /** Where inference runs (Anthropic `inference_geo`); null leaves the workspace default. */
+  inferenceGeo: "global" | "us" | null;
   /** Provider request timeout and the whole request's budget, in milliseconds. */
   providerTimeoutMs: number;
   budgetMs: number;
@@ -48,6 +50,8 @@ export function readConfig(env: (k: string) => string | undefined): AssistConfig
   }
   const model = (env("AI_MODEL") ?? "claude-opus-5-5").trim();
   if (!/^[a-z0-9.-]{3,80}$/.test(model)) throw new ConfigError("invalid AI_MODEL");
+  const geo = (env("AI_INFERENCE_GEO") ?? "").trim();
+  if (geo !== "" && geo !== "global" && geo !== "us") throw new ConfigError("invalid AI_INFERENCE_GEO");
   return {
     supabaseUrl: required(env, "SUPABASE_URL").replace(/\/+$/, ""),
     supabaseAnonKey: required(env, "SUPABASE_ANON_KEY"),
@@ -56,6 +60,7 @@ export function readConfig(env: (k: string) => string | undefined): AssistConfig
     model,
     effort,
     maxTokens: intIn(env, "AI_MAX_TOKENS", 8000, 1000, 32000),
+    inferenceGeo: geo === "" ? null : geo,
     providerTimeoutMs: intIn(env, "AI_TIMEOUT_MS", 30000, 5000, 60000),
     budgetMs: intIn(env, "AI_BUDGET_MS", 45000, 10000, 110000),
     allowedOrigins: (env("AI_ALLOWED_ORIGINS") ?? "").split(",").map((o) => o.trim()).filter(Boolean),

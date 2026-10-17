@@ -15,6 +15,8 @@ export interface ProviderRequest {
   effort: "low" | "medium" | "high";
   maxTokens: number;
   timeoutMs: number;
+  /** Requested inference region; null or absent leaves the provider's default. */
+  inferenceGeo?: "global" | "us" | null;
 }
 
 export interface ProviderUsage {
@@ -31,6 +33,8 @@ export interface ProviderResponse {
   servedModel: string | null;
   requestId: string | null;
   usage: ProviderUsage;
+  /** Where the provider reports inference ran, when it says. */
+  inferenceGeo?: string | null;
 }
 
 export type ProviderErrorKind = "timeout" | "rate_limited" | "provider_error" | "not_configured";

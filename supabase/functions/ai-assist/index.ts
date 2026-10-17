@@ -18,6 +18,7 @@ Deno.serve(createHandler({
     maxTokens: config.maxTokens,
     providerTimeoutMs: config.providerTimeoutMs,
     budgetMs: config.budgetMs,
+    inferenceGeo: config.inferenceGeo,
   },
   allowedOrigins: config.allowedOrigins,
   // Operational metadata only: never message text, prompts, outputs or keys.

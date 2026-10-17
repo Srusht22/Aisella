@@ -12,6 +12,7 @@ export interface PipelineSettings {
   maxTokens: number;
   providerTimeoutMs: number;
   budgetMs: number;
+  inferenceGeo?: "global" | "us" | null;
 }
 
 export interface RunOutcome {
@@ -59,6 +60,7 @@ export async function runAssist(
   let usage = emptyUsage();
   let attempts = 0;
   let servedModel: string | null = null;
+  let servedGeo: string | null = null;
   let requestId: string | null = null;
   let stopReason: string | null = null;
   let output: unknown = null;
@@ -66,6 +68,8 @@ export async function runAssist(
   const meta = () => ({
     model: settings.model,
     served_model: servedModel,
+    // The region the provider reports, else the one requested (US-only is costed at 1.1x).
+    inference_geo: servedGeo ?? settings.inferenceGeo ?? null,
     prompt_version: PROMPT_VERSION,
     effort: settings.effort,
     stop_reason: stopReason,
@@ -89,9 +93,11 @@ export async function runAssist(
         effort: settings.effort,
         maxTokens: settings.maxTokens,
         timeoutMs: Math.max(1000, Math.min(settings.providerTimeoutMs, remaining)),
+        inferenceGeo: settings.inferenceGeo ?? null,
       });
       usage = addUsage(usage, response.usage);
       servedModel = response.servedModel;
+      servedGeo = response.inferenceGeo ?? servedGeo;
       requestId = response.requestId;
       stopReason = response.stopReason;
       if (response.stopReason === "refusal") {
