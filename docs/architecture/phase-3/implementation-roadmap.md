@@ -68,3 +68,14 @@ Changes to any of these require an updated ADR and owner approval before code ch
 2. The R0 reachability result is available, **or** the owner explicitly accepts the risk of starting R1 before it. R1 does not depend on a hosted project.
 3. Environment network access for the Android SDK is allowed, **or** Android builds are delegated to CI or the owner's machine.
 4. The owner confirms who provides the macOS and iOS build capability.
+
+## 5. Progress (updated 2026-10-18)
+
+The milestones above are unchanged. Current status is kept in [project-status.md](../../implementation/project-status.md); in short:
+- **Done locally:** R1–R5, Phase 8.5 and R7 (Phase 9, six providers, local only).
+- **In progress:** R8 (Phase 10, fulfilment extensions) is the next phase.
+- **Not started:** R6, R9, R10.
+
+**Owner decision (2026-10-18):** all real Gemini API calls, including the 35-conversation real-model evaluation and native review of real outputs, are **deferred to the final pre-publication verification** ([checklist](../../implementation/pre-publication-checklist.md)).
+
+**About the "phase-10" folder.** The Gemini verification work done before this decision was requested under the name "Phase 10" and lives in `docs/implementation/phase-10/gemini-readiness.md`. It is a Phase 9 follow-up, not R8.

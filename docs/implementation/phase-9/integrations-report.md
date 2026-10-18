@@ -257,7 +257,7 @@ Live AI suggestions stay disabled until these are addressed and tested.
 ### 7.5 Unresolved issues and blockers
 
 1. **Official documentation not read directly.** Facts were confirmed from official search snippets, but capabilities stay `assumption`, so **no provider can send** until someone reads the pages and records each one as `verified` (URL and date).
-2. **Real Gemini evaluation not run:** there is no API key in this environment. The plan-mode run of the 35 scenarios passes, and so do the adversarial end-to-end steps against the stub. Price rows for `gemini-3.8-flash` are assumptions.
+2. **Real Gemini evaluation not run** (deferred by the owner to pre-publication; see [readiness report](../phase-10/gemini-readiness.md) and [checklist](../pre-publication-checklist.md) item A): there is no API key in this environment. The plan-mode run of the 35 scenarios passes, and so do the adversarial end-to-end steps against the stub. Price rows for `gemini-3.8-flash` are assumptions.
 3. **Provider gaps:**
    - TikTok's send body and webhook schema are unresolved: the adapter refuses unless `TIKTOK_SEND_PATH` is set, and the authorize URL must be configured;
    - Meta's Instagram subscription field names and delivery/read events are assumptions;

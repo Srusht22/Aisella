@@ -1,4 +1,18 @@
-# Phase 10: Gemini verification and safe local testing (readiness report)
+# Gemini verification and safe local testing (readiness report)
+
+> **Status (owner decision, 2026-10-18): offline work COMPLETE; real-model evaluation DEFERRED and INCOMPLETE.**
+>
+> **What is complete:** the offline implementation and tests in this report (spending-brake fixes, retry back-off, evaluation runner fixes, documentation verification).
+>
+> **The owner chose not to create or use a Gemini API key until the final pre-publication verification.** Until then:
+> - **no real Gemini response has been tested;**
+> - the **35-conversation real-model evaluation is outstanding** (attempted once on 2026-10-18, but the run was refused because no key was set; nothing was called or charged);
+> - **actual model behaviour, observed API cost and real rate-limit handling are unverified;**
+> - **native Sorani and Arabic review of real model outputs is outstanding.**
+>
+> Do not call the real Gemini API or request a key before that stage. The steps are item A of the [pre-publication checklist](../pre-publication-checklist.md).
+>
+> **About the name.** This work was requested as "Phase 10" and filed under `phase-10/`. In the [roadmap](../../architecture/phase-3/implementation-roadmap.md), however, **Phase 10 is milestone R8, "Fulfilment extensions"**. This report is therefore a Phase 9 follow-up (Gemini verification), not the roadmap's Phase 10. The roadmap's Phase 10 is implemented separately ([fulfilment report](fulfilment-extensions.md)). Phases were not renumbered; see the [project status](../project-status.md).
 
 **Date:** 2026-10-18. **Branch:** `S.H_Branch`. Builds on Phase 9 ([integrations report §7](../phase-9/integrations-report.md)).
 
@@ -10,7 +24,7 @@
 
 ## 0. Verdict
 
-**Gemini is ready for isolated local testing as soon as a key is provided.** Everything that can be checked without a key has been checked and passes. The 35-scenario real-model evaluation is prepared, with spending caps, and has **not been run**. Real model behaviour is therefore **not verified**: passing the local Gemini imitation is not evidence that the real model behaves.
+**Gemini is ready for isolated local testing as soon as a key is provided; that test is deferred by the owner to the pre-publication stage.** Everything that can be checked without a key has been checked and passes. The 35-scenario real-model evaluation is prepared, with spending caps, and has **not been run**. Real model behaviour is therefore **not verified**: passing the local Gemini imitation is not evidence that the real model behaves.
 
 ## 1. What already worked, what was assumed, what changed
 
