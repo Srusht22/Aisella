@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(39);
+select plan(44);
 
 create temp table ids (k text primary key, v uuid);
 grant all on ids to public;
@@ -215,6 +215,41 @@ select is((select jsonb_agg(pg_temp.tg(u) -> 'events') from jsonb_array_elements
           '[[], [], [], []]'::jsonb, 'Telegram: groups, bots, edits and membership updates produce no messages');
 select is((select value from app.provider_capabilities where provider_id = 'telegram' and capability = 'reply_window_hours'), 'null'::jsonb,
           'Telegram: no customer-service window (recorded as an assumption)');
+
+-- ---- Viber -----------------------------------------------------------------------------------------------------
+select is((select row(webhook_scheme, payload_format, status)::text from app.providers where id = 'viber'),
+          row('viber_sha256', 'viber_bot', 'in_development')::text, 'Viber: per-bot HMAC with the bot token, REST Bot API body, test connections only');
+with x as (insert into app.connections (store_id, provider_id, external_account_id, state, is_test, connected_at)
+           values (pg_temp.id('store_a'), 'viber', 'shop-a-bot', 'connected', true, now()) returning id)
+insert into ids select 'vb_a', id from x;
+create function pg_temp.vb(p_body jsonb) returns jsonb language plpgsql as $$
+declare c app.connections; p app.providers;
+begin
+  select * into c from app.connections where id = pg_temp.id('vb_a');
+  select * into p from app.providers where id = 'viber';
+  return app.channel_normalize_viber_bot(p, c, p_body);
+end $$;
+select is(pg_temp.vb('{"event": "message", "timestamp": 1760781600000, "message_token": 4912661846655238145,
+                       "sender": {"id": "01234567890A=", "name": "Shno", "country": "IQ"}, "message": {"type": "text", "text": "سڵاو"}}'),
+          '{"event_id": "message:4912661846655238145:01234567890A=", "events": [{"kind": "message", "account_id": "shop-a-bot",
+            "external_user_id": "01234567890A=", "display_name": "Shno", "external_message_id": "4912661846655238145",
+            "occurred_at": "2025-10-18T10:00:00+00:00", "text": "سڵاو"}]}'::jsonb,
+          'Viber: a text message; the 64-bit message token is kept exactly');
+select is(pg_temp.vb('{"event": "seen", "timestamp": 1760781600000, "message_token": 5741311803571721087, "user_id": "01234567890A="}') -> 'events',
+          '[{"kind": "read", "account_id": "shop-a-bot", "provider_message_id": "5741311803571721087",
+             "provider_event_key": "seen:5741311803571721087", "occurred_at": "2025-10-18T10:00:00+00:00"}]'::jsonb,
+          'Viber: "seen" is a read receipt for the exact token the send returned');
+select is(pg_temp.vb('{"event": "message", "timestamp": 1760781600000, "message_token": 1, "sender": {"id": "u="},
+                       "message": {"type": "picture", "text": "this?", "media": "https://dl-media.viber.com/x.jpg"}}') #> '{events,0}',
+          '{"kind": "message", "account_id": "shop-a-bot", "external_user_id": "u=", "external_message_id": "1",
+            "occurred_at": "2025-10-18T10:00:00+00:00", "text": "this?", "attachments": [{"kind": "image"}]}'::jsonb,
+          'Viber: a picture keeps its kind and description; the temporary media URL is not stored');
+select is((select jsonb_agg(pg_temp.vb(b) -> 'events') from jsonb_array_elements('[
+            {"event": "subscribed", "timestamp": 1, "message_token": 2, "user": {"id": "u="}},
+            {"event": "conversation_started", "timestamp": 1, "message_token": 3, "user": {"id": "u="}},
+            {"event": "webhook", "timestamp": 1, "message_token": 4},
+            {"event": "message", "timestamp": 1, "message_token": "x", "sender": {"id": "u="}, "message": {"type": "text", "text": "bad token"}}]') b),
+          '[[], [], [], []]'::jsonb, 'Viber: subscriptions, conversation starts, webhook checks and malformed tokens produce no messages');
 
 select * from finish();
 rollback;

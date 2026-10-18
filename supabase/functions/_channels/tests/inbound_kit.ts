@@ -110,9 +110,11 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
             products: [],
           });
           const [row] = await admin`
-            insert into app.connections (store_id, provider_id, external_account_id, state, is_test, connected_at,
-                                         credential_ref, webhook_secret_ref)
-            values (${seller.store}, ${provider}, ${c.accountId}, 'connected', true, now(),
+            insert into app.connections (store_id, provider_id, external_account_id, display_name, state, is_test,
+                                         connected_at, credential_ref, webhook_secret_ref)
+            values (${seller.store}, ${provider}, ${c.accountId}, ${`Shop ${
+            i + 1
+          }`}, 'connected', true, now(),
                     ${c.credential ? admin`vault.create_secret(${c.credential})` : null},
                     ${c.webhookSecret ? admin`vault.create_secret(${c.webhookSecret})` : null})
             returning id`;

@@ -32,6 +32,8 @@ export interface ClaimedSend {
   text_sha256: string;
   credential: string | null;
   attempt: number;
+  /** The connection's display name (providers that require a sender name). */
+  sender_name?: string | null;
 }
 
 export interface SenderDb {

@@ -39,7 +39,13 @@ export async function runSend(
   let result;
   try {
     result = await adapter.send(
-      { text: textToSubmit, textSha256: c.text_sha256, recipient: c.recipient, accountId: c.account_id },
+      {
+        text: textToSubmit,
+        textSha256: c.text_sha256,
+        recipient: c.recipient,
+        accountId: c.account_id,
+        senderName: c.sender_name ?? null,
+      },
       c.credential,
       { timeoutMs: deps.timeoutMs ?? 15000 },
     );

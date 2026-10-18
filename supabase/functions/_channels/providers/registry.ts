@@ -6,6 +6,7 @@ import { DEFAULT_GRAPH_VERSION } from "./meta_graph.ts";
 import { InstagramAdapter } from "./instagram.ts";
 import { MessengerAdapter } from "./messenger.ts";
 import { TelegramAdapter } from "./telegram.ts";
+import { ViberAdapter } from "./viber.ts";
 import { WhatsAppAdapter } from "./whatsapp.ts";
 
 export function realAdapters(env: (k: string) => string | undefined): Record<string, ProviderAdapter> {
@@ -15,6 +16,7 @@ export function realAdapters(env: (k: string) => string | undefined): Record<str
     new MessengerAdapter(graph),
     new WhatsAppAdapter(graph),
     new TelegramAdapter(),
+    new ViberAdapter(),
   ];
   return Object.fromEntries(list.map((a) => [a.provider, a]));
 }

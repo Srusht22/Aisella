@@ -12,6 +12,8 @@ export interface OutboundText {
   textSha256: string;
   recipient: string;
   accountId: string;
+  /** The connection's display name, for providers that require a sender name (Viber). */
+  senderName?: string | null;
 }
 
 export type SendResult =
