@@ -4,10 +4,10 @@ import 'package:flutter/widgets.dart';
 
 import '../theme/theme_ext.dart';
 
-/// The Aisellia mark: a shopping bag with a check on it, selling made
-/// simple and every order under control. Drawn, so it stays sharp at any
-/// size and follows the colour theme. The same geometry is used for the
-/// app icons (tool/icons/render_app_icon.py) and the web loading screen.
+/// The Aisellia mark: a bold geometric "A" with an AI spark in its
+/// counter and a small one at its peak. Drawn, so it stays sharp at any
+/// size and follows the colour theme. The same geometry is used for the app
+/// icons (tool/icons/render_app_icon.py) and the web loading screen.
 class AppLogo extends StatelessWidget {
   const AppLogo({super.key, this.size = 40, this.color, this.glow = false});
 
@@ -46,74 +46,54 @@ class AppLogo extends StatelessWidget {
               ]
             : null,
       ),
-      child: CustomPaint(
-        painter: _BagCheckPainter(ink: p.textOnBrand, cut: bg),
-      ),
+      child: CustomPaint(painter: _MarkPainter(ink: p.textOnBrand)),
     );
   }
 }
 
-class _BagCheckPainter extends CustomPainter {
-  const _BagCheckPainter({required this.ink, required this.cut});
+class _MarkPainter extends CustomPainter {
+  const _MarkPainter({required this.ink});
 
   final Color ink;
-  final Color cut;
 
   @override
   void paint(Canvas canvas, Size size) {
     final u = size.width / 100;
     Offset p(double x, double y) => Offset(x * u, y * u);
-    // Slanted sides (wider at the bottom) read as a shopping bag; corners
-    // are rounded by stroking the outline with a round join.
-    final bag = Path()
-      ..addPolygon([p(33, 41), p(67, 41), p(72, 77), p(28, 77)], true);
-    canvas
-      ..drawPath(bag, Paint()..color = ink)
-      ..drawPath(
-        bag,
-        Paint()
-          ..color = ink
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 10 * u
-          ..strokeJoin = StrokeJoin.round,
-      );
-    // Handle.
-    final handle = Path()
-      ..moveTo(40 * u, 40 * u)
-      ..lineTo(40 * u, 35 * u)
-      ..arcTo(
-        Rect.fromLTRB(40 * u, 25 * u, 60 * u, 45 * u),
-        math.pi,
-        math.pi,
-        false,
-      )
-      ..lineTo(60 * u, 40 * u);
+    // The "A": two legs meeting at a rounded apex.
+    final a = Path()
+      ..moveTo(28 * u, 77 * u)
+      ..lineTo(50 * u, 25 * u)
+      ..lineTo(72 * u, 77 * u);
     canvas.drawPath(
-      handle,
+      a,
       Paint()
         ..color = ink
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 4.5 * u
-        ..strokeCap = StrokeCap.round,
-    );
-    // Check, cut into the bag in the tile colour.
-    final check = Path()
-      ..moveTo(39 * u, 60 * u)
-      ..lineTo(47 * u, 68 * u)
-      ..lineTo(62 * u, 53 * u);
-    canvas.drawPath(
-      check,
-      Paint()
-        ..color = cut
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 6 * u
+        ..strokeWidth = 11 * u
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round,
     );
+    // The spark in place of the crossbar, and a small one at the peak.
+    canvas
+      ..drawPath(_spark(p(50, 61), 8.5 * u), Paint()..color = ink)
+      ..drawPath(_spark(p(73, 25), 5.5 * u), Paint()..color = ink);
+  }
+
+  /// A four-point star with gently pinched sides.
+  static Path _spark(Offset c, double r) {
+    final k = r * 0.22;
+    return Path()
+      ..moveTo(c.dx, c.dy - r)
+      ..quadraticBezierTo(c.dx + k, c.dy - k, c.dx + r, c.dy)
+      ..quadraticBezierTo(c.dx + k, c.dy + k, c.dx, c.dy + r)
+      ..quadraticBezierTo(c.dx - k, c.dy + k, c.dx - r, c.dy)
+      ..quadraticBezierTo(c.dx - k, c.dy - k, c.dx, c.dy - r)
+      ..close();
   }
 
   @override
-  bool shouldRepaint(_BagCheckPainter old) => old.ink != ink || old.cut != cut;
+  bool shouldRepaint(_MarkPainter old) => old.ink != ink;
 }
 
 /// A line globe: the language control.

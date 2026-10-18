@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Renders the Aisellia app icon (bag with a check) into every platform file.
+"""Renders the Aisellia app icon (the "A" mark with a spark) into every platform file.
 
     python3 tool/icons/render_app_icon.py
 
@@ -13,7 +13,6 @@ from PIL import Image, ImageDraw
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 TOP = (0x2C, 0x4F, 0xA6)     # brand indigo, lifted
 BOTTOM = (0x16, 0x2C, 0x66)  # brand indigo, deepened
-CUT = (0x1F, 0x3F, 0x8F)     # check colour = brand
 INK = (255, 255, 255)
 
 
@@ -27,36 +26,38 @@ def gradient(size):
     return img
 
 
-# Bag outline before rounding: slanted sides (wider at the bottom) read as a
-# shopping bag, not a padlock. Corners are rounded by stroking the polygon
-# with a round join of radius ROUND.
-BAG = [(33, 41), (67, 41), (72, 77), (28, 77)]
-ROUND = 5
-HANDLE = (40, 25, 60, 45)  # circle box; the top half is drawn
-CHECK = [(39, 60), (47, 68), (62, 53)]
+A_LEGS = [(28, 77), (50, 25), (72, 77)]
+A_STROKE = 11
+SPARKS = [((50, 61), 8.5), ((73, 25), 5.5)]
+
+
+def spark_points(cx, cy, r, steps=24):
+    """Four-point star with pinched sides (quadratic curves, as in the app)."""
+    k = r * 0.22
+    corners = [(cx, cy - r), (cx + r, cy), (cx, cy + r), (cx - r, cy)]
+    controls = [(cx + k, cy - k), (cx + k, cy + k), (cx - k, cy + k), (cx - k, cy - k)]
+    pts = []
+    for i in range(4):
+        (x0, y0), (x2, y2), (x1, y1) = corners[i], corners[(i + 1) % 4], controls[i]
+        for s in range(steps):
+            t = s / steps
+            pts.append(((1 - t) ** 2 * x0 + 2 * (1 - t) * t * x1 + t * t * x2,
+                        (1 - t) ** 2 * y0 + 2 * (1 - t) * t * y1 + t * t * y2))
+    return pts
 
 
 def glyph(draw, ox, oy, u):
     def p(x, y):
         return (ox + x * u, oy + y * u)
 
-    pts = [p(*q) for q in BAG]
-    r = ROUND * u
-    draw.polygon(pts, fill=INK)
-    draw.line(pts + [pts[0]], fill=INK, width=round(2 * r), joint="curve")
-    for cx, cy in pts:
-        draw.ellipse([cx - r, cy - r, cx + r, cy + r], fill=INK)
-    w = round(4.5 * u)
-    (x0, y0), (x1, y1) = p(HANDLE[0], HANDLE[1]), p(HANDLE[2], HANDLE[3])
-    # PIL strokes arcs inside their box: grow it by half the stroke.
-    draw.arc([x0 - w / 2, y0 - w / 2, x1 + w / 2, y1 + w / 2], 180, 360, fill=INK, width=w)
-    for x in (HANDLE[0], HANDLE[2]):
-        draw.line([p(x, 35), p(x, 40)], fill=INK, width=w)
-    cw = round(6 * u)
-    c = [p(*q) for q in CHECK]
-    draw.line(c, fill=CUT, width=cw, joint="curve")
-    for cx, cy in (c[0], c[2]):
-        draw.ellipse([cx - cw / 2, cy - cw / 2, cx + cw / 2, cy + cw / 2], fill=CUT)
+    w = round(A_STROKE * u)
+    legs = [p(*q) for q in A_LEGS]
+    draw.line(legs, fill=INK, width=w, joint="curve")
+    for cx, cy in legs:
+        draw.ellipse([cx - w / 2, cy - w / 2, cx + w / 2, cy + w / 2], fill=INK)
+    for (x, y), r in SPARKS:
+        cx, cy = p(x, y)
+        draw.polygon(spark_points(cx, cy, r * u), fill=INK)
 
 
 def render(size, *, rounded, scale=1.0):
