@@ -61,7 +61,7 @@ Deno.test("whatsapp: a text message from the business number, no link preview, t
     );
     assertEquals(r, { kind: "sent", providerMessageId: "wamid.HBgM1" });
     const req = fx.imitation.received[0];
-    assertEquals(req.url.pathname, "/v21.0/106540352242922/messages");
+    assertEquals(req.url.pathname, "/v26.0/106540352242922/messages");
     assertFalse(req.url.href.includes(TOKEN));
     assertEquals(JSON.parse(new TextDecoder().decode(req.raw)), {
       messaging_product: "whatsapp",
@@ -92,10 +92,12 @@ Deno.test("whatsapp: ids that are not plain numbers are refused before any reque
 
 Deno.test("whatsapp: policy restrictions and missing permissions are permanent", async () => {
   for (
-    const [code, expected] of [[368, "account_restricted"], [131031, "account_restricted"], [
-      131005,
-      "permission_missing",
-    ]] as const
+    const [code, expected] of [
+      [368, "account_restricted"],
+      [131031, "account_restricted"],
+      [131005, "permission_missing"],
+      [131049, "marketing_limit"],
+    ] as const
   ) {
     const adapter = new WhatsAppAdapter({ fetchFn: () => Promise.resolve(waError(400, code)) });
     assertEquals(

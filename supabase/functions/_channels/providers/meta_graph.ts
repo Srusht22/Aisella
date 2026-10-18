@@ -9,12 +9,13 @@ import { isSendResult, postJson, retryAfterMs, safeCode, type SendResult } from 
 export interface GraphOptions {
   /** Default https://graph.facebook.com (tests point it at a local imitation). */
   baseURL?: string;
-  /** Graph API version, e.g. v21.0 (META_GRAPH_VERSION). */
+  /** Graph API version, e.g. v26.0 (META_GRAPH_VERSION). */
   version?: string;
   fetchFn?: typeof fetch;
 }
 
-export const DEFAULT_GRAPH_VERSION = "v21.0";
+// Official examples on 2026-10-18 use v23.0–v26.0; configurable with META_GRAPH_VERSION.
+export const DEFAULT_GRAPH_VERSION = "v26.0";
 
 export function graphUrl(opts: GraphOptions, path: string): string {
   const base = (opts.baseURL ?? "https://graph.facebook.com").replace(/\/+$/, "");
@@ -54,6 +55,8 @@ export function mapGraphError(status: number, headers: Headers, body: Record<str
   if (code === 10 || code === 200 || code === 230 || code === 3 || code === 131005) {
     return { kind: "permanent", code: "permission_missing" };
   }
+  // WhatsApp per-user marketing limit: Meta says wait 24 h; retrying sooner hurts delivery metrics.
+  if (code === 131049) return { kind: "permanent", code: "marketing_limit" };
   // The business account is restricted or locked (policy enforcement): nothing will go through.
   if (code === 368 || code === 131031) return { kind: "permanent", code: "account_restricted" };
   if (code === 100) return { kind: "permanent", code: safeCode("invalid_request", sub ?? code) };

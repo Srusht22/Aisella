@@ -32,7 +32,7 @@ Deno.test("instagram: the Send API request (path, Bearer token, body) and the to
     );
     assertEquals(r, { kind: "sent", providerMessageId: "aWdfZAG1faXRlbTo1" });
     const req = fx.imitation.received[0];
-    assertEquals(req.url.pathname, "/v21.0/me/messages");
+    assertEquals(req.url.pathname, "/v26.0/me/messages");
     assertFalse(req.url.href.includes(TOKEN));
     assertEquals(JSON.parse(new TextDecoder().decode(req.raw)), {
       recipient: { id: "6203145623143021" },

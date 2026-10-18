@@ -33,7 +33,7 @@ Deno.test("messenger: the Send API request is a RESPONSE to the customer, token 
       },
     );
     const req = fx.imitation.received[0];
-    assertEquals(req.url.pathname, "/v21.0/me/messages");
+    assertEquals(req.url.pathname, "/v26.0/me/messages");
     assertEquals(JSON.parse(new TextDecoder().decode(req.raw)), {
       recipient: { id: "24637829385" },
       messaging_type: "RESPONSE",
