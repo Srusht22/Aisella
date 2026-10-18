@@ -7,7 +7,7 @@
 // adapter never logs or returns URLs or provider descriptions. No parse_mode: the text is sent as
 // plain text, exactly as authorized. EVIDENCE: assumption until the official page is read.
 import { isSendResult, postJson, type ProviderAdapter, safeCode, type SendResult } from "../adapter.ts";
-import type { OutboundText } from "../adapter.ts";
+import type { BotConnect, Identity, OutboundText } from "../adapter.ts";
 
 export interface TelegramOptions {
   /** Default https://api.telegram.org (tests point it at a local imitation). */
@@ -31,6 +31,44 @@ export class TelegramAdapter implements ProviderAdapter {
     this.#base = (opts.baseURL ?? "https://api.telegram.org").replace(/\/+$/, "");
     this.#fetch = opts.fetchFn;
   }
+
+  /** getMe tells which bot the token belongs to; setWebhook registers our URL and secret token. */
+  readonly connect: BotConnect = {
+    identify: async (token: string, opts: { timeoutMs: number }): Promise<Identity> => {
+      if (!TELEGRAM_TOKEN.test(token)) return { ok: false, code: "token_invalid" };
+      const res = await postJson(`${this.#base}/bot${token}/getMe`, {}, {
+        timeoutMs: opts.timeoutMs,
+        fetchFn: this.#fetch,
+      });
+      if (isSendResult(res)) return { ok: false, code: "provider_unreachable" };
+      const r = res.json as {
+        ok?: boolean;
+        result?: { id?: number; is_bot?: boolean; first_name?: string; username?: string };
+      };
+      if (
+        res.status !== 200 || r.ok !== true || typeof r.result?.id !== "number" || r.result.is_bot !== true
+      ) {
+        return { ok: false, code: "token_rejected" };
+      }
+      return {
+        ok: true,
+        accountId: String(r.result.id),
+        displayName: r.result.first_name ?? r.result.username ?? "Telegram bot",
+      };
+    },
+    setWebhook: async (token: string, url: string, secret: string, opts: { timeoutMs: number }) => {
+      const res = await postJson(
+        `${this.#base}/bot${token}/setWebhook`,
+        // Only messages: no group, channel, edit or inline traffic is ever delivered to us.
+        { url, secret_token: secret, allowed_updates: ["message"], max_connections: 40 },
+        { timeoutMs: opts.timeoutMs, fetchFn: this.#fetch },
+      );
+      if (isSendResult(res)) return { ok: false, code: "provider_unreachable" };
+      return (res.json as { ok?: boolean }).ok === true && res.status === 200
+        ? { ok: true }
+        : { ok: false, code: safeCode("set_webhook", res.status) };
+    },
+  };
 
   async send(msg: OutboundText, credential: string | null, opts: { timeoutMs: number }): Promise<SendResult> {
     if (!credential) return { kind: "permanent", code: "no_credential" };

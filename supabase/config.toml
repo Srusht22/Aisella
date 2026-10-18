@@ -415,6 +415,9 @@ verify_jwt = false
 [functions.channel-send]
 verify_jwt = true
 
+[functions.channel-connect]
+verify_jwt = true
+
 [analytics]
 enabled = false
 port = 54327

@@ -33,6 +33,22 @@ export interface ProviderAdapter {
   readonly handshake?: "meta";
   /** Submits exactly `msg.text`. Must never throw for provider errors: map them to a SendResult. */
   send(msg: OutboundText, credential: string | null, opts: { timeoutMs: number }): Promise<SendResult>;
+  /** Token-based connection (per-bot providers); OAuth providers have none. */
+  readonly connect?: BotConnect;
+}
+
+export type Identity = { ok: true; accountId: string; displayName: string } | { ok: false; code: string };
+
+export interface BotConnect {
+  /** Asks the PROVIDER which account the token belongs to (never trusts the seller's word). */
+  identify(token: string, opts: { timeoutMs: number }): Promise<Identity>;
+  /** Registers our webhook URL (and secret, where the provider echoes one) for the bot. */
+  setWebhook(
+    token: string,
+    url: string,
+    secret: string,
+    opts: { timeoutMs: number },
+  ): Promise<{ ok: boolean; code?: string }>;
 }
 
 /** Fetch with a deadline; a timeout or reset after the request may have left is `unknown`. */

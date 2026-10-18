@@ -6,8 +6,8 @@
 // {"status": 0, "message_token": <64-bit integer>} or {"status": <code>, "status_message"}.
 // message_token exceeds JavaScript's exact integers, so it is read from the raw response text.
 // EVIDENCE: assumption until the official pages are read (also Viber's chatbot fees).
-import type { OutboundText, ProviderAdapter, SendResult } from "../adapter.ts";
-import { retryAfterMs, safeCode } from "../adapter.ts";
+import type { BotConnect, Identity, OutboundText, ProviderAdapter, SendResult } from "../adapter.ts";
+import { isSendResult, postJson, retryAfterMs, safeCode } from "../adapter.ts";
 
 export interface ViberOptions {
   /** Default https://chatapi.viber.com (tests point it at a local imitation). */
@@ -31,6 +31,37 @@ export class ViberAdapter implements ProviderAdapter {
     this.#base = (opts.baseURL ?? "https://chatapi.viber.com").replace(/\/+$/, "");
     this.#fetch = opts.fetchFn ?? fetch;
   }
+
+  /** get_account_info tells which bot the token belongs to; set_webhook registers our URL. */
+  readonly connect: BotConnect = {
+    identify: async (token: string, opts: { timeoutMs: number }): Promise<Identity> => {
+      if (!VIBER_TOKEN.test(token)) return { ok: false, code: "token_invalid" };
+      const res = await postJson(`${this.#base}/pa/get_account_info`, {}, {
+        timeoutMs: opts.timeoutMs,
+        headers: { "X-Viber-Auth-Token": token },
+        fetchFn: this.#fetch,
+      });
+      if (isSendResult(res)) return { ok: false, code: "provider_unreachable" };
+      const r = res.json as { status?: number; id?: string; name?: string };
+      if (res.status !== 200 || r.status !== 0 || typeof r.id !== "string" || r.id === "") {
+        return { ok: false, code: "token_rejected" };
+      }
+      return { ok: true, accountId: r.id, displayName: r.name ?? "Viber bot" };
+    },
+    // Viber signs every callback with the bot token itself; the secret is not sent to Viber.
+    setWebhook: async (token: string, url: string, _secret: string, opts: { timeoutMs: number }) => {
+      const res = await postJson(
+        `${this.#base}/pa/set_webhook`,
+        { url, event_types: ["delivered", "seen", "failed"], send_name: true, send_photo: false },
+        { timeoutMs: opts.timeoutMs, headers: { "X-Viber-Auth-Token": token }, fetchFn: this.#fetch },
+      );
+      if (isSendResult(res)) return { ok: false, code: "provider_unreachable" };
+      const status = (res.json as { status?: number }).status;
+      return res.status === 200 && status === 0
+        ? { ok: true }
+        : { ok: false, code: safeCode("set_webhook", status ?? res.status) };
+    },
+  };
 
   async send(msg: OutboundText, credential: string | null, opts: { timeoutMs: number }): Promise<SendResult> {
     if (!credential) return { kind: "permanent", code: "no_credential" };

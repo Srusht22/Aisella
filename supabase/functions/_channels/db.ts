@@ -73,6 +73,40 @@ async function call<T = Record<string, unknown>>(
   }
 }
 
+export interface ConnectorDb {
+  register(
+    nonce: string,
+    provider: string,
+    accountId: string,
+    displayName: string,
+    credential: string,
+    webhookSecret: string,
+  ): Promise<ApiResult<{ connection_id: string }>>;
+  finish(nonce: string, ok: boolean): Promise<ApiResult>;
+}
+
+/** The aisellia_channel_connector role: it can only redeem a seller's connect nonce. */
+export class PostgresConnectorDb implements ConnectorDb {
+  constructor(private readonly url: string) {}
+  register(
+    nonce: string,
+    provider: string,
+    accountId: string,
+    displayName: string,
+    credential: string,
+    webhookSecret: string,
+  ) {
+    return call<{ connection_id: string }>(
+      this.url,
+      "select api.channel_register_bot($1, $2, $3, $4, $5, $6) as r",
+      [nonce, provider, accountId, displayName, credential, webhookSecret],
+    );
+  }
+  finish(nonce: string, ok: boolean) {
+    return call(this.url, "select api.channel_finish_connect($1, $2) as r", [nonce, ok]);
+  }
+}
+
 export class PostgresIngestDb implements IngestDb {
   constructor(private readonly url: string) {}
   ingestRaw(provider: string, hint: string | null, raw: Uint8Array, headers: Record<string, string>) {
