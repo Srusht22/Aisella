@@ -100,8 +100,9 @@ select is(
     'api.channel_claim_send(uuid)',
     'api.channel_complete_send(uuid,text,text)',
     'api.channel_fail_send(uuid,text,text,integer)',
-    'api.channel_ingest(text,text,text,jsonb,text)',
+    'api.channel_ingest_raw(text,text,bytea,jsonb)',
     'api.channel_send_state(uuid)',
+    'api.channel_webhook_challenge(text,text)',
     'api.copy_suggestion(uuid,uuid,text,uuid)',
     'api.create_ai_draft_grant(uuid,text,text,integer)',
     'api.create_conversation(uuid,text,text,jsonb,uuid)',
@@ -285,8 +286,8 @@ select is(
   (select array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text) from pg_proc p
      join pg_namespace n on n.oid = p.pronamespace
     where n.nspname in ('api', 'app', 'internal') and has_function_privilege('aisellia_channel_ingest', p.oid, 'EXECUTE')),
-  array['api.channel_ingest(text,text,text,jsonb,text)'],
-  'aisellia_channel_ingest can execute exactly api.channel_ingest');
+  array['api.channel_ingest_raw(text,text,bytea,jsonb)', 'api.channel_webhook_challenge(text,text)'],
+  'aisellia_channel_ingest can execute exactly the raw ingest and the handshake check (it cannot store normalised events)');
 select is(
   (select array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text) from pg_proc p
      join pg_namespace n on n.oid = p.pronamespace
@@ -330,8 +331,9 @@ select is(
 select is(
   (select array_agg(r order by r) from unnest(array['anon', 'authenticated', 'service_role', 'aisellia_ai', 'aisellia_ai_worker',
                                                      'aisellia_channel_sender']) r
-    where has_function_privilege(r, 'api.channel_ingest(text,text,text,jsonb,text)', 'EXECUTE')),
-  null, 'no role other than the ingest role can store webhook events');
+    where has_function_privilege(r, 'api.channel_ingest_raw(text,text,bytea,jsonb)', 'EXECUTE')
+       or (r <> 'service_role' and has_function_privilege(r, 'internal.channel_store_events(text,text,text,jsonb,text)', 'EXECUTE'))),
+  null, 'no role other than the ingest role can hand in webhooks, and only the service role can store normalised events');
 select is(
   (select array_agg(p.oid::regprocedure::text order by 1) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
     where n.nspname in ('api', 'app', 'internal')

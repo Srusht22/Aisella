@@ -39,10 +39,13 @@ Deno.test({
         `postgresql://${role}:${encodeURIComponent(p)}@127.0.0.1:54322/postgres`;
       const ingestDb = new PostgresIngestDb(url("aisellia_channel_ingest", pw.ingest));
       const senderDb = new PostgresSenderDb(url("aisellia_channel_sender", pw.sender));
-      const adapter = new StubProvider({ provider, appSecret, baseURL: server.url });
+      const adapter = new StubProvider({ provider, baseURL: server.url });
 
       // Registry, seller, a TEST connection holding a Vault credential (all local).
-      await admin`insert into app.providers (id, display_name, status) values (${provider}, 'E2E stub', 'in_development')`;
+      await admin`insert into app.providers (id, display_name, status, webhook_scheme, payload_format)
+                  values (${provider}, 'E2E stub', 'in_development', 'stub_sha256', 'aisellia_stub')`;
+      // The app secret lives only in the database's Vault: the database verifies webhooks itself.
+      await admin`select vault.create_secret(${appSecret}, ${`aisellia/provider/${provider}/app_secret`})`;
       await admin`insert into app.provider_capabilities (provider_id, capability, value, evidence, source_url, checked_on) values
         (${provider}, 'outbound_text', 'true', 'verified', 'https://stub.invalid/docs', current_date),
         (${provider}, 'reply_window_hours', '24', 'verified', 'https://stub.invalid/docs', current_date)`;
@@ -60,7 +63,7 @@ Deno.test({
 
       let conversation = "";
       await t.step(
-        "a signed webhook is stored by the ingest role and becomes a live conversation",
+        "a signed webhook is verified by the database and becomes a live conversation",
         async () => {
           const raw = new TextEncoder().encode(JSON.stringify({
             event_id: `ev-${uuid()}`,

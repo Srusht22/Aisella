@@ -6,7 +6,6 @@ import { StubProvider } from "../stub_provider.ts";
 import { sha256Hex } from "../text.ts";
 import { SAMPLE_TEXTS } from "../conformance.ts";
 import { startStubServer } from "./stub_server.ts";
-import { randomSecret } from "./stub_fixture.ts";
 
 class MemorySenderDb implements SenderDb {
   calls: { fn: string; args: unknown[] }[] = [];
@@ -48,7 +47,7 @@ class MemorySenderDb implements SenderDb {
 
 async function setup(text: string, hashOf = text, credential: string | null = null) {
   const server = startStubServer();
-  const adapter = new StubProvider({ provider: "stub", appSecret: randomSecret(), baseURL: server.url });
+  const adapter = new StubProvider({ provider: "stub", baseURL: server.url });
   const db = new MemorySenderDb(text, await sha256Hex(hashOf), credential);
   const logs: Record<string, unknown>[] = [];
   return {
@@ -148,7 +147,7 @@ Deno.test("credentials and text never appear in logs", async () => {
 Deno.test("the stub provider refuses any non-loopback address", () => {
   let threw = false;
   try {
-    new StubProvider({ provider: "stub", appSecret: randomSecret(), baseURL: "https://api.example.com" });
+    new StubProvider({ provider: "stub", baseURL: "https://api.example.com" });
   } catch {
     threw = true;
   }

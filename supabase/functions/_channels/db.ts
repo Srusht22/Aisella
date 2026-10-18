@@ -1,7 +1,7 @@
 // Database access for the channel functions: each uses its own LOGIN role with a fixed function
-// set (aisellia_channel_ingest: 1 function; aisellia_channel_sender: 4). Never the service role.
+// set (aisellia_channel_ingest: raw ingest and the handshake check; aisellia_channel_sender: 4).
+// Never the service role.
 import postgres from "postgres";
-import type { NormalizedEvent } from "./adapter.ts";
 
 export interface ApiResult<T = Record<string, unknown>> {
   ok: boolean;
@@ -13,13 +13,14 @@ export interface ApiResult<T = Record<string, unknown>> {
 export class DbUnavailable extends Error {}
 
 export interface IngestDb {
-  ingest(
+  /** Raw bytes and the signature headers; the database verifies, normalises and stores. */
+  ingestRaw(
     provider: string,
-    externalEventId: string,
     connectionHint: string | null,
-    events: NormalizedEvent[],
-    rawSha256: string,
+    raw: Uint8Array,
+    headers: Record<string, string>,
   ): Promise<ApiResult>;
+  challenge(provider: string, verifyToken: string): Promise<ApiResult>;
 }
 
 export interface ClaimedSend {
@@ -72,20 +73,16 @@ async function call<T = Record<string, unknown>>(
 
 export class PostgresIngestDb implements IngestDb {
   constructor(private readonly url: string) {}
-  ingest(
-    provider: string,
-    externalEventId: string,
-    hint: string | null,
-    events: NormalizedEvent[],
-    rawSha256: string,
-  ) {
-    return call(this.url, "select api.channel_ingest($1, $2, $3, $4::jsonb, $5) as r", [
+  ingestRaw(provider: string, hint: string | null, raw: Uint8Array, headers: Record<string, string>) {
+    return call(this.url, "select api.channel_ingest_raw($1, $2, $3::bytea, $4::jsonb) as r", [
       provider,
-      externalEventId,
       hint,
-      events, // an object: the driver encodes jsonb itself
-      rawSha256,
+      raw, // bytes: the signature is over these exact bytes
+      headers, // an object: the driver encodes jsonb itself
     ]);
+  }
+  challenge(provider: string, verifyToken: string) {
+    return call(this.url, "select api.channel_webhook_challenge($1, $2) as r", [provider, verifyToken]);
   }
 }
 

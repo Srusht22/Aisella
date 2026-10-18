@@ -25,8 +25,8 @@ end $$;
 create function pg_temp.ingest(p_provider text, p_event text, p_hint text, p_events jsonb) returns jsonb language plpgsql as $$
 declare v jsonb;
 begin
-  perform pg_temp.act_as_role('aisellia_channel_ingest');
-  v := api.channel_ingest(p_provider, p_event, p_hint, p_events, encode(sha256(convert_to(p_events::text, 'UTF8')), 'hex'));
+  perform pg_temp.act_as_admin();   -- normalised events: the storage step behind api.channel_ingest_raw (suite 20)
+  v := internal.channel_store_events(p_provider, p_event, p_hint, p_events, encode(sha256(convert_to(p_events::text, 'UTF8')), 'hex'));
   perform pg_temp.act_as_admin();
   return v;
 end $$;
@@ -383,7 +383,7 @@ select is((select delivery_state from app.messages where id = (pg_temp.r('send_e
 select pg_temp.act_as(pg_temp.id('a'));
 insert into res select 'send_echo', api.send_message(pg_temp.id('store_a'), pg_temp.id('conv_a'), 'echo me', null, null, null, gen_random_uuid());
 select pg_temp.sender('channel_claim_send', quote_literal(pg_temp.r('send_echo') #>> '{data,send_request_id}'));
-select pg_temp.ingest('stub', 'x1', null, '[{"kind": "echo", "account_id": "acct-A", "external_user_id": "cust-1", "external_message_id": "pm-echo", "text": "echo me"}]');
+select pg_temp.ingest('stub', 'x1', null, '[{"kind": "echo", "account_id": "acct-A", "external_user_id": "cust-1", "external_message_id": "pm-echo", "text": "echo me", "sent_by_app": true}]');
 select pg_temp.ingest('stub', 'x2', null, '[{"kind": "echo", "account_id": "acct-A", "external_user_id": "cust-1", "external_message_id": "pm-app", "text": "sent from the app"}]');
 select pg_temp.process();
 select is((select state || ':' || provider_message_id from app.send_requests where id = (pg_temp.r('send_echo') #>> '{data,send_request_id}')::uuid),

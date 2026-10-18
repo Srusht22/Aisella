@@ -90,7 +90,7 @@ select is(pg_temp.notes('p1'), 'the sister; her brother 07501112233 pays',
 
 select pg_temp.act_as(pg_temp.id('a'));
 insert into res select 'anon', api.anonymize_customer(pg_temp.id('store_a'), '+9647501112233', gen_random_uuid());
-select is((pg_temp.r('anon') -> 'data') - 'order_ids', '{"anonymized": 3, "skipped_in_progress": 0, "notes_redacted": 4}'::jsonb,
+select is((pg_temp.r('anon') -> 'data') - 'order_ids', '{"anonymized": 3, "skipped_in_progress": 0, "notes_redacted": 4, "contacts_anonymized": 0, "contacts_skipped_in_progress": 0}'::jsonb,
           'three orders are anonymised; notes change on those three and on the earlier p1');
 
 select pg_temp.act_as_admin();

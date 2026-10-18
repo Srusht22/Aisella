@@ -1,6 +1,6 @@
 // A local HTTP server playing the stub provider's send API. It records the raw request bytes so
 // tests can prove the text arrived byte for byte. Loopback only.
-export type Mode = "ok" | "429" | "500" | "timeout" | "window_closed";
+import type { StubMode as Mode } from "../conformance.ts";
 
 export function startStubServer() {
   const received: { raw: Uint8Array; auth: string | null }[] = [];
@@ -16,6 +16,10 @@ export function startStubServer() {
         return Response.json({ error: "server" }, { status: 500 });
       case "window_closed":
         return Response.json({ error: "window_closed" }, { status: 400 });
+      case "blocked":
+        return Response.json({ error: "blocked" }, { status: 403 });
+      case "bad_token":
+        return Response.json({ error: "bad_token" }, { status: 401 });
       case "timeout":
         await new Promise((r) => setTimeout(r, 1500));
         return Response.json({ id: `late-${++n}` });

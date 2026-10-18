@@ -25,8 +25,8 @@ end $$;
 create function pg_temp.ingest(p_event text, p_events jsonb) returns jsonb language plpgsql as $$
 declare v jsonb;
 begin
-  perform pg_temp.as_role('aisellia_channel_ingest');
-  v := api.channel_ingest('stub', p_event, null, p_events, encode(sha256(convert_to(p_events::text, 'UTF8')), 'hex'));
+  perform pg_temp.act_as_admin();   -- normalised events: the storage step behind api.channel_ingest_raw (suite 20)
+  v := internal.channel_store_events('stub', p_event, null, p_events, encode(sha256(convert_to(p_events::text, 'UTF8')), 'hex'));
   perform pg_temp.act_as_admin();
   return v;
 end $$;
