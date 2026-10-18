@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(31);
+select plan(42);
 
 select is(
   (select array_agg(c.relname order by c.relname) from pg_class c
@@ -78,7 +78,7 @@ select is(
   'every api view is security_invoker, so RLS applies to the caller'
 );
 
--- Every api function must appear here AND be covered by an isolation suite (02, 07 or 10).
+-- Every api function must appear here AND be covered by an isolation suite (02, 07, 10, 14, 15 or 18).
 -- Adding a function without updating both fails this test.
 select is(
   (select array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text) from pg_proc p
@@ -95,7 +95,13 @@ select is(
     'api.anonymize_customer(uuid,text,uuid)',
     'api.approve_order(uuid,uuid,integer,jsonb,uuid)',
     'api.cancel_order(uuid,uuid,integer,text,text,uuid)',
+    'api.cancel_send(uuid,uuid)',
     'api.catalog_summary(uuid)',
+    'api.channel_claim_send(uuid)',
+    'api.channel_complete_send(uuid,text,text)',
+    'api.channel_fail_send(uuid,text,text,integer)',
+    'api.channel_ingest(text,text,text,jsonb,text)',
+    'api.channel_send_state(uuid)',
     'api.copy_suggestion(uuid,uuid,text,uuid)',
     'api.create_ai_draft_grant(uuid,text,text,integer)',
     'api.create_conversation(uuid,text,text,jsonb,uuid)',
@@ -113,6 +119,7 @@ select is(
     'api.get_product(uuid,uuid)',
     'api.import_messages(uuid,uuid,jsonb,uuid)',
     'api.list_ai_draft_grants(uuid)',
+    'api.list_connections(uuid)',
     'api.list_conversations(uuid,text,integer,integer)',
     'api.list_inventory_movements(uuid,uuid,uuid,integer,bigint)',
     'api.list_orders(uuid,text,text,integer,integer)',
@@ -128,7 +135,9 @@ select is(
     'api.reject_draft(uuid,uuid,integer,text,text,uuid)',
     'api.request_account_deletion(text)',
     'api.request_ai_assist(uuid,uuid,text,uuid)',
+    'api.resolve_unknown_send(uuid,uuid,text,uuid)',
     'api.revoke_ai_draft_grant(uuid,uuid)',
+    'api.send_message(uuid,uuid,text,uuid,text,uuid,uuid)',
     'api.set_ai_enabled(uuid,boolean)',
     'api.set_product_status(uuid,uuid,integer,text)',
     'api.transition_order(uuid,uuid,integer,text,jsonb,uuid)',
@@ -252,6 +261,83 @@ select is(
                              'api.ai_fail_run(uuid,text,text,jsonb)', 'api.ai_run_state(uuid)']) f
     where has_function_privilege(r, f, 'EXECUTE')),
   null, 'no other role can execute the worker functions');
+
+-- The channel roles (Phase 9 MC-2): their own logins, one function set each, no tables, no seller
+-- rights; and no AI role can execute any send or ingest function.
+select is((select array_agg(row(rolname, rolcanlogin, rolinherit, rolsuper, rolbypassrls, rolcreaterole, rolcreatedb, rolreplication)::text
+                            order by rolname)
+             from pg_roles where rolname in ('aisellia_channel_ingest', 'aisellia_channel_sender')),
+          array[row('aisellia_channel_ingest', true, false, false, false, false, false, false)::text,
+                row('aisellia_channel_sender', true, false, false, false, false, false, false)::text],
+          'both channel roles can log in but inherit nothing and have no special attributes');
+select is((select array_agg(b.rolname::text order by b.rolname) from pg_auth_members m
+             join pg_roles b on b.oid = m.roleid
+            where m.member in ('aisellia_channel_ingest'::regrole, 'aisellia_channel_sender'::regrole)),
+          null, 'the channel roles are members of no other role');
+select is(
+  (select array_agg(r || '>' || c order by r, c)
+     from unnest(array['authenticator', 'anon', 'authenticated', 'service_role', 'aisellia_ai', 'aisellia_ai_worker']) r
+     cross join unnest(array['aisellia_channel_ingest', 'aisellia_channel_sender']) c
+    where pg_has_role(r, c, 'member')),
+  null, 'no API or AI role can switch to a channel role');
+select is(
+  (select array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text) from pg_proc p
+     join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname in ('api', 'app', 'internal') and has_function_privilege('aisellia_channel_ingest', p.oid, 'EXECUTE')),
+  array['api.channel_ingest(text,text,text,jsonb,text)'],
+  'aisellia_channel_ingest can execute exactly api.channel_ingest');
+select is(
+  (select array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text) from pg_proc p
+     join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname in ('api', 'app', 'internal') and has_function_privilege('aisellia_channel_sender', p.oid, 'EXECUTE')),
+  array['api.channel_claim_send(uuid)', 'api.channel_complete_send(uuid,text,text)',
+        'api.channel_fail_send(uuid,text,text,integer)', 'api.channel_send_state(uuid)'],
+  'aisellia_channel_sender can execute exactly the four send functions');
+select is(
+  (select array_agg(format('%s:%s.%s:%s', r, n.nspname, c.relname, p.priv) order by 1) from pg_class c
+     join pg_namespace n on n.oid = c.relnamespace
+     cross join unnest(array['aisellia_channel_ingest', 'aisellia_channel_sender']) r
+     cross join (values ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE'), ('TRUNCATE')) p(priv)
+    where n.nspname not in ('pg_catalog', 'information_schema') and n.nspname not like 'pg_t%'
+      and c.relkind in ('r', 'v', 'm', 'p', 'f')
+      and has_schema_privilege(r, n.oid, 'USAGE')
+      and has_table_privilege(r, c.oid, p.priv)),
+  null,
+  'the channel roles can reach no table or view in any schema (including vault)');
+select is(
+  (select array_agg(r || ':' || n.nspname::text order by r, n.nspname) from pg_namespace n
+     cross join unnest(array['aisellia_channel_ingest', 'aisellia_channel_sender']) r
+    where has_schema_privilege(r, n.oid, 'USAGE')
+      and n.nspname not in ('pg_catalog', 'information_schema') and n.nspname not like 'pg_t%'),
+  array['aisellia_channel_ingest:api', 'aisellia_channel_ingest:public', 'aisellia_channel_sender:api',
+        'aisellia_channel_sender:public'],
+  'the channel roles can enter only api (and public)');
+select is(
+  (select array_agg(r || ':' || f order by r, f)
+     from unnest(array['anon', 'authenticated', 'service_role', 'aisellia_ai', 'aisellia_ai_worker', 'aisellia_channel_ingest']) r
+     cross join unnest(array['api.channel_claim_send(uuid)', 'api.channel_complete_send(uuid,text,text)',
+                             'api.channel_fail_send(uuid,text,text,integer)', 'api.channel_send_state(uuid)']) f
+    where has_function_privilege(r, f, 'EXECUTE')),
+  null, 'no role other than the sender (and never an AI role) can execute the send-execution functions');
+select is(
+  (select array_agg(r || ':' || f order by r, f)
+     from unnest(array['anon', 'aisellia_ai', 'aisellia_ai_worker', 'aisellia_channel_ingest', 'aisellia_channel_sender']) r
+     cross join unnest(array['api.send_message(uuid,uuid,text,uuid,text,uuid,uuid)', 'api.resolve_unknown_send(uuid,uuid,text,uuid)',
+                             'api.cancel_send(uuid,uuid)']) f
+    where has_function_privilege(r, f, 'EXECUTE')),
+  null, 'no AI or machine role can authorize, resend or cancel a message: only signed-in sellers');
+select is(
+  (select array_agg(r order by r) from unnest(array['anon', 'authenticated', 'service_role', 'aisellia_ai', 'aisellia_ai_worker',
+                                                     'aisellia_channel_sender']) r
+    where has_function_privilege(r, 'api.channel_ingest(text,text,text,jsonb,text)', 'EXECUTE')),
+  null, 'no role other than the ingest role can store webhook events');
+select is(
+  (select array_agg(p.oid::regprocedure::text order by 1) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+    where n.nspname in ('api', 'app', 'internal')
+      and (has_function_privilege('aisellia_ai_worker', p.oid, 'EXECUTE') or has_function_privilege('aisellia_ai', p.oid, 'EXECUTE'))
+      and p.proname in ('approve_order', 'transition_order', 'edit_approved_order', 'send_message', 'channel_claim_send',
+                        'channel_complete_send', 'resolve_unknown_send', 'mark_confirmation_sent')),
+  null, 'neither AI role can approve or advance an order, or send, resend or confirm a message');
 
 select * from finish();
 rollback;
