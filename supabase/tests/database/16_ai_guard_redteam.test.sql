@@ -6,7 +6,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(86);
+select plan(94);
 
 create temp table ids (k text primary key, v uuid);
 create temp table res (k text primary key, v jsonb);
@@ -340,6 +340,41 @@ select is(app.ai_spent(pg_temp.id('store_a')) - (select coalesce(sum(cost_micro_
                                                   where store_id = pg_temp.id('store_a') and created_at > now() - interval '24 hours'),
           (select value * 2 from app.ai_limits where name = 'assist_run_reserve_micro_usd')::numeric,
           'a run still in flight and a run that expired after it may have reached the model both count at the reserve');
+
+-- ---- 8. Failures whose cost is unknown are charged the reserve (Phase 10, 20261023090000) ------------------------
+select pg_temp.act_as_admin();
+update app.ai_limits set value = 1000 where name in ('assist_calls_per_store_per_10min', 'assist_calls_per_store_per_day');
+update app.ai_limits set value = 20000000 where name = 'assist_daily_cost_micro_usd_per_store';
+create function pg_temp.failed_cost(p_conv text, p_status text, p_code text) returns bigint language plpgsql as $$
+declare v uuid;
+begin
+  perform pg_temp.conv(p_conv, 'Is it available?');
+  perform pg_temp.act_as_admin();
+  v := pg_temp.queue(p_conv);
+  perform pg_temp.claim(v);
+  perform pg_temp.act_as_worker();
+  perform api.ai_fail_run(v, p_status, p_code, '{"model": "gemini-3.8-flash", "usage": {}}');
+  perform pg_temp.act_as_admin();
+  return (pg_temp.run_row(v) ->> 'cost_micro_usd')::bigint;
+end $$;
+create temp table reserve as select value::bigint as v from app.ai_limits where name = 'assist_run_reserve_micro_usd';
+grant all on reserve to public;
+select is(pg_temp.failed_cost('f1', 'provider_error', 'connection'), (select v from reserve),
+          'a connection lost after the request left may have been billed: charged the reserve');
+select is(pg_temp.failed_cost('f2', 'provider_error', 'bad_response'), (select v from reserve),
+          'an unreadable 2xx answer was billed: charged the reserve');
+select is(pg_temp.failed_cost('f3', 'provider_error', 'unexpected'), (select v from reserve),
+          'an unexpected failure is charged the reserve');
+select is(pg_temp.failed_cost('f4', 'provider_error', 'http_unknown'), (select v from reserve),
+          'a failure without an HTTP status is charged the reserve');
+select is(pg_temp.failed_cost('f5', 'provider_error', 'server_error'), 0::bigint,
+          'an HTTP 5xx answer is not billed (Gemini billing docs): no charge');
+select is(pg_temp.failed_cost('f6', 'provider_error', 'http_400'), 0::bigint,
+          'an HTTP 4xx answer is not billed: no charge');
+select is(pg_temp.failed_cost('f7', 'provider_error', 'no_api_key'), 0::bigint,
+          'no request was made without a key: no charge');
+select is(pg_temp.failed_cost('f8', 'rate_limited', 'provider_rate_limited'), 0::bigint,
+          'a rate-limit answer (429) is not billed: no charge');
 
 select * from finish();
 rollback;

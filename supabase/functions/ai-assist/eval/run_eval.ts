@@ -7,11 +7,11 @@
 //   GEMINI_API_KEY=... AISELLIA_EVAL=1 SUPABASE_TEST_URL=http://127.0.0.1:54321 \
 //   SUPABASE_TEST_PUBLISHABLE_KEY=... SUPABASE_TEST_JWT_SECRET=... \
 //   deno run --allow-net --allow-env --allow-read --allow-write=./eval/out eval/run_eval.ts \
-//     [--max-cost-usd=5] [--set=/path/outside/the/repo/consented.json] [--plan] [scenario-id ...]
+//     [--max-cost-usd=2] [--set=/path/outside/the/repo/consented.json] [--plan] [scenario-id ...]
 //
 // --plan prints what would run and the spending cap, and calls nothing (no key needed).
 // --max-cost-usd stops before the next scenario once the recorded cost reaches the cap
-//   (default USD 5; the overshoot is at most one scenario, two model calls).
+//   (default USD 2; the overshoot is at most one scenario, two model calls).
 // --set reads another scenario file of the same shape, e.g. consented real conversations. It must
 //   live outside the repository so customer text is never committed; reports go to eval/out/
 //   (ignored by git).
@@ -131,8 +131,18 @@ if (Deno.env.get("AISELLIA_EVAL") !== "1" || !apiKey) {
 }
 assertLocal();
 
+// The database's own limits stay as they are: a store may ask for at most
+// assist_calls_per_store_per_10min runs, so the set is spread over identical stores (a fresh one
+// every SCENARIOS_PER_STORE scenarios) instead of being refused part-way as "rate limited".
+const SCENARIOS_PER_STORE = 20;
+
 const results = await withWorker(async (admin, workerUrl) => {
-  const seller: Seller = await createSeller(admin, { tag: "eval", ...spec.store });
+  const sellers: Seller[] = [];
+  const sellerFor = async (i: number) =>
+    sellers[Math.floor(i / SCENARIOS_PER_STORE)] ??= await createSeller(admin, {
+      tag: "eval",
+      ...spec.store,
+    });
   await createSeller(admin, { tag: "eval-other", ...spec.other_store } as {
     tag: string;
     storeName: string;
@@ -154,7 +164,8 @@ const results = await withWorker(async (admin, workerUrl) => {
 
   const out: (EvalResult & Record<string, unknown>)[] = [];
   let spentMicro = 0;
-  for (const s of scenarios) {
+  for (const [i, s] of scenarios.entries()) {
+    const seller = await sellerFor(i);
     if (spentMicro >= args.maxCostUsd * 1e6) {
       out.push({
         id: s.id,

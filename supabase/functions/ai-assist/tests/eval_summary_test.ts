@@ -28,7 +28,7 @@ Deno.test("arguments: ids, a spending cap, an external set, plan mode", () => {
     setPath: "/tmp/c.json",
     plan: true,
   });
-  assertEquals(parseArgs([]).maxCostUsd, 5);
+  assertEquals(parseArgs([]).maxCostUsd, 2);
   assertThrows(() => parseArgs(["--max-cost-usd=0"]), ArgsError);
   assertThrows(() => parseArgs(["--max-cost-usd=500"]), ArgsError);
   assertThrows(() => parseArgs(["--model=x"]), ArgsError);

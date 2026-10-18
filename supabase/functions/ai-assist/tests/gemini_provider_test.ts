@@ -230,3 +230,49 @@ Deno.test('effort maps to a thinking level for 3.x and 4.x models; never "minima
     await server.shutdown();
   }
 });
+
+Deno.test("retries are bounded and back off: a 429 waits, Retry-After is honoured, never a loop", async () => {
+  let calls = 0;
+  let mode: "429" | "503" | "429-long" = "429";
+  const { server, url } = stub(() => {
+    calls++;
+    if (mode === "429-long") return new Response("{}", { status: 429, headers: { "retry-after": "60" } });
+    return new Response("{}", { status: mode === "429" ? 429 : 503 });
+  });
+  const waits: number[] = [];
+  const provider = (minAttemptMs = 3000) =>
+    new GeminiProvider({
+      apiKey: KEY,
+      baseURL: url,
+      maxRetries: 5, // capped at 1 whatever is configured
+      minAttemptMs,
+      sleep: (ms) => {
+        waits.push(ms);
+        return Promise.resolve();
+      },
+    });
+  try {
+    // A persistent 429: one retry after 2 s, then rate_limited (the seller decides; nothing loops).
+    const e1 = await assertRejects(() => provider().generate(request(30000)), ProviderError);
+    assertEquals([e1.kind, calls, waits], ["rate_limited", 2, [2000]]);
+    // A persistent 503: one retry after 1 s, then the error.
+    calls = 0;
+    waits.length = 0;
+    mode = "503";
+    const e2 = await assertRejects(() => provider().generate(request(30000)), ProviderError);
+    assertEquals([e2.code, calls, waits], ["overloaded", 2, [1000]]);
+    // Retry-After longer than the time left: no retry at all.
+    calls = 0;
+    waits.length = 0;
+    mode = "429-long";
+    await assertRejects(() => provider().generate(request(30000)), ProviderError);
+    assertEquals([calls, waits], [1, []]);
+    // Too little budget left for a useful second attempt: no retry.
+    calls = 0;
+    mode = "503";
+    await assertRejects(() => provider(3000).generate(request(3500)), ProviderError);
+    assertEquals([calls, waits], [1, []]);
+  } finally {
+    await server.shutdown();
+  }
+});

@@ -31,6 +31,7 @@ Deno.test({
   async fn(t) {
     assertLocal();
     const seen: { url: string; key: string | null; body: string }[] = [];
+    const logs: string[] = [];
     let answer: (store: Record<string, unknown>) => unknown = () => ({});
     const gemini = Deno.serve({ port: 0, hostname: "127.0.0.1", onListen: () => {} }, async (req) => {
       const body = await req.json();
@@ -74,7 +75,7 @@ Deno.test({
             budgetMs: 45000,
           },
           allowedOrigins: [],
-          log: () => {},
+          log: (e) => logs.push(JSON.stringify(e)),
         });
         const call = async (conv: string) => {
           const res = await handler(
@@ -234,6 +235,17 @@ Deno.test({
             assertEquals(s.key, GEMINI_KEY);
             assertFalse(s.url.includes(GEMINI_KEY));
             assertFalse(s.body.includes("Secret Mug"));
+            // The customer's phone number is replaced by a token before anything reaches Google.
+            assertFalse(/0750 ?111 ?2233|7501112233/.test(s.body), "no phone number sent to Gemini");
+          }
+        });
+
+        await t.step("logs carry operational metadata only: no key, message text or personal data", () => {
+          assert(logs.length >= 2);
+          for (const line of logs) {
+            for (const secret of [GEMINI_KEY, "abaya", "سارة", "0750", "عباء", "ڕێنماییەکانت"]) {
+              assertFalse(line.includes(secret), `a log line contains "${secret}"`);
+            }
           }
         });
       });

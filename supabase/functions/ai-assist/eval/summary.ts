@@ -55,7 +55,7 @@ export interface EvalArgs {
 export class ArgsError extends Error {}
 
 export function parseArgs(args: string[]): EvalArgs {
-  const out: EvalArgs = { ids: [], maxCostUsd: 5, setPath: null, plan: false };
+  const out: EvalArgs = { ids: [], maxCostUsd: 2, setPath: null, plan: false };
   for (const a of args) {
     if (a === "--plan") out.plan = true;
     else if (a.startsWith("--max-cost-usd=")) {

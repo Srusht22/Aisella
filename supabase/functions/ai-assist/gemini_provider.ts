@@ -14,6 +14,14 @@ export interface GeminiProviderOptions {
   /** Retries on 429 / 5xx / connection errors (Phase 3 AI §11: at most 1). */
   maxRetries?: number;
   /**
+   * Wait before the retry (Google: back off on 429 and 5xx). Default 1 s, 2 s after a 429, or the
+   * answer's Retry-After when it is shorter than the time left. No retry when less than
+   * [minAttemptMs] would remain for it.
+   */
+  retryDelayMs?: { server: number; rateLimited: number };
+  minAttemptMs?: number;
+  sleep?: (ms: number) => Promise<void>;
+  /**
    * `json_schema` sends the output schema as `responseJsonSchema`; `json_only` asks only for JSON
    * (the prompt and the database still enforce the shape). A fallback if a model refuses the schema.
    */
@@ -113,6 +121,9 @@ export class GeminiProvider implements AiProvider {
   readonly #retries: number;
   readonly #structured: "json_schema" | "json_only";
   readonly #fetch: typeof fetch;
+  readonly #delay: { server: number; rateLimited: number };
+  readonly #minAttempt: number;
+  readonly #sleep: (ms: number) => Promise<void>;
 
   constructor(options: GeminiProviderOptions) {
     this.#key = options.apiKey;
@@ -121,6 +132,9 @@ export class GeminiProvider implements AiProvider {
     this.#retries = Math.max(0, Math.min(options.maxRetries ?? 1, 1));
     this.#structured = options.structuredOutput ?? "json_schema";
     this.#fetch = options.fetchFn ?? fetch;
+    this.#delay = options.retryDelayMs ?? { server: 1000, rateLimited: 2000 };
+    this.#minAttempt = options.minAttemptMs ?? 3000;
+    this.#sleep = options.sleep ?? ((ms) => new Promise((r) => setTimeout(r, ms)));
   }
 
   async generate(request: ProviderRequest): Promise<ProviderResponse> {
@@ -130,7 +144,13 @@ export class GeminiProvider implements AiProvider {
     const body = JSON.stringify(geminiRequestBody(request, this.#structured));
     const deadline = Date.now() + request.timeoutMs;
     let last: ProviderError | null = null;
+    let wait = 0;
     for (let attempt = 0; attempt <= this.#retries; attempt++) {
+      if (attempt > 0) {
+        // One bounded retry, after a back-off, only if a useful attempt still fits the budget.
+        if (deadline - Date.now() - wait < this.#minAttempt) break;
+        await this.#sleep(wait);
+      }
       const left = deadline - Date.now();
       if (left <= 0) break;
       const controller = new AbortController();
@@ -146,6 +166,9 @@ export class GeminiProvider implements AiProvider {
         await res.body?.cancel();
         last = httpError(res.status);
         if (!(res.status === 429 || res.status >= 500)) throw last;
+        const after = Number(res.headers.get("retry-after"));
+        wait = res.status === 429 ? this.#delay.rateLimited : this.#delay.server;
+        if (Number.isFinite(after) && after > 0) wait = Math.max(wait, after * 1000);
       } catch (error) {
         if (error instanceof ProviderError) throw error;
         if (controller.signal.aborted || (error instanceof DOMException && error.name === "AbortError")) {
@@ -154,6 +177,7 @@ export class GeminiProvider implements AiProvider {
         // Response body that is not JSON: never retried (the call may have been billed).
         if (error instanceof SyntaxError) throw new ProviderError("provider_error", "bad_response");
         last = new ProviderError("provider_error", "connection");
+        wait = this.#delay.server;
       } finally {
         clearTimeout(timer);
       }
