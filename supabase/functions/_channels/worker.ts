@@ -66,6 +66,34 @@ export async function handleWorkerRequest(
 }
 
 /**
+ * WhatsApp template lists: refreshed every 6 hours per connected number (the database decides which
+ * are due). A failure leaves the stored list untouched; it is retried next cycle.
+ */
+export async function runTemplateSyncCycle(deps: {
+  db: WorkerDb;
+  fetchers: Record<string, (wabaId: string, token: string) => Promise<unknown[]>>;
+  log: Logger;
+}): Promise<{ synced: number; failed: number }> {
+  const out = { synced: 0, failed: 0 };
+  if (!deps.db.dueTemplateSyncs || !deps.db.storeTemplates) return out;
+  const due = await deps.db.dueTemplateSyncs();
+  for (const item of due.ok ? due.data?.items ?? [] : []) {
+    const fetcher = deps.fetchers[item.provider];
+    if (!fetcher || !item.credential) continue;
+    try {
+      const templates = await fetcher(item.waba_id, item.credential);
+      const stored = await deps.db.storeTemplates(item.connection_id, templates);
+      if (stored.ok) out.synced++;
+      else out.failed++;
+    } catch {
+      out.failed++;
+    }
+  }
+  if (out.synced || out.failed) deps.log({ event: "template_sync", ...out });
+  return out;
+}
+
+/**
  * Token refresh (TikTok access tokens live one day): refresh what expires within two hours. A refusal
  * marks the connection "error" (needs_attention) so the seller reconnects; tokens are never logged.
  */

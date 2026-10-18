@@ -5,7 +5,13 @@
 import { PostgresSenderDb } from "../_channels/db.ts";
 import { realAdapters } from "../_channels/providers/registry.ts";
 import { refreshTikTokToken } from "../_channels/providers/tiktok_connect.ts";
-import { handleWorkerRequest, runRefreshCycle, runWorkerCycle } from "../_channels/worker.ts";
+import { fetchTemplates } from "../_channels/providers/whatsapp.ts";
+import {
+  handleWorkerRequest,
+  runRefreshCycle,
+  runTemplateSyncCycle,
+  runWorkerCycle,
+} from "../_channels/worker.ts";
 
 const env = (k: string) => Deno.env.get(k);
 const required = (k: string) => {
@@ -35,6 +41,14 @@ Deno.serve((req) =>
     cycle: async () => {
       const result = await runWorkerCycle({ db, adapters, log });
       await runRefreshCycle({ db, refreshers, log });
+      await runTemplateSyncCycle({
+        db,
+        fetchers: {
+          whatsapp: (waba, token) =>
+            fetchTemplates({ version: env("META_GRAPH_VERSION")?.trim() || undefined }, waba, token),
+        },
+        log,
+      });
       return result;
     },
   })

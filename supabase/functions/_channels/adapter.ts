@@ -14,6 +14,17 @@ export interface OutboundText {
   accountId: string;
   /** The connection's display name, for providers that require a sender name (Viber). */
   senderName?: string | null;
+  /**
+   * An approved WhatsApp template (outside the customer-service window). `text` is then the template
+   * rendered with these parameters; the adapter submits the template, not free-form text.
+   */
+  template?: OutboundTemplate | null;
+}
+
+export interface OutboundTemplate {
+  name: string;
+  language: string;
+  params: string[];
 }
 
 export type SendResult =
@@ -31,6 +42,8 @@ export interface ProviderAdapter {
   readonly perConnectionWebhook: boolean;
   /** Providers that confirm a webhook subscription with a GET verify-token handshake (Meta). */
   readonly handshake?: "meta";
+  /** Providers that can submit message templates (WhatsApp). Others refuse a template send. */
+  readonly supportsTemplates?: boolean;
   /** Submits exactly `msg.text`. Must never throw for provider errors: map them to a SendResult. */
   send(msg: OutboundText, credential: string | null, opts: { timeoutMs: number }): Promise<SendResult>;
   /** Token-based connection (per-bot providers); OAuth providers have none. */

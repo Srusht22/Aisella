@@ -34,6 +34,15 @@ export interface ClaimedSend {
   attempt: number;
   /** The connection's display name (providers that require a sender name). */
   sender_name?: string | null;
+  /** Template sends: what to submit; `text` is its rendering, re-checked before submission. */
+  template?: { name: string; language: string; body_text: string; params: string[] } | null;
+}
+
+export interface TemplateSync {
+  connection_id: string;
+  provider: string;
+  waba_id: string;
+  credential: string | null;
 }
 
 export interface SenderDb {
@@ -55,6 +64,9 @@ export interface WorkerDb extends SenderDb {
   dueRefreshes?(): Promise<
     ApiResult<{ items: { connection_id: string; provider: string; refresh_token: string }[] }>
   >;
+  /** WhatsApp numbers whose template list is stale, with the token to read it. */
+  dueTemplateSyncs?(): Promise<ApiResult<{ items: TemplateSync[] }>>;
+  storeTemplates?(connectionId: string, templates: unknown[]): Promise<ApiResult>;
   storeRefresh?(
     connectionId: string,
     ok: boolean,
@@ -195,6 +207,12 @@ export class PostgresSenderDb implements WorkerDb {
       refreshToken,
       expiresAt,
     ]);
+  }
+  dueTemplateSyncs() {
+    return call<{ items: TemplateSync[] }>(this.url, "select api.channel_due_template_syncs() as r", []);
+  }
+  storeTemplates(id: string, templates: unknown[]) {
+    return call(this.url, "select api.channel_store_templates($1::uuid, $2::jsonb) as r", [id, templates]);
   }
   claim(id: string) {
     return call<ClaimedSend>(this.url, "select api.channel_claim_send($1::uuid) as r", [id]);

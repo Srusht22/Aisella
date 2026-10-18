@@ -102,6 +102,7 @@ select is(
     'api.channel_complete_send(uuid,text,text)',
     'api.channel_due_refreshes()',
     'api.channel_due_sends(integer)',
+    'api.channel_due_template_syncs()',
     'api.channel_fail_send(uuid,text,text,integer)',
     'api.channel_finish_connect(text,boolean)',
     'api.channel_ingest_raw(text,text,bytea,jsonb)',
@@ -109,6 +110,7 @@ select is(
     'api.channel_register_bot(text,text,text,text,text,text)',
     'api.channel_send_state(uuid)',
     'api.channel_store_refresh(uuid,boolean,text,text,timestamp with time zone)',
+    'api.channel_store_templates(uuid,jsonb)',
     'api.channel_webhook_challenge(text,text)',
     'api.check_send_dispatch(uuid)',
     'api.copy_suggestion(uuid,uuid,text,uuid)',
@@ -136,6 +138,7 @@ select is(
     'api.list_orders(uuid,text,text,integer,integer)',
     'api.list_policies(uuid)',
     'api.list_products(uuid,text,text,text,text,integer,integer)',
+    'api.list_templates(uuid,uuid)',
     'api.mark_confirmation_sent(uuid,uuid)',
     'api.mark_message_sent(uuid,uuid)',
     'api.order_confirmation_text(uuid,uuid,text)',
@@ -150,6 +153,7 @@ select is(
     'api.resolve_unknown_send(uuid,uuid,text,uuid)',
     'api.revoke_ai_draft_grant(uuid,uuid)',
     'api.send_message(uuid,uuid,text,uuid,text,uuid,uuid)',
+    'api.send_template(uuid,uuid,uuid,jsonb,uuid)',
     'api.set_ai_enabled(uuid,boolean)',
     'api.set_product_status(uuid,uuid,integer,text)',
     'api.transition_order(uuid,uuid,integer,text,jsonb,uuid)',
@@ -303,9 +307,10 @@ select is(
      join pg_namespace n on n.oid = p.pronamespace
     where n.nspname in ('api', 'app', 'internal') and has_function_privilege('aisellia_channel_sender', p.oid, 'EXECUTE')),
   array['api.channel_claim_send(uuid)', 'api.channel_complete_send(uuid,text,text)', 'api.channel_due_refreshes()',
-        'api.channel_due_sends(integer)', 'api.channel_fail_send(uuid,text,text,integer)', 'api.channel_send_state(uuid)',
-        'api.channel_store_refresh(uuid,boolean,text,text,timestamp with time zone)'],
-  'aisellia_channel_sender can execute exactly its send and token-refresh functions');
+        'api.channel_due_sends(integer)', 'api.channel_due_template_syncs()', 'api.channel_fail_send(uuid,text,text,integer)',
+        'api.channel_send_state(uuid)', 'api.channel_store_refresh(uuid,boolean,text,text,timestamp with time zone)',
+        'api.channel_store_templates(uuid,jsonb)'],
+  'aisellia_channel_sender can execute exactly its send, token-refresh and template-sync functions');
 select is(
   (select array_agg(format('%s:%s.%s:%s', r, n.nspname, c.relname, p.priv) order by 1) from pg_class c
      join pg_namespace n on n.oid = c.relnamespace
@@ -336,7 +341,7 @@ select is(
   (select array_agg(r || ':' || f order by r, f)
      from unnest(array['anon', 'aisellia_ai', 'aisellia_ai_worker', 'aisellia_channel_ingest', 'aisellia_channel_sender']) r
      cross join unnest(array['api.send_message(uuid,uuid,text,uuid,text,uuid,uuid)', 'api.resolve_unknown_send(uuid,uuid,text,uuid)',
-                             'api.cancel_send(uuid,uuid)']) f
+                             'api.cancel_send(uuid,uuid)', 'api.send_template(uuid,uuid,uuid,jsonb,uuid)']) f
     where has_function_privilege(r, f, 'EXECUTE')),
   null, 'no AI or machine role can authorize, resend or cancel a message: only signed-in sellers');
 select is(

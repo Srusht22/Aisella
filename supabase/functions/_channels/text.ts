@@ -7,6 +7,19 @@ export async function sha256Hex(text: string | Uint8Array): Promise<string> {
   return Array.from(digest, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+/**
+ * WhatsApp template rendering, identical to the database's app.render_template: {{1}}..{{n}} replaced
+ * by the parameters in order. Parameters never contain "{{" (checked when the seller sends), so the
+ * order of replacement cannot change the result.
+ */
+export function renderTemplate(body: string, params: readonly string[]): string {
+  let out = body;
+  params.forEach((p, i) => {
+    out = out.split(`{{${i + 1}}}`).join(p);
+  });
+  return out;
+}
+
 /** Constant-time comparison of two strings of equal expected length. */
 export function timingSafeEqual(a: string, b: string): boolean {
   const ea = new TextEncoder().encode(a);

@@ -5,7 +5,7 @@
 import type { ProviderAdapter } from "./adapter.ts";
 import { type ApiResult, DbUnavailable, type SenderDb } from "./db.ts";
 import type { Logger } from "./ingest.ts";
-import { sha256Hex } from "./text.ts";
+import { renderTemplate, sha256Hex } from "./text.ts";
 
 export interface SendOutcome {
   send_request_id: string;
@@ -29,9 +29,19 @@ export async function runSend(
     await report(db.fail(sendRequestId, "permanent", "no_adapter", null), db, sendRequestId, log);
     return { send_request_id: sendRequestId, state: "failed", code: "no_adapter" };
   }
-  // The exact-text guarantee: what we submit must hash to what the seller authorized.
-  const textToSubmit = c.text;
-  if ((await sha256Hex(textToSubmit)) !== c.text_sha256) {
+  const template = c.template ?? null;
+  if (template && !adapter.supportsTemplates) {
+    await report(db.fail(sendRequestId, "permanent", "templates_unsupported", null), db, sendRequestId, log);
+    return { send_request_id: sendRequestId, state: "failed", code: "templates_unsupported" };
+  }
+  // The exact-text guarantee: what we submit must hash to what the seller authorized. For a template,
+  // what the customer will read is the template rendered with its parameters, so that is checked.
+  const textToSubmit = template ? renderTemplate(template.body_text, template.params) : c.text;
+  if (
+    (template && textToSubmit !== c.text) ||
+    (template && !(Array.isArray(template.params) && template.params.every((p) => typeof p === "string"))) ||
+    (await sha256Hex(textToSubmit)) !== c.text_sha256
+  ) {
     log({ event: "send_integrity_refused", send_request_id: sendRequestId });
     await report(db.fail(sendRequestId, "integrity", "text_integrity", null), db, sendRequestId, log);
     return { send_request_id: sendRequestId, state: "failed", code: "text_integrity" };
@@ -45,6 +55,9 @@ export async function runSend(
         recipient: c.recipient,
         accountId: c.account_id,
         senderName: c.sender_name ?? null,
+        template: template
+          ? { name: template.name, language: template.language, params: template.params }
+          : null,
       },
       c.credential,
       { timeoutMs: deps.timeoutMs ?? 15000 },
