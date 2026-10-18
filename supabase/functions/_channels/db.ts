@@ -1,0 +1,115 @@
+// Database access for the channel functions: each uses its own LOGIN role with a fixed function
+// set (aisellia_channel_ingest: 1 function; aisellia_channel_sender: 4). Never the service role.
+import postgres from "postgres";
+import type { NormalizedEvent } from "./adapter.ts";
+
+export interface ApiResult<T = Record<string, unknown>> {
+  ok: boolean;
+  data?: T;
+  error?: { code: string; details?: Record<string, unknown> };
+}
+
+/** A transport failure: the call may or may not have reached the database. */
+export class DbUnavailable extends Error {}
+
+export interface IngestDb {
+  ingest(
+    provider: string,
+    externalEventId: string,
+    connectionHint: string | null,
+    events: NormalizedEvent[],
+    rawSha256: string,
+  ): Promise<ApiResult>;
+}
+
+export interface ClaimedSend {
+  send_request_id: string;
+  provider: string;
+  account_id: string;
+  recipient: string;
+  text: string;
+  text_sha256: string;
+  credential: string | null;
+  attempt: number;
+}
+
+export interface SenderDb {
+  claim(sendRequestId: string): Promise<ApiResult<ClaimedSend>>;
+  complete(sendRequestId: string, providerMessageId: string, textSha256: string): Promise<ApiResult>;
+  fail(
+    sendRequestId: string,
+    outcome: "retriable" | "permanent" | "unknown" | "integrity",
+    code: string,
+    retryAfterMs: number | null,
+  ): Promise<ApiResult>;
+  state(sendRequestId: string): Promise<ApiResult>;
+}
+
+async function call<T = Record<string, unknown>>(
+  url: string,
+  text: string,
+  params: unknown[],
+): Promise<ApiResult<T>> {
+  // One short-lived connection per call; a lost connection is DbUnavailable so callers reconcile
+  // instead of guessing.
+  const sql = postgres(url, {
+    max: 1,
+    prepare: false,
+    connect_timeout: 5,
+    idle_timeout: 1,
+    onnotice: () => {},
+  });
+  try {
+    const rows = await sql.unsafe(text, params as postgres.ParameterOrJSON<never>[]);
+    return rows[0].r as ApiResult<T>;
+  } catch (error) {
+    if (error instanceof postgres.PostgresError) throw error;
+    throw new DbUnavailable("channel database unavailable");
+  } finally {
+    await sql.end({ timeout: 2 }).catch(() => {});
+  }
+}
+
+export class PostgresIngestDb implements IngestDb {
+  constructor(private readonly url: string) {}
+  ingest(
+    provider: string,
+    externalEventId: string,
+    hint: string | null,
+    events: NormalizedEvent[],
+    rawSha256: string,
+  ) {
+    return call(this.url, "select api.channel_ingest($1, $2, $3, $4::jsonb, $5) as r", [
+      provider,
+      externalEventId,
+      hint,
+      events, // an object: the driver encodes jsonb itself
+      rawSha256,
+    ]);
+  }
+}
+
+export class PostgresSenderDb implements SenderDb {
+  constructor(private readonly url: string) {}
+  claim(id: string) {
+    return call<ClaimedSend>(this.url, "select api.channel_claim_send($1::uuid) as r", [id]);
+  }
+  complete(id: string, providerMessageId: string, textSha256: string) {
+    return call(this.url, "select api.channel_complete_send($1::uuid, $2, $3) as r", [
+      id,
+      providerMessageId,
+      textSha256,
+    ]);
+  }
+  fail(id: string, outcome: string, code: string, retryAfterMs: number | null) {
+    return call(this.url, "select api.channel_fail_send($1::uuid, $2, $3, $4) as r", [
+      id,
+      outcome,
+      code,
+      retryAfterMs,
+    ]);
+  }
+  state(id: string) {
+    return call(this.url, "select api.channel_send_state($1::uuid) as r", [id]);
+  }
+}
