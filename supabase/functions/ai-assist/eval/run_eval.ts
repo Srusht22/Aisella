@@ -1,10 +1,10 @@
 // deno-lint-ignore-file no-explicit-any -- untyped API JSON inspected by an evaluation script
 // Evaluation against the REAL model provider (Phase 3 AI §11). It costs money, so it runs only on
 // request: never in CI and never without an explicit key. It drives the real handler, the real
-// database rules and the real AnthropicProvider on the LOCAL stack, then checks what the database
-// stored (deterministic checks; no model grading).
+// database rules and the configured provider (AI_PROVIDER: gemini by default, or anthropic) on the
+// LOCAL stack, then checks what the database stored (deterministic checks; no model grading).
 //
-//   ANTHROPIC_API_KEY=... AISELLIA_EVAL=1 SUPABASE_TEST_URL=http://127.0.0.1:54321 \
+//   GEMINI_API_KEY=... AISELLIA_EVAL=1 SUPABASE_TEST_URL=http://127.0.0.1:54321 \
 //   SUPABASE_TEST_PUBLISHABLE_KEY=... SUPABASE_TEST_JWT_SECRET=... \
 //   deno run --allow-net --allow-env --allow-read --allow-write=./eval/out eval/run_eval.ts \
 //     [--max-cost-usd=5] [--set=/path/outside/the/repo/consented.json] [--plan] [scenario-id ...]
@@ -15,8 +15,9 @@
 // --set reads another scenario file of the same shape, e.g. consented real conversations. It must
 //   live outside the repository so customer text is never committed; reports go to eval/out/
 //   (ignored by git).
-import { AnthropicProvider } from "../anthropic_provider.ts";
+import { DEFAULT_MODELS } from "../config.ts";
 import { createHandler } from "../handler.ts";
+import { createProvider } from "../provider_factory.ts";
 import { PostgrestSellerApi } from "../seller_api.ts";
 import { PostgresWorkerDb } from "../worker_db.ts";
 import {
@@ -84,7 +85,12 @@ if (args.setPath) {
 const spec = JSON.parse(await Deno.readTextFile(setUrl));
 const only = new Set(args.ids);
 const scenarios = (spec.scenarios as Scenario[]).filter((s) => only.size === 0 || only.has(s.id));
-const model = Deno.env.get("AI_MODEL") ?? "claude-opus-5-5";
+const providerName = (Deno.env.get("AI_PROVIDER")?.trim() || "gemini") as "gemini" | "anthropic";
+if (providerName !== "gemini" && providerName !== "anthropic") {
+  console.error("Not run: AI_PROVIDER must be gemini or anthropic.");
+  Deno.exit(2);
+}
+const model = Deno.env.get("AI_MODEL")?.trim() || DEFAULT_MODELS[providerName];
 const effort = (Deno.env.get("AI_EFFORT") ?? "low") as "low" | "medium" | "high";
 const geoRaw = Deno.env.get("AI_INFERENCE_GEO")?.trim() || null;
 if (geoRaw !== null && geoRaw !== "global" && geoRaw !== "us") {
@@ -92,6 +98,10 @@ if (geoRaw !== null && geoRaw !== "global" && geoRaw !== "us") {
   Deno.exit(2);
 }
 const inferenceGeo = geoRaw as "global" | "us" | null;
+if (inferenceGeo !== null && providerName !== "anthropic") {
+  console.error("Not run: AI_INFERENCE_GEO applies to anthropic only.");
+  Deno.exit(2);
+}
 
 if (args.plan) {
   const perLang: Record<string, number> = {};
@@ -101,6 +111,7 @@ if (args.plan) {
       set: spec.version,
       scenarios: scenarios.length,
       per_language: perLang,
+      provider: providerName,
       model,
       effort,
       inference_geo: inferenceGeo,
@@ -112,9 +123,10 @@ if (args.plan) {
   Deno.exit(0);
 }
 
-const apiKey = Deno.env.get("ANTHROPIC_API_KEY")?.trim();
+const keyName = providerName === "gemini" ? "GEMINI_API_KEY" : "ANTHROPIC_API_KEY";
+const apiKey = Deno.env.get(keyName)?.trim();
 if (Deno.env.get("AISELLIA_EVAL") !== "1" || !apiKey) {
-  console.error("Not run: set AISELLIA_EVAL=1 and ANTHROPIC_API_KEY (this evaluation calls the paid API).");
+  console.error(`Not run: set AISELLIA_EVAL=1 and ${keyName} (this evaluation calls the paid API).`);
   Deno.exit(2);
 }
 assertLocal();
@@ -130,7 +142,11 @@ const results = await withWorker(async (admin, workerUrl) => {
   const handler = createHandler({
     sellerApi: new PostgrestSellerApi(API, KEY),
     db: new PostgresWorkerDb(workerUrl),
-    provider: new AnthropicProvider({ apiKey }),
+    provider: createProvider({
+      provider: providerName,
+      geminiApiKey: providerName === "gemini" ? apiKey : null,
+      anthropicApiKey: providerName === "anthropic" ? apiKey : null,
+    }),
     settings: { model, effort, maxTokens: 8000, providerTimeoutMs: 60000, budgetMs: 110000, inferenceGeo },
     allowedOrigins: [],
     log: () => {},

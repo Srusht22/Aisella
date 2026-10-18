@@ -4,7 +4,7 @@
 // deployed endpoint refuses calls without a session. It never prints a secret or a connection
 // string: only check names, pass / fail / skip and short codes.
 //
-//   SUPABASE_URL=... SUPABASE_ANON_KEY=... AISELLIA_AI_WORKER_DB_URL=... ANTHROPIC_API_KEY=... \
+//   SUPABASE_URL=... SUPABASE_ANON_KEY=... AISELLIA_AI_WORKER_DB_URL=... GEMINI_API_KEY=... \
 //   deno run --allow-net --allow-env ops/staging_check.ts [--check-provider] [--check-endpoint]
 //
 // Run it from a trusted operator machine with the same values as the function's secrets.
@@ -41,11 +41,14 @@ export async function runChecks(
     add("config.valid", "fail", e instanceof ConfigError ? e.message : "unreadable");
   }
 
-  const key = env("ANTHROPIC_API_KEY")?.trim() ?? "";
+  // The key of the configured provider (AI_PROVIDER, gemini by default). Only its shape is checked.
+  const anthropic = (env("AI_PROVIDER") ?? "").trim() === "anthropic";
+  const key = env(anthropic ? "ANTHROPIC_API_KEY" : "GEMINI_API_KEY")?.trim() ?? "";
+  const shapeOk = anthropic ? key.startsWith("sk-ant-") : /^[A-Za-z0-9_-]{30,60}$/.test(key);
   add(
-    "secret.anthropic_api_key",
-    key === "" ? "fail" : key.startsWith("sk-ant-") ? "pass" : "fail",
-    key === "" ? "missing" : key.startsWith("sk-ant-") ? undefined : "unexpected format",
+    anthropic ? "secret.anthropic_api_key" : "secret.gemini_api_key",
+    key !== "" && shapeOk ? "pass" : "fail",
+    key === "" ? "missing" : shapeOk ? undefined : "unexpected format",
   );
 
   const dbUrl = env("AISELLIA_AI_WORKER_DB_URL")?.trim() ?? "";
@@ -148,9 +151,19 @@ export async function runChecks(
 
   if (options.checkProvider && key && config) {
     try {
-      const client = new Anthropic({ apiKey: key, baseURL: "https://api.anthropic.com", maxRetries: 0 });
-      const model = await client.models.retrieve(config.model);
-      add("provider.key_and_model", model.id ? "pass" : "fail");
+      if (anthropic) {
+        const client = new Anthropic({ apiKey: key, baseURL: "https://api.anthropic.com", maxRetries: 0 });
+        const model = await client.models.retrieve(config.model);
+        add("provider.key_and_model", model.id ? "pass" : "fail");
+      } else {
+        // Model lookup: free, no tokens. The key goes in a header, never in the URL.
+        const res = await (options.fetchFn ?? fetch)(
+          `https://generativelanguage.googleapis.com/v1beta/models/${config.model}`,
+          { headers: { "x-goog-api-key": key } },
+        );
+        await res.body?.cancel();
+        add("provider.key_and_model", res.ok ? "pass" : "fail", res.ok ? undefined : `http_${res.status}`);
+      }
     } catch (e) {
       const status = (e as { status?: number }).status;
       add("provider.key_and_model", "fail", status ? `http_${status}` : "unreachable");

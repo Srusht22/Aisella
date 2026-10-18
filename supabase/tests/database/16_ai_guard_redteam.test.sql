@@ -6,7 +6,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(78);
+select plan(81);
 
 create temp table ids (k text primary key, v uuid);
 create temp table res (k text primary key, v jsonb);
@@ -276,6 +276,12 @@ select is(pg_temp.cost_of('{"model": "claude-sonnet-5-5", "usage": {"input_token
           'Sonnet runs are costed at its price (1,000 in, 500 out = USD 0.007)');
 select is(pg_temp.cost_of('{"model": "claude-haiku-5-5", "usage": {"input_tokens": 1000, "output_tokens": 500}}'), 350,
           'Haiku runs are costed at its price');
+select is(pg_temp.cost_of('{"model": "gemini-2.5-pro", "usage": {"input_tokens": 1000, "output_tokens": 500}}'), 6250,
+          'Gemini 2.5 Pro runs (the primary provider) are costed at its price');
+select is(pg_temp.cost_of('{"model": "gemini-2.5-flash", "usage": {"input_tokens": 1000, "output_tokens": 500}}'), 1550,
+          'Gemini 2.5 Flash runs are costed at its price');
+select is(pg_temp.cost_of('{"model": "gemini-9-unpriced", "usage": {"input_tokens": 1000, "output_tokens": 500}}'), 14000,
+          'a model without a price is costed at the highest known prices, so it cannot escape the spending brakes');
 select is(pg_temp.cost_of('{"model": "claude-opus-5-5", "inference_geo": "us", "usage": {"input_tokens": 1000, "output_tokens": 500}}'), 15400,
           'US-only inference is costed at 1.1x');
 select pg_temp.act_as_admin();

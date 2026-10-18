@@ -10,7 +10,7 @@ const status = (checks: { check: string; status: string }[], name: string) =>
 Deno.test("an empty environment fails by name and touches nothing", async () => {
   const checks = await runChecks(() => undefined);
   assertEquals(status(checks, "config.valid"), "fail");
-  assertEquals(status(checks, "secret.anthropic_api_key"), "fail");
+  assertEquals(status(checks, "secret.gemini_api_key"), "fail");
   assertEquals(status(checks, "secret.worker_db_url"), "fail");
   assertEquals(status(checks, "worker_db.connect"), "skip");
   assertEquals(status(checks, "provider.key_and_model"), "skip");
@@ -20,6 +20,7 @@ Deno.test("a remote worker URL must use TLS and the worker role; values are neve
   const secret = "s3cret-Pa55word";
   const checks = await runChecks((k) =>
     ({
+      AI_PROVIDER: "anthropic",
       ANTHROPIC_API_KEY: "not-a-key",
       AISELLIA_AI_WORKER_DB_URL: `postgresql://postgres:${secret}@db.example.invalid:6543/postgres`,
     })[k]
@@ -47,7 +48,7 @@ Deno.test({
             SUPABASE_URL: API,
             SUPABASE_ANON_KEY: KEY,
             AISELLIA_AI_WORKER_DB_URL: workerUrl,
-            ANTHROPIC_API_KEY: "sk-ant-test-not-a-real-key",
+            GEMINI_API_KEY: "test-not-a-real-gemini-key-000000000",
           })[k],
         {
           checkEndpoint: true,
