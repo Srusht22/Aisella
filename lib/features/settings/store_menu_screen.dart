@@ -108,7 +108,11 @@ class StoreMenuScreen extends ConsumerWidget {
                       icon: AppIcons.sparkle,
                       onTap: () => context.push(Routes.storeAi),
                     ),
-                    later(DeferredFeature.channels, AppIcons.chatsCircle),
+                    NavRow(
+                      label: l10n.channelsTitle,
+                      icon: AppIcons.chatsCircle,
+                      onTap: () => context.push(Routes.storeChannels),
+                    ),
                   ],
                 ),
                 const SizedBox(height: Space.s24),

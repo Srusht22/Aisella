@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -74,6 +75,30 @@ enum ApiErrorCode {
 
   /// The suggestion was replaced or dismissed meanwhile.
   suggestionClosed,
+
+  /// Outside the channel's customer-service window: free text is refused
+  /// (WhatsApp: an approved template can still be sent).
+  replyWindowClosed,
+
+  /// The conversation's channel cannot send now (disconnected, needs
+  /// attention, or the provider is not available).
+  channelUnavailable,
+
+  /// The customer blocked the store or their data was anonymised.
+  contactUnavailable,
+
+  /// The send changed state meanwhile (no longer queued / no longer unknown).
+  sendStateChanged,
+
+  /// The provider did not accept the bot token the seller pasted.
+  tokenRejected,
+
+  /// The account is already connected to another store.
+  accountInUse,
+
+  /// The provider accepted the account but the connection could not be
+  /// completed (webhook not registered).
+  connectFailed,
 
   /// The request could not be sent (offline, DNS, connection refused).
   /// Nothing reached the server.
@@ -161,6 +186,19 @@ const _codes = <String, ApiErrorCode>{
   'AI_UNAVAILABLE': ApiErrorCode.aiUnavailable,
   'SUGGESTION_CLOSED': ApiErrorCode.suggestionClosed,
   'INTERNAL': ApiErrorCode.internal,
+  'REPLY_WINDOW_CLOSED': ApiErrorCode.replyWindowClosed,
+  'CHANNEL_NOT_CONNECTED': ApiErrorCode.channelUnavailable,
+  'CHANNEL_UNAVAILABLE': ApiErrorCode.channelUnavailable,
+  'CHANNEL_CAPABILITY_MISSING': ApiErrorCode.channelUnavailable,
+  'NOT_A_LIVE_CONVERSATION': ApiErrorCode.channelUnavailable,
+  'CONTACT_BLOCKED': ApiErrorCode.contactUnavailable,
+  'CONTACT_ANONYMIZED': ApiErrorCode.contactUnavailable,
+  'SEND_NOT_CANCELLABLE': ApiErrorCode.sendStateChanged,
+  'SEND_NOT_UNKNOWN': ApiErrorCode.sendStateChanged,
+  'TOKEN_REJECTED': ApiErrorCode.tokenRejected,
+  'ACCOUNT_IN_USE': ApiErrorCode.accountInUse,
+  'WEBHOOK_NOT_SET': ApiErrorCode.connectFailed,
+  'NOT_CONFIGURED': ApiErrorCode.channelUnavailable,
 };
 
 /// Default client timeout for RPC calls (Phase 3 Flutter §13).
@@ -228,4 +266,41 @@ ApiException mapPostgrestException(PostgrestException e) {
     return const ApiException(ApiErrorCode.forbidden);
   }
   return const ApiException(ApiErrorCode.internal);
+}
+
+/// Edge Function failures. Their error answers carry the same envelope as
+/// `api.*`; otherwise the HTTP status decides, and anything unexpected is
+/// [fallback]. Provider or server wording never reaches the UI.
+ApiException mapFunctionException(
+  FunctionException e, {
+  ApiErrorCode fallback = ApiErrorCode.internal,
+}) {
+  // Nothing reached the server (offline, DNS, refused).
+  if (e is FunctionsFetchException) {
+    return const ApiException(ApiErrorCode.network);
+  }
+  final details = e.details;
+  final Object? body = details is String
+      ? (() {
+          try {
+            return jsonDecode(details);
+          } on FormatException {
+            return null;
+          }
+        })()
+      : details;
+  if (body is Map && body['ok'] == false) {
+    try {
+      unwrapEnvelope(body);
+    } on ApiException catch (api) {
+      return api;
+    }
+  }
+  return switch (e.status) {
+    401 => const ApiException(ApiErrorCode.unauthenticated),
+    403 => const ApiException(ApiErrorCode.forbidden),
+    404 => const ApiException(ApiErrorCode.notFound),
+    429 => const ApiException(ApiErrorCode.rateLimited),
+    _ => ApiException(fallback),
+  };
 }

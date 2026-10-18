@@ -1,11 +1,12 @@
 import 'package:flutter/foundation.dart';
 
 import '../../../core/formatting/money.dart';
+import '../../channels/domain/channel.dart';
 import '../../orders/domain/order.dart' show Actor, OrderIssue, OrderStatus;
 
-/// Where a conversation came from. No channel is connected in Phase 8: every
-/// conversation is pasted in by the seller (labelled with its source) or is a
-/// sandbox test (Phase 1 §4.2, US-020/021).
+/// Where a conversation came from: pasted in by the seller (labelled with its
+/// source), a sandbox test (Phase 1 §4.2, US-020/021), or live from a
+/// connected messaging account (Phase 9; the summary's `channel` names it).
 enum ConversationSource {
   instagram,
   whatsapp,
@@ -13,7 +14,8 @@ enum ConversationSource {
   telegram,
   phone,
   other,
-  sandbox;
+  sandbox,
+  live;
 
   static ConversationSource parse(Object? v) => values.firstWhere(
     (s) => s.name == v,
@@ -58,8 +60,9 @@ enum InboxFilter {
   final String wire;
 }
 
-/// Who wrote a message and what is known about it having been sent. Nothing
-/// is ever "sent" by Aisellia in Phase 8 (BR-45–49).
+/// Who wrote a message and what is known about it having been sent. Pasted
+/// conversations are never sent by Aisellia (BR-45–49); live ones are sent
+/// only after the seller authorizes the exact text (Phase 9).
 enum MessageOrigin {
   /// Pasted by the seller (customer text, or the seller's earlier reply).
   imported,
@@ -68,11 +71,23 @@ enum MessageOrigin {
   sellerWritten,
 
   /// An AI suggestion the seller copied (and possibly edited).
-  aiReplyCopied;
+  aiReplyCopied,
+
+  /// Received from the customer through a connected account.
+  channelIn,
+
+  /// Authorized by the seller and sent through the connected account.
+  sellerSent,
+
+  /// Sent by the seller from the provider's own app (seen as an echo).
+  sellerExternal;
 
   static MessageOrigin parse(Object? v) => switch (v) {
     'seller_written' => MessageOrigin.sellerWritten,
     'ai_reply_copied' => MessageOrigin.aiReplyCopied,
+    'channel_in' => MessageOrigin.channelIn,
+    'seller_sent' => MessageOrigin.sellerSent,
+    'seller_external' => MessageOrigin.sellerExternal,
     _ => MessageOrigin.imported,
   };
 }
@@ -84,11 +99,15 @@ enum MessageState {
   copied,
 
   /// "Marked as sent by you".
-  markedSent;
+  markedSent,
+
+  /// A message of a live conversation (see [Message.delivery]).
+  live;
 
   static MessageState parse(Object? v) => switch (v) {
     'copied' => MessageState.copied,
     'marked_sent' => MessageState.markedSent,
+    'live' => MessageState.live,
     _ => MessageState.imported,
   };
 }
@@ -104,6 +123,8 @@ class Message {
     this.body,
     this.edited = false,
     this.author,
+    this.delivery,
+    this.send,
   });
 
   factory Message.fromJson(Map<String, dynamic> j) => Message(
@@ -115,6 +136,10 @@ class Message {
     edited: j['edited'] == true,
     author: j['author'] == null ? null : Actor.parse(j['author']),
     createdAt: DateTime.parse(j['created_at'] as String).toLocal(),
+    delivery: DeliveryState.parse(j['delivery_state']),
+    send: j['send'] is Map
+        ? SendInfo.fromJson((j['send'] as Map).cast<String, dynamic>())
+        : null,
   );
 
   final String id;
@@ -129,6 +154,12 @@ class Message {
   final bool edited;
   final Actor? author;
   final DateTime createdAt;
+
+  /// Messages sent through a channel: how far delivery got.
+  final DeliveryState? delivery;
+
+  /// Messages sent through a channel: the send request behind it.
+  final SendInfo? send;
 }
 
 /// A value the server rendered into a suggestion from the store's records.
@@ -336,7 +367,9 @@ class ConversationSummary {
     this.aiPaused = false,
     this.lastPreview,
     this.lastInbound = true,
+    this.lastDelivery,
     this.order,
+    this.channel,
   });
 
   factory ConversationSummary.fromJson(Map<String, dynamic> j) {
@@ -352,8 +385,14 @@ class ConversationSummary {
       aiPaused: j['ai_paused'] == true,
       lastPreview: last is Map ? last['preview'] as String? : null,
       lastInbound: last is Map ? last['direction'] == 'in' : true,
+      lastDelivery: last is Map
+          ? DeliveryState.parse(last['delivery_state'])
+          : null,
       order: j['order'] is Map
           ? ConversationOrder.fromJson((j['order'] as Map).cast())
+          : null,
+      channel: j['channel'] is Map
+          ? ConversationChannel.fromJson((j['channel'] as Map).cast())
           : null,
       lastActivityAt: DateTime.parse(j['last_activity_at'] as String).toLocal(),
       version: (j['version'] as num).toInt(),
@@ -368,11 +407,18 @@ class ConversationSummary {
   final bool aiPaused;
   final String? lastPreview;
   final bool lastInbound;
+  final DeliveryState? lastDelivery;
   final ConversationOrder? order;
+
+  /// Live conversations: the connected account it arrived on.
+  final ConversationChannel? channel;
   final DateTime lastActivityAt;
   final int version;
 
   bool get isSandbox => source == ConversationSource.sandbox;
+
+  /// Arrived through a connected account: replies are sent from Aisellia.
+  bool get isLive => channel != null;
 }
 
 /// The conversation screen's data: messages, the current suggestion, the last

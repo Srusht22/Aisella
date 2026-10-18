@@ -231,7 +231,7 @@ class SupabaseConversationsRepository implements ConversationsRepository {
     } on TimeoutException {
       throw const ApiException(ApiErrorCode.timeout);
     } on FunctionException catch (e) {
-      throw _functionError(e);
+      throw mapFunctionException(e, fallback: ApiErrorCode.aiUnavailable);
     } on AuthException {
       throw const ApiException(ApiErrorCode.unauthenticated);
     } on Exception {
@@ -240,38 +240,6 @@ class SupabaseConversationsRepository implements ConversationsRepository {
     return AssistOutcome.fromJson(
       unwrapEnvelope(raw is String ? jsonDecode(raw) : raw),
     );
-  }
-
-  /// Error answers of the function carry the same envelope as `api.*`.
-  ApiException _functionError(FunctionException e) {
-    // Nothing reached the server (offline, DNS, refused).
-    if (e is FunctionsFetchException) {
-      return const ApiException(ApiErrorCode.network);
-    }
-    final details = e.details;
-    final Object? body = details is String
-        ? (() {
-            try {
-              return jsonDecode(details);
-            } on FormatException {
-              return null;
-            }
-          })()
-        : details;
-    if (body is Map && body['ok'] == false) {
-      try {
-        unwrapEnvelope(body);
-      } on ApiException catch (api) {
-        return api;
-      }
-    }
-    return switch (e.status) {
-      401 => const ApiException(ApiErrorCode.unauthenticated),
-      403 => const ApiException(ApiErrorCode.forbidden),
-      404 => const ApiException(ApiErrorCode.notFound),
-      429 => const ApiException(ApiErrorCode.rateLimited),
-      _ => const ApiException(ApiErrorCode.aiUnavailable),
-    };
   }
 
   @override

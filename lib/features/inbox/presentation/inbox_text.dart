@@ -11,7 +11,13 @@ String sourceLabel(AppLocalizations l10n, ConversationSource s) => switch (s) {
   ConversationSource.phone => l10n.sourcePhone,
   ConversationSource.other => l10n.sourceOther,
   ConversationSource.sandbox => l10n.sourceSandbox,
+  ConversationSource.live => l10n.sourceLive,
 };
+
+/// The label of a conversation in the inbox: the connected provider's name
+/// for live conversations, otherwise where it was pasted from.
+String conversationSourceLabel(AppLocalizations l10n, ConversationSummary c) =>
+    c.channel?.providerName ?? sourceLabel(l10n, c.source);
 
 String conversationStatusLabel(AppLocalizations l10n, ConversationStatus s) =>
     switch (s) {
@@ -83,6 +89,7 @@ String? holdingReason(AppLocalizations l10n, Suggestion s) {
 
 String messageStateLabel(AppLocalizations l10n, Message m) =>
     switch ((m.origin, m.state, m.inbound)) {
+      (MessageOrigin.channelIn, _, true) => l10n.msgFromCustomer,
       (_, _, true) => l10n.msgFromCustomerPasted,
       (MessageOrigin.imported, _, false) => l10n.msgYourReplyPasted,
       (MessageOrigin.sellerWritten, _, _) => l10n.msgMarkedSentByYou,
@@ -90,6 +97,10 @@ String messageStateLabel(AppLocalizations l10n, Message m) =>
         m.edited ? l10n.msgCopiedEdited : l10n.msgCopiedNotSent,
       (MessageOrigin.aiReplyCopied, _, _) =>
         m.edited ? l10n.msgSentEdited : l10n.msgMarkedSentByYou,
+      (MessageOrigin.sellerSent, _, _) =>
+        m.edited ? l10n.msgSentFromAiselliaEdited : l10n.msgSentFromAisellia,
+      (MessageOrigin.sellerExternal, _, _) => l10n.msgSentElsewhere,
+      (MessageOrigin.channelIn, _, false) => l10n.msgSentElsewhere,
     };
 
 /// The outcome of a run that did not produce a suggestion.

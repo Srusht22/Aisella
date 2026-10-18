@@ -19,6 +19,8 @@ import '../../design_system/layout/responsive.dart';
 import '../../design_system/motion/primitives.dart';
 import '../../design_system/theme/theme_ext.dart';
 import '../../design_system/tokens/tokens.g.dart';
+import '../channels/domain/channel.dart' show DeliveryState;
+import '../common/channel_labels.dart' show deliveryLabel;
 import '../common/order_labels.dart' show orderNumber;
 import '../common/top_level_page.dart';
 import 'application/inbox_providers.dart';
@@ -333,10 +335,19 @@ class _ConversationRow extends ConsumerWidget {
             locale: Localizations.localeOf(context),
             digits: digits,
           );
+    // A reply that did not go out is worth seeing from the inbox.
+    final problem = switch (c.lastDelivery) {
+      DeliveryState.failed || DeliveryState.unknown when !c.lastInbound =>
+        deliveryLabel(l10n, c.lastDelivery!),
+      _ => null,
+    };
     final preview = c.lastPreview == null
         ? null
-        : '${c.lastInbound ? '' : l10n.previewYou} ${Bidi.auto(c.lastPreview!)}'
-              .trim();
+        : [
+            '${c.lastInbound ? '' : l10n.previewYou} ${Bidi.auto(c.lastPreview!)}'
+                .trim(),
+            ?problem,
+          ].join(' · ');
     final reasons = c.escalationReasons
         .map((r) => escalationLabel(l10n, r))
         .join(', ');
@@ -346,7 +357,7 @@ class _ConversationRow extends ConsumerWidget {
       selected: selected,
       label: [
         name,
-        sourceLabel(l10n, c.source),
+        conversationSourceLabel(l10n, c),
         conversationStatusLabel(l10n, c.status),
         if (reasons.isNotEmpty) reasons,
         ?preview,
@@ -403,7 +414,7 @@ class _ConversationRow extends ConsumerWidget {
                         const SizedBox(height: Space.s2),
                         Text(
                           [
-                            sourceLabel(l10n, c.source),
+                            conversationSourceLabel(l10n, c),
                             if (c.order != null)
                               l10n.orderTitle(orderNumber(c.order!.number)),
                             if (c.aiPaused) l10n.aiPausedShort,

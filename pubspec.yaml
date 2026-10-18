@@ -23,6 +23,7 @@ dependencies:
   intl: any # version pinned by flutter_localizations
   shared_preferences: 2.5.6 # device-local UI preferences (language before sign-in)
   supabase_flutter: 2.18.3
+  url_launcher: 6.3.3 # opens the provider's authorization page to connect an account (Phase 9); already resolved through supabase_flutter
 
 dev_dependencies:
   flutter_test:

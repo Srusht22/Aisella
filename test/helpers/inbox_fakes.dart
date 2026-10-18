@@ -42,6 +42,10 @@ class FakeConversationsRepository implements ConversationsRepository {
   Map<String, dynamic> _conv(String id) =>
       _convs[id] ?? (throw const ApiException(ApiErrorCode.notFound));
 
+  /// The stored JSON of a conversation (the channels fake appends sent
+  /// messages to it, as the server does).
+  Map<String, dynamic> raw(String id) => _conv(id);
+
   /// A conversation row as get_conversation returns it.
   static Map<String, dynamic> conversationJson({
     required String id,
@@ -54,8 +58,10 @@ class FakeConversationsRepository implements ConversationsRepository {
     Map<String, dynamic>? lastRun,
     List<String> escalation = const [],
     bool aiPaused = false,
+    Map<String, dynamic>? channel,
   }) => {
     'id': id,
+    'channel': channel,
     'customer_label': label,
     'source': source,
     'is_sandbox': source == 'sandbox',
@@ -84,8 +90,12 @@ class FakeConversationsRepository implements ConversationsRepository {
     bool inbound = true,
     String origin = 'imported',
     String state = 'imported',
+    String? delivery,
+    Map<String, dynamic>? send,
   }) => {
     'id': id,
+    'delivery_state': delivery,
+    'send': send,
     'direction': inbound ? 'in' : 'out',
     'origin': origin,
     'body': body,

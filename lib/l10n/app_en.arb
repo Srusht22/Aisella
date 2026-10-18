@@ -3652,5 +3652,378 @@
   "writtenPoliciesHelp": "The assistant answers policy questions only from these.",
   "@writtenPoliciesHelp": {
     "description": "Section help."
+  },
+  "channelsTitle": "Connected accounts",
+  "@channelsTitle": {
+    "description": "Store menu row and screen title (Phase 9)."
+  },
+  "channelsIntro": "Connect your shop's messaging accounts. Customer messages arrive in the inbox, and nothing is sent until you confirm the exact text.",
+  "@channelsIntro": {
+    "description": "Connected accounts intro."
+  },
+  "channelsYourAccounts": "Your accounts",
+  "@channelsYourAccounts": {
+    "description": "Section header."
+  },
+  "channelsNone": "No account connected yet.",
+  "@channelsNone": {
+    "description": "Empty list."
+  },
+  "channelsAdd": "Add an account",
+  "@channelsAdd": {
+    "description": "Section header."
+  },
+  "channelNotAvailable": "Not available yet",
+  "@channelNotAvailable": {
+    "description": "Provider cannot be connected yet."
+  },
+  "connStateDisconnected": "Not connected",
+  "@connStateDisconnected": {
+    "description": "Connection state."
+  },
+  "connStateAwaiting": "Waiting for authorization",
+  "@connStateAwaiting": {
+    "description": "Connection state."
+  },
+  "connStateConnected": "Connected",
+  "@connStateConnected": {
+    "description": "Connection state."
+  },
+  "connStateError": "Needs attention",
+  "@connStateError": {
+    "description": "Connection state."
+  },
+  "connStateUnavailable": "Sending not available yet",
+  "@connStateUnavailable": {
+    "description": "Connection state: connected but cannot send."
+  },
+  "connAwaitingBody": "Finish the authorization in the provider's page, then come back here.",
+  "@connAwaitingBody": {
+    "description": "State explanation."
+  },
+  "connErrorBody": "The provider stopped accepting this account's authorization. Disconnect it and connect it again.",
+  "@connErrorBody": {
+    "description": "State explanation."
+  },
+  "connUnavailableBody": "Messages are received, but replies cannot be sent from Aisellia until this provider's sending has been verified.",
+  "@connUnavailableBody": {
+    "description": "State explanation."
+  },
+  "connTestAccount": "Test account",
+  "@connTestAccount": {
+    "description": "Badge."
+  },
+  "disconnect": "Disconnect",
+  "@disconnect": {
+    "description": "Button."
+  },
+  "disconnectTitle": "Disconnect {name}?",
+  "@disconnectTitle": {
+    "description": "Confirm title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "disconnectBody": "Messages from this account stop arriving and replies waiting to be sent are cancelled. You can connect it again later.",
+  "@disconnectBody": {
+    "description": "Confirm body."
+  },
+  "connectTitle": "Connect {provider}",
+  "@connectTitle": {
+    "description": "Sheet title.",
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "connectAction": "Connect",
+  "@connectAction": {
+    "description": "Button."
+  },
+  "connectedSnack": "{provider} connected.",
+  "@connectedSnack": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "botTokenLabel": "Bot token",
+  "@botTokenLabel": {
+    "description": "Field label."
+  },
+  "botTokenHelp": "Paste the bot token from {provider}. It goes once to Aisellia's server, where it is stored encrypted; this app does not keep it.",
+  "@botTokenHelp": {
+    "description": "Sheet help.",
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "botTokenInvalid": "Paste the whole token, without spaces.",
+  "@botTokenInvalid": {
+    "description": "Field error."
+  },
+  "authorizeBody": "A {provider} page opens in your browser. Sign in there and choose the account to connect.",
+  "@authorizeBody": {
+    "description": "Sheet body.",
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "authorizeWhatsappBody": "A Meta page opens in your browser. Choose your WhatsApp Business account and phone number there.",
+  "@authorizeWhatsappBody": {
+    "description": "Sheet body (WhatsApp)."
+  },
+  "authorizeOpen": "Open {provider}",
+  "@authorizeOpen": {
+    "description": "Button.",
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "authorizeOpenFailed": "The page could not be opened. Try again.",
+  "@authorizeOpenFailed": {
+    "description": "Error."
+  },
+  "authorizeReturn": "When you have finished in the browser, tap Done. The account appears here once the provider confirms it.",
+  "@authorizeReturn": {
+    "description": "Banner after opening."
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Button."
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Button tooltip."
+  },
+  "errTokenRejected": "The provider did not accept this token. Check it and try again.",
+  "@errTokenRejected": {
+    "description": "Error."
+  },
+  "errAccountInUse": "This account is already connected to another store.",
+  "@errAccountInUse": {
+    "description": "Error."
+  },
+  "errConnectFailed": "The account could not be connected. Try again.",
+  "@errConnectFailed": {
+    "description": "Error."
+  },
+  "errChannelUnavailable": "This account cannot send right now.",
+  "@errChannelUnavailable": {
+    "description": "Error."
+  },
+  "errContactUnavailable": "This customer cannot receive messages from the store.",
+  "@errContactUnavailable": {
+    "description": "Error / banner."
+  },
+  "errSendStateChanged": "This message changed meanwhile. The screen has been updated.",
+  "@errSendStateChanged": {
+    "description": "Error."
+  },
+  "errWindowClosed": "The customer last wrote more than 24 hours ago, so free text cannot be sent. Use an approved template, or wait for them to write.",
+  "@errWindowClosed": {
+    "description": "Error."
+  },
+  "failAccountRestricted": "The provider has restricted this account.",
+  "@failAccountRestricted": {
+    "description": "Send failure reason."
+  },
+  "failTemplate": "The template is no longer available. Choose another one.",
+  "@failTemplate": {
+    "description": "Send failure reason."
+  },
+  "failMarketingLimit": "The provider limits messages to this customer for now. Try again tomorrow.",
+  "@failMarketingLimit": {
+    "description": "Send failure reason."
+  },
+  "failRateLimited": "The provider asked to slow down. It was tried three times.",
+  "@failRateLimited": {
+    "description": "Send failure reason."
+  },
+  "failProviderRefused": "The provider did not accept this message.",
+  "@failProviderRefused": {
+    "description": "Send failure reason."
+  },
+  "sourceLive": "Connected account",
+  "@sourceLive": {
+    "description": "Conversation source."
+  },
+  "liveNote": "Arrived through {account}. Replies are sent from Aisellia only after you confirm them.",
+  "@liveNote": {
+    "description": "Live conversation note.",
+    "placeholders": {
+      "account": {
+        "type": "String"
+      }
+    }
+  },
+  "liveCannotSend": "Replies cannot be sent from this account right now.",
+  "@liveCannotSend": {
+    "description": "Banner title."
+  },
+  "windowClosedTitle": "Customer-service window closed",
+  "@windowClosedTitle": {
+    "description": "Banner title."
+  },
+  "windowClosedBody": "The customer wrote more than 24 hours ago. You can reply when they write again.",
+  "@windowClosedBody": {
+    "description": "Banner body."
+  },
+  "windowClosedTemplates": "The customer wrote more than 24 hours ago. Until they write again, only an approved template can be sent.",
+  "@windowClosedTemplates": {
+    "description": "Banner body (WhatsApp)."
+  },
+  "composerLabel": "Your reply",
+  "@composerLabel": {
+    "description": "Reply box label."
+  },
+  "sendAction": "Send",
+  "@sendAction": {
+    "description": "Button."
+  },
+  "sendConfirmTitle": "Send this message?",
+  "@sendConfirmTitle": {
+    "description": "Confirm title."
+  },
+  "sendConfirmBody": "Exactly this text will be sent to the customer through {provider}:",
+  "@sendConfirmBody": {
+    "description": "Confirm body.",
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "useThisReply": "Use this reply",
+  "@useThisReply": {
+    "description": "Suggestion button (live)."
+  },
+  "replyInComposer": "The reply is in the box below. Check and edit it, then send.",
+  "@replyInComposer": {
+    "description": "Snackbar."
+  },
+  "msgFromCustomer": "From the customer",
+  "@msgFromCustomer": {
+    "description": "Message label (live)."
+  },
+  "msgSentFromAisellia": "Sent by you from Aisellia",
+  "@msgSentFromAisellia": {
+    "description": "Message label."
+  },
+  "msgSentFromAiselliaEdited": "Edited AI reply, sent by you from Aisellia",
+  "@msgSentFromAiselliaEdited": {
+    "description": "Message label."
+  },
+  "msgSentElsewhere": "Sent outside Aisellia",
+  "@msgSentElsewhere": {
+    "description": "Message label."
+  },
+  "deliveryQueued": "Waiting to send",
+  "@deliveryQueued": {
+    "description": "Delivery state."
+  },
+  "deliverySending": "Sending…",
+  "@deliverySending": {
+    "description": "Delivery state."
+  },
+  "deliverySent": "Sent",
+  "@deliverySent": {
+    "description": "Delivery state."
+  },
+  "deliveryDelivered": "Delivered",
+  "@deliveryDelivered": {
+    "description": "Delivery state."
+  },
+  "deliveryRead": "Read",
+  "@deliveryRead": {
+    "description": "Delivery state."
+  },
+  "deliveryFailed": "Not sent",
+  "@deliveryFailed": {
+    "description": "Delivery state."
+  },
+  "deliveryUnknown": "Not known if sent",
+  "@deliveryUnknown": {
+    "description": "Delivery state."
+  },
+  "deliveryCancelled": "Cancelled",
+  "@deliveryCancelled": {
+    "description": "Delivery state."
+  },
+  "deliveryRetrying": "Will be tried again automatically.",
+  "@deliveryRetrying": {
+    "description": "Delivery note."
+  },
+  "unknownBody": "The connection was lost after sending, so it may or may not have arrived. Check the chat in the provider's app. It is never resent automatically.",
+  "@unknownBody": {
+    "description": "Unknown outcome explanation."
+  },
+  "markArrived": "It arrived",
+  "@markArrived": {
+    "description": "Button."
+  },
+  "sendAgain": "Send again",
+  "@sendAgain": {
+    "description": "Button."
+  },
+  "sendAgainTitle": "Send it again?",
+  "@sendAgainTitle": {
+    "description": "Confirm title."
+  },
+  "sendAgainBody": "If the first message did arrive, the customer will receive it twice.",
+  "@sendAgainBody": {
+    "description": "Confirm body."
+  },
+  "cancelSending": "Cancel sending",
+  "@cancelSending": {
+    "description": "Button."
+  },
+  "templatesAction": "Send an approved template",
+  "@templatesAction": {
+    "description": "Button."
+  },
+  "templatesTitle": "Approved templates",
+  "@templatesTitle": {
+    "description": "Sheet title."
+  },
+  "templatesHelp": "Templates approved by Meta for this number. Fill in the values; the preview shows exactly what will be sent.",
+  "@templatesHelp": {
+    "description": "Sheet help."
+  },
+  "templatesNone": "No approved template is available for this account yet.",
+  "@templatesNone": {
+    "description": "Empty list."
+  },
+  "templateParam": "Value {number}",
+  "@templateParam": {
+    "description": "Template parameter field.",
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "templateParamInvalid": "Each value needs 1 to 300 characters on one line.",
+  "@templateParamInvalid": {
+    "description": "Field error."
+  },
+  "sendOrderConfirmation": "Send order confirmation",
+  "@sendOrderConfirmation": {
+    "description": "Button (live conversation)."
+  },
+  "confirmationQueued": "Order confirmation authorized for sending.",
+  "@confirmationQueued": {
+    "description": "Snackbar."
   }
 }

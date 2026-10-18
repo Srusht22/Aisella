@@ -16,6 +16,7 @@ import '../features/catalog/presentation/inventory_history_screen.dart';
 import '../features/catalog/presentation/product_detail_screen.dart';
 import '../features/catalog/presentation/product_editor_screen.dart';
 import '../features/catalog/presentation/product_list_screen.dart';
+import '../features/channels/presentation/channels_screen.dart';
 import '../features/common/deferred_feature_screen.dart';
 import '../features/common/not_found_screen.dart';
 import '../features/inbox/inbox_screen.dart';
@@ -257,6 +258,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (_, _) => const InventorySettingsScreen(),
           ),
           GoRoute(path: 'ai', builder: (_, _) => const AiSettingsScreen()),
+          GoRoute(path: 'channels', builder: (_, _) => const ChannelsScreen()),
           GoRoute(
             path: 'account',
             builder: (_, _) => const AccountScreen(),

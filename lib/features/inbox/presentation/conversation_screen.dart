@@ -27,9 +27,13 @@ import '../application/inbox_providers.dart';
 import '../domain/conversation.dart';
 import 'inbox_sheets.dart';
 import 'inbox_text.dart';
+import 'live_conversation.dart';
 
 /// One conversation (Phase 1 US-020–028): the pasted messages, the AI's
 /// suggested reply (never sent by Aisellia), escalation, and the AI draft.
+/// Live conversations (Phase 9) add a reply box: "Use this reply" puts the
+/// suggestion there, and nothing is sent until the seller confirms the exact
+/// text; each sent message shows its delivery.
 /// Four levels are kept apart on screen (Phase 3 AI §10): a suggestion is
 /// "not sent", a draft is "not confirmed", approval happens only on the order
 /// screen, and a copied reply is "not confirmed as sent" until the seller
@@ -52,6 +56,26 @@ class ConversationScreen extends ConsumerStatefulWidget {
 
 class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   bool _running = false;
+
+  /// Live conversations: the reply being written, and the suggestion it
+  /// started from.
+  final _composer = TextEditingController();
+  String? _composerSuggestionId;
+
+  @override
+  void dispose() {
+    _composer.dispose();
+    super.dispose();
+  }
+
+  void _useReply(Suggestion s) {
+    if (s.text == null) return;
+    setState(() {
+      _composer.text = s.text!;
+      _composerSuggestionId = s.id;
+    });
+    showSnackOn(ScaffoldMessenger.of(context), context.l10n.replyInComposer);
+  }
 
   /// The latest failure of this screen's AI request, until the next success.
   String? _aiError;
@@ -102,6 +126,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
         running: _running,
         aiError: _aiError,
         onRetry: _assist,
+        onUseReply: _useReply,
       ),
       AsyncError(:final error) =>
         error is ApiException && error.code == ApiErrorCode.notFound
@@ -141,39 +166,59 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       ),
       bottomNavigationBar: value == null
           ? null
-          : StickyActionBar(
-              reason: canAssist
-                  ? null
-                  : Text(
-                      !value.aiEnabled
-                          ? l10n.errAiDisabled
-                          : value.summary.aiPaused
-                          ? l10n.errAiPaused
-                          : l10n.errNothingToAnswer,
-                      style: context.type.caption.copyWith(
-                        color: p.textSecondary,
+          : _withComposer(
+              value,
+              StickyActionBar(
+                reason: canAssist
+                    ? null
+                    : Text(
+                        !value.aiEnabled
+                            ? l10n.errAiDisabled
+                            : value.summary.aiPaused
+                            ? l10n.errAiPaused
+                            : l10n.errNothingToAnswer,
+                        style: context.type.caption.copyWith(
+                          color: p.textSecondary,
+                        ),
                       ),
-                    ),
-              secondary: AppButton(
-                label: l10n.prepareDraft,
-                variant: AppButtonVariant.secondary,
-                icon: AppIcons.receipt,
-                onPressed: canAssist && !_running
-                    ? () => _assist(draft: true)
-                    : null,
-              ),
-              primary: AppButton(
-                label: value.suggestion == null
-                    ? l10n.getSuggestion
-                    : l10n.suggestAgain,
-                icon: AppIcons.sparkle,
-                loading: _running,
-                loadingLabel: l10n.aiWorking,
-                onPressed: canAssist && !_running ? _assist : null,
+                secondary: AppButton(
+                  label: l10n.prepareDraft,
+                  variant: AppButtonVariant.secondary,
+                  icon: AppIcons.receipt,
+                  onPressed: canAssist && !_running
+                      ? () => _assist(draft: true)
+                      : null,
+                ),
+                primary: AppButton(
+                  label: value.suggestion == null
+                      ? l10n.getSuggestion
+                      : l10n.suggestAgain,
+                  icon: AppIcons.sparkle,
+                  loading: _running,
+                  loadingLabel: l10n.aiWorking,
+                  onPressed: canAssist && !_running ? _assist : null,
+                ),
               ),
             ),
     );
   }
+
+  /// Live conversations: the reply box above the assistant's actions.
+  Widget _withComposer(Conversation c, Widget actions) => !c.summary.isLive
+      ? actions
+      : Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            LiveComposer(
+              conversation: c,
+              controller: _composer,
+              suggestionId: _composerSuggestionId,
+              onSent: () => setState(() => _composerSuggestionId = null),
+            ),
+            actions,
+          ],
+        );
 }
 
 enum _MenuItem { add, reply, pause, resume, close, reopen, delete }
@@ -190,8 +235,11 @@ class _Menu extends ConsumerWidget {
     final actions = ref.read(inboxActionsProvider);
     final messenger = ScaffoldMessenger.of(context);
     final items = <(_MenuItem, String, IconData)>[
-      (_MenuItem.add, l10n.addMessages, AppIcons.plus),
-      (_MenuItem.reply, l10n.recordMyReply, AppIcons.chatText),
+      // Live conversations receive and send through the channel itself.
+      if (!c.isLive) ...[
+        (_MenuItem.add, l10n.addMessages, AppIcons.plus),
+        (_MenuItem.reply, l10n.recordMyReply, AppIcons.chatText),
+      ],
       if (c.aiPaused)
         (_MenuItem.resume, l10n.resumeAi, AppIcons.sparkle)
       else
@@ -277,12 +325,14 @@ class _Body extends ConsumerWidget {
     required this.running,
     required this.aiError,
     required this.onRetry,
+    required this.onUseReply,
   });
 
   final Conversation conversation;
   final bool running;
   final String? aiError;
   final VoidCallback onRetry;
+  final ValueChanged<Suggestion> onUseReply;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -316,12 +366,15 @@ class _Body extends ConsumerWidget {
                 ),
                 const SizedBox(height: Space.s12),
               ],
-              Text(
-                c.isSandbox
-                    ? l10n.sandboxNote
-                    : l10n.importedNote(sourceLabel(l10n, c.source)),
-                style: type.caption.copyWith(color: p.textTertiary),
-              ),
+              if (c.channel case final channel?)
+                LiveChannelHeader(channel: channel)
+              else
+                Text(
+                  c.isSandbox
+                      ? l10n.sandboxNote
+                      : l10n.importedNote(sourceLabel(l10n, c.source)),
+                  style: type.caption.copyWith(color: p.textTertiary),
+                ),
               if (c.status == ConversationStatus.needsYou) ...[
                 const SizedBox(height: Space.s12),
                 Semantics(
@@ -387,6 +440,16 @@ class _Body extends ConsumerWidget {
                     ),
                   ],
                 ),
+                if (c.isLive) ...[
+                  const SizedBox(height: Space.s8),
+                  Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: SendOrderConfirmationButton(
+                      conversation: conversation,
+                      language: suggestion?.language ?? 'ckb',
+                    ),
+                  ),
+                ],
               ],
               const SizedBox(height: Space.s16),
               SectionHeader(l10n.sectionAiAssistant),
@@ -428,6 +491,10 @@ class _Body extends ConsumerWidget {
                 _SuggestionCard(
                   conversationId: conversation.id,
                   suggestion: suggestion,
+                  live: c.isLive,
+                  onUse: c.channel?.canSend == true && c.channel!.windowOpen
+                      ? () => onUseReply(suggestion)
+                      : null,
                 ),
               ],
               const SizedBox(height: Space.s12),
@@ -502,6 +569,8 @@ class _MessageBubble extends ConsumerWidget {
                       '$label · $time',
                       style: type.caption.copyWith(color: p.textTertiary),
                     ),
+                    if (!m.inbound && m.delivery != null)
+                      DeliveryLine(conversationId: conversationId, message: m),
                     if (m.state == MessageState.copied)
                       AppButton(
                         label: l10n.iSentThis,
@@ -533,10 +602,17 @@ class _SuggestionCard extends ConsumerStatefulWidget {
   const _SuggestionCard({
     required this.conversationId,
     required this.suggestion,
+    this.live = false,
+    this.onUse,
   });
 
   final String conversationId;
   final Suggestion suggestion;
+
+  /// Live conversation: the reply goes into the reply box (and is sent only
+  /// after the seller confirms it) instead of being copied.
+  final bool live;
+  final VoidCallback? onUse;
 
   @override
   ConsumerState<_SuggestionCard> createState() => _SuggestionCardState();
@@ -594,7 +670,7 @@ class _SuggestionCardState extends ConsumerState<_SuggestionCard> {
               runSpacing: Space.s4,
               children: [
                 StatusBadge(
-                  label: copied
+                  label: copied && !widget.live
                       ? l10n.suggestionCopied
                       : l10n.suggestionNotSent,
                   icon: AppIcons.sparkle,
@@ -662,28 +738,38 @@ class _SuggestionCardState extends ConsumerState<_SuggestionCard> {
               spacing: Space.s8,
               runSpacing: Space.s8,
               children: [
-                AppButton(
-                  label: l10n.copyReply,
-                  icon: AppIcons.copy,
-                  loading: _busy,
-                  onPressed: _busy || s.text == null ? null : () => _copy(text),
-                ),
-                AppButton(
-                  label: l10n.editBeforeCopy,
-                  icon: AppIcons.pencilSimple,
-                  variant: AppButtonVariant.secondary,
-                  onPressed: _busy || s.text == null
-                      ? null
-                      : () async {
-                          final edited = await showEditSuggestionSheet(
-                            context,
-                            text,
-                          );
-                          if (edited != null && mounted) {
-                            await _copy(edited, edited: edited);
-                          }
-                        },
-                ),
+                if (widget.live)
+                  AppButton(
+                    label: l10n.useThisReply,
+                    icon: AppIcons.arrowUUpLeft,
+                    onPressed: s.text == null ? null : widget.onUse,
+                  )
+                else ...[
+                  AppButton(
+                    label: l10n.copyReply,
+                    icon: AppIcons.copy,
+                    loading: _busy,
+                    onPressed: _busy || s.text == null
+                        ? null
+                        : () => _copy(text),
+                  ),
+                  AppButton(
+                    label: l10n.editBeforeCopy,
+                    icon: AppIcons.pencilSimple,
+                    variant: AppButtonVariant.secondary,
+                    onPressed: _busy || s.text == null
+                        ? null
+                        : () async {
+                            final edited = await showEditSuggestionSheet(
+                              context,
+                              text,
+                            );
+                            if (edited != null && mounted) {
+                              await _copy(edited, edited: edited);
+                            }
+                          },
+                  ),
+                ],
                 if (!copied)
                   AppButton(
                     label: l10n.dismiss,

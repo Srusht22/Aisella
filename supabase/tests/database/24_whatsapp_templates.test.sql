@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(30);
+select plan(34);
 
 create temp table ids (k text primary key, v uuid);
 grant all on ids to public;
@@ -146,6 +146,20 @@ select pg_temp.sender(format('select api.channel_store_templates(%L, %L)', pg_te
 select is((select status || ':' || usable::text from app.message_templates where id = pg_temp.tpl('order_ready')),
           'MISSING:false', 'a template gone from Meta is marked missing');
 select is(pg_temp.send_tpl('order_ready', '["ئارام", "A-19"]') #>> '{error,code}', 'NOT_FOUND', '… and cannot be sent');
+
+-- ---- What the app sees (conversation_json additions) ------------------------------------------------------------------
+create temp table cj on commit drop as
+  select pg_temp.seller(format('select api.get_conversation(%L, %L)', pg_temp.id('store_a'), pg_temp.id('conv'))) -> 'data' as v;
+grant all on cj to public;
+select is((select v #>> '{channel,provider}' || ':' || (v #>> '{channel,window_open}') || ':' || (v #>> '{channel,templates}') from cj),
+          'fx_wa:false:true', 'a live conversation names its channel, the closed window and that templates are possible');
+select ok((select not (v -> 'channel' ?| array['external_account_id', 'credential', 'phone', 'external_user_id']) from cj),
+          'no provider ids, phone numbers or credentials in what the app sees');
+select is((select m #>> '{send,state}' || ':' || (m #>> '{send,kind}') || ':' || (m #>> '{send,can_cancel}')
+             from cj, jsonb_array_elements(v -> 'messages') m where m ->> 'body' = 'سڵاو ئارام، داواکارییەکەت A-17 ئامادەیە.'),
+          'sending:template:false', 'each sent message carries its send state and what the seller can do (claimed: not cancellable)');
+select is((select jsonb_typeof(m -> 'send') from cj, jsonb_array_elements(v -> 'messages') m where m ->> 'direction' = 'in' limit 1),
+          'null', 'incoming messages have no send');
 
 -- ---- Roles ------------------------------------------------------------------------------------------------------------------
 select ok(not has_function_privilege('authenticated', 'api.channel_store_templates(uuid, jsonb)', 'execute')
