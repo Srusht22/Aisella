@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/l10n/l10n.dart';
 import '../../core/settings/app_settings.dart';
+import '../../design_system/components/app_button.dart';
+import '../../design_system/components/feedback.dart';
 import '../../design_system/components/inputs.dart';
 import '../../design_system/components/overlays.dart';
 import '../../design_system/components/rows.dart';
@@ -26,13 +28,27 @@ String accentName(AppLocalizations l10n, AppAccent a) => switch (a) {
   AppAccent.onyx => l10n.accentOnyx,
 };
 
-/// Opens light/dark mode and the colour themes in a sheet. Choices apply at
-/// once (the app cross-fades) and are remembered.
-Future<void> showAppearanceSheet(BuildContext context) => showAppSheet<void>(
-  context: context,
-  title: context.l10n.appearanceTitle,
-  builder: (_) => const AppearancePicker(),
-);
+/// Opens light/dark mode and the colour themes in a sheet. Each tap
+/// previews at once (the app cross-fades); Apply keeps the choice, and
+/// closing the sheet any other way puts the previous look back.
+Future<void> showAppearanceSheet(BuildContext context) async {
+  final container = ProviderScope.containerOf(context, listen: false);
+  final messenger = ScaffoldMessenger.of(context);
+  final applied = context.l10n.appearanceApplied;
+  final before = container.read(settingsProvider);
+  final ok = await showAppSheet<bool>(
+    context: context,
+    title: context.l10n.appearanceTitle,
+    builder: (_) => const AppearancePicker(),
+  );
+  final ctl = container.read(settingsProvider.notifier);
+  if (ok ?? false) {
+    showSnackOn(messenger, applied);
+  } else {
+    await ctl.setTheme(before.theme);
+    await ctl.setAccent(before.accent);
+  }
+}
 
 /// Mode (system, light, dark) and the colour theme grid.
 class AppearancePicker extends ConsumerWidget {
@@ -60,6 +76,13 @@ class AppearancePicker extends ConsumerWidget {
         const SizedBox(height: Space.s24),
         SectionHeader(l10n.accentTitle),
         AccentGrid(selected: settings.accent, onChanged: ctl.setAccent),
+        const SizedBox(height: Space.s24),
+        AppButton(
+          label: l10n.appearanceApply,
+          icon: AppIcons.check,
+          expand: true,
+          onPressed: () => Navigator.of(context).pop(true),
+        ),
       ],
     );
   }

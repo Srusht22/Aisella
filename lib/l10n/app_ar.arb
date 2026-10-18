@@ -970,7 +970,7 @@
   "accentTitle": "لون الواجهة",
   "accentLedger": "كلاسيكي",
   "accentGold": "ذهبي ملكي",
-  "accentEmerald": "زمرّدي",
+  "accentEmerald": "زمردي",
   "accentSapphire": "ياقوت أزرق",
   "accentRuby": "ياقوت أحمر",
   "accentAmethyst": "بنفسجي",
@@ -978,5 +978,7 @@
   "accentTeal": "فيروزي",
   "accentCopper": "نحاسي",
   "accentOnyx": "أسود فاخر",
-  "modeTitle": "الوضع"
+  "modeTitle": "الوضع",
+  "appearanceApply": "تطبيق",
+  "appearanceApplied": "تم تحديث المظهر"
 }

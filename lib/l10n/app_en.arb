@@ -4501,5 +4501,13 @@
   "modeTitle": "Mode",
   "@modeTitle": {
     "description": "Section title: system, light or dark mode."
+  },
+  "appearanceApply": "Apply",
+  "@appearanceApply": {
+    "description": "Button that keeps the previewed mode and colour theme."
+  },
+  "appearanceApplied": "Appearance updated",
+  "@appearanceApplied": {
+    "description": "Snackbar after Apply in the Appearance sheet."
   }
 }

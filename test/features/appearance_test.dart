@@ -19,6 +19,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Royal Gold'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('Apply'));
+    await tester.pumpAndSettle();
+    expect(find.text('Appearance updated'), findsOneWidget);
 
     final context = tester.element(find.byType(Scaffold).first);
     expect(context.palette.brandPrimary, accentSeeds[AppAccent.gold]!.light);
@@ -26,6 +29,26 @@ void main() {
     expect(
       container.read(keyValueStoreProvider).read('settings.accent'),
       'gold',
+    );
+  });
+
+  testWidgets('closing without Apply puts the previous look back', (
+    tester,
+  ) async {
+    setScreen(tester);
+    await tester.pumpWidget(testApp(signedIn: false));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Appearance'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Emerald'));
+    await tester.pumpAndSettle();
+    final context = tester.element(find.byType(Scaffold).first);
+    expect(context.palette.brandPrimary, accentSeeds[AppAccent.emerald]!.light);
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+    expect(
+      tester.element(find.byType(Scaffold).first).palette.brandPrimary,
+      accentSeeds[AppAccent.ledger]!.light,
     );
   });
 }

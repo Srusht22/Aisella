@@ -9,6 +9,7 @@ import '../../core/l10n/supported_locales.dart';
 import '../../core/settings/app_settings.dart';
 import '../../design_system/components/inputs.dart';
 import '../../design_system/components/rows.dart';
+import '../../design_system/icons/app_icons.dart';
 import '../../design_system/layout/responsive.dart';
 import '../../design_system/theme/theme_ext.dart';
 import '../../design_system/tokens/tokens.g.dart';
@@ -97,7 +98,15 @@ class LanguageDisplayScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: Space.s24),
                 SectionHeader(l10n.accentTitle),
-                AccentGrid(selected: settings.accent, onChanged: ctl.setAccent),
+                RowGroup(
+                  children: [
+                    NavRow(
+                      label: accentName(l10n, settings.accent),
+                      icon: AppIcons.circleHalf,
+                      onTap: () => showAppearanceSheet(context),
+                    ),
+                  ],
+                ),
                 const SizedBox(height: Space.s24),
                 SectionHeader(l10n.motionTitle),
                 AppSegmented<MotionPreference>(

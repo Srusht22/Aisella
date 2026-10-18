@@ -970,13 +970,15 @@
   "accentTitle": "ڕەنگی ڕووکار",
   "accentLedger": "کلاسیک",
   "accentGold": "ئاڵتوونی شاهانە",
-  "accentEmerald": "زمرووتی",
+  "accentEmerald": "زومڕوود",
   "accentSapphire": "یاقووتی شین",
   "accentRuby": "یاقووتی سوور",
-  "accentAmethyst": "بەنەوشەیی",
-  "accentRose": "گوڵی",
-  "accentTeal": "شینی دەریایی",
+  "accentAmethyst": "وەنەوشەیی",
+  "accentRose": "پەمەیی",
+  "accentTeal": "پیرۆزەیی",
   "accentCopper": "مسی",
-  "accentOnyx": "ڕەشی بریقەدار",
-  "modeTitle": "دۆخ"
+  "accentOnyx": "ڕەشی شاهانە",
+  "modeTitle": "دۆخ",
+  "appearanceApply": "جێبەجێکردن",
+  "appearanceApplied": "ڕووکار نوێکرایەوە"
 }
