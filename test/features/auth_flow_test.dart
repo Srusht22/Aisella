@@ -119,6 +119,23 @@ void main() {
   });
 
   group('Sign up (AU-03)', () {
+    testWidgets('the terms open in a sheet over the form, keeping input', (
+      tester,
+    ) async {
+      setScreen(tester);
+      await tester.pumpWidget(testApp(signedIn: false));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Create account').first);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, 'a@example.com');
+      await tester.tap(find.text('Terms and Privacy Policy'));
+      await tester.pumpAndSettle();
+      expect(find.text("Your store's data is yours"), findsOneWidget);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      expect(find.text('a@example.com'), findsOneWidget);
+    });
+
     testWidgets('invalid input shows field errors and sends nothing', (
       tester,
     ) async {

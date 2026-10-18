@@ -11,11 +11,11 @@ import '../../../design_system/components/status.dart';
 import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../common/api_error_text.dart';
-import '../../common/form_page.dart';
 import '../../common/form_widgets.dart';
 import '../application/auth_controller.dart';
 import '../domain/auth_status.dart';
 import '../domain/credentials.dart';
+import 'auth_page.dart';
 import 'auth_widgets.dart';
 
 /// AU-04 Sign in (Phase 1 US-002). Success needs no navigation here: the
@@ -85,18 +85,11 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final expired =
         auth is SignedOut && auth.reason == SignedOutReason.sessionExpired;
 
-    return FormPage(
-      bottom: formActions(
-        primary: AppButton(
-          label: l10n.signIn,
-          loadingLabel: l10n.signingIn,
-          loading: _busy,
-          expand: true,
-          onPressed: _submit,
-        ),
-      ),
-      children: [
-        FormHeading(title: l10n.signInTitle),
+    return AuthPage(
+      title: l10n.signInTitle,
+      subtitle: l10n.signInSubtitle,
+      icon: AppIcons.sparkleFill,
+      card: [
         if (expired && _failure == null)
           Padding(
             padding: const EdgeInsets.only(bottom: Space.s16),
@@ -168,6 +161,15 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           ),
         ),
         const SizedBox(height: Space.s8),
+        AppButton(
+          label: l10n.signIn,
+          loadingLabel: l10n.signingIn,
+          loading: _busy,
+          expand: true,
+          onPressed: _submit,
+        ),
+      ],
+      footer: [
         AuthSwitchLink(
           prompt: l10n.newToAisellia,
           action: l10n.welcomeCreateAccount,

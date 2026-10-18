@@ -4389,5 +4389,57 @@
   "errEmailNotSent": "We couldn't send the email to this address. Please try again later or use another address.",
   "@errEmailNotSent": {
     "description": "Sign-up or verification email could not be sent by the provider."
+  },
+  "signUpSubtitle": "Set up your store in a few minutes. Nothing reaches a customer without your approval.",
+  "@signUpSubtitle": {
+    "description": "Subtitle under the sign-up title."
+  },
+  "signInSubtitle": "Sign in to see your orders, stock and conversations.",
+  "@signInSubtitle": {
+    "description": "Subtitle under the sign-in title."
+  },
+  "termsPoint1Title": "Your store's data is yours",
+  "@termsPoint1Title": {
+    "description": "Terms summary point title."
+  },
+  "termsPoint1Body": "Products, customers and orders belong to your store. They are used only to run Aisellia for you.",
+  "@termsPoint1Body": {
+    "description": "Terms summary point body."
+  },
+  "termsPoint2Title": "You approve every order",
+  "@termsPoint2Title": {
+    "description": "Terms summary point title."
+  },
+  "termsPoint2Body": "Aisellia prepares drafts and replies. Nothing is confirmed or sent to a customer until you approve it.",
+  "@termsPoint2Body": {
+    "description": "Terms summary point body."
+  },
+  "termsPoint3Title": "How AI is used",
+  "@termsPoint3Title": {
+    "description": "Terms summary point title."
+  },
+  "termsPoint3Body": "When you use suggestions, the conversation and your catalog facts are sent to our AI provider only to prepare that suggestion.",
+  "@termsPoint3Body": {
+    "description": "Terms summary point body."
+  },
+  "termsPoint4Title": "Leave whenever you want",
+  "@termsPoint4Title": {
+    "description": "Terms summary point title."
+  },
+  "termsPoint4Body": "You can delete your account and your store's data from Settings at any time.",
+  "@termsPoint4Body": {
+    "description": "Terms summary point body."
+  },
+  "passwordStrengthWeak": "Weak",
+  "@passwordStrengthWeak": {
+    "description": "Password strength label."
+  },
+  "passwordStrengthFair": "Fair",
+  "@passwordStrengthFair": {
+    "description": "Password strength label."
+  },
+  "passwordStrengthStrong": "Strong",
+  "@passwordStrengthStrong": {
+    "description": "Password strength label."
   }
 }

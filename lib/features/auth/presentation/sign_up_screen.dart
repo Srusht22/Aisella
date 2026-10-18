@@ -6,14 +6,14 @@ import '../../../app/route_guard.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../design_system/components/app_button.dart';
-import '../../../design_system/theme/theme_ext.dart';
+import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../common/api_error_text.dart';
-import '../../common/form_page.dart';
 import '../../common/form_widgets.dart';
 import '../application/auth_controller.dart';
 import '../domain/auth_status.dart';
 import '../domain/credentials.dart';
+import 'auth_page.dart';
 import 'auth_widgets.dart';
 
 /// AU-03 Sign up (Phase 1 US-001).
@@ -84,23 +84,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final p = context.palette;
-    final type = context.type;
     final emailInUse = _failure == AuthFailure.emailInUse;
     final email = normalizeEmail(_email.text);
 
-    return FormPage(
-      bottom: formActions(
-        primary: AppButton(
-          label: l10n.welcomeCreateAccount,
-          loadingLabel: l10n.creatingAccount,
-          loading: _busy,
-          expand: true,
-          onPressed: _submit,
-        ),
-      ),
-      children: [
-        FormHeading(title: l10n.signUpTitle),
+    return AuthPage(
+      title: l10n.signUpTitle,
+      subtitle: l10n.signUpSubtitle,
+      icon: AppIcons.storefrontFill,
+      card: [
         if (_failure != null && !emailInUse)
           FormErrorBanner(
             message: authFailureWithDetail(
@@ -167,22 +158,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 onChanged: (_) => setState(() {}),
                 onSubmitted: (_) => _submit(),
               ),
+              PasswordStrengthMeter(password: _password.text),
             ],
           ),
         ),
         const SizedBox(height: Space.s16),
-        Text(
-          l10n.termsConsent,
-          style: type.caption.copyWith(color: p.textSecondary),
+        const TermsConsent(),
+        const SizedBox(height: Space.s20),
+        AppButton(
+          label: l10n.welcomeCreateAccount,
+          loadingLabel: l10n.creatingAccount,
+          loading: _busy,
+          expand: true,
+          onPressed: _submit,
         ),
-        Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: TextButton(
-            onPressed: () => context.push(Routes.terms),
-            child: Text(l10n.termsAndPrivacy),
-          ),
-        ),
-        const SizedBox(height: Space.s8),
+      ],
+      footer: [
         AuthSwitchLink(
           prompt: l10n.alreadyHaveAccount,
           action: l10n.signIn,
