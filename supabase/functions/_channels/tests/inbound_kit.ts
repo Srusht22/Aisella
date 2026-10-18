@@ -184,7 +184,10 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
             assertEquals(await deliver(raw, {}), 401, "no signature");
             if (fx.signsBody !== false) {
               assertEquals(await deliver(tampered, good), 401, "a changed byte");
-              assertEquals(await deliver(reserialised, good), 401, "a re-serialised body");
+              // (Only meaningful when re-serialising changes the bytes.)
+              if (reserialised.join() !== raw.join()) {
+                assertEquals(await deliver(reserialised, good), 401, "a re-serialised body");
+              }
             }
             assertEquals(await stored(), before);
           },

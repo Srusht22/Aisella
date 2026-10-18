@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(44);
+select plan(49);
 
 create temp table ids (k text primary key, v uuid);
 grant all on ids to public;
@@ -250,6 +250,33 @@ select is((select jsonb_agg(pg_temp.vb(b) -> 'events') from jsonb_array_elements
             {"event": "webhook", "timestamp": 1, "message_token": 4},
             {"event": "message", "timestamp": 1, "message_token": "x", "sender": {"id": "u="}, "message": {"type": "text", "text": "bad token"}}]') b),
           '[[], [], [], []]'::jsonb, 'Viber: subscriptions, conversation starts, webhook checks and malformed tokens produce no messages');
+
+-- ---- TikTok (BLOCKED: partner approval; formats unresolved) -------------------------------------------------------
+select is((select row(webhook_scheme, payload_format, status)::text from app.providers where id = 'tiktok'),
+          row('tiktok_sha256', 'tiktok_bm', 'in_development')::text, 'TikTok: timestamped client-secret signature, assumed envelope, test connections only');
+select is(app.channel_normalize_tiktok_bm((select p from app.providers p where id = 'tiktok'), null,
+            jsonb_build_object('client_key', 'ck-1', 'event', 'direct_message.receive', 'create_time', 1760781600, 'user_openid', 'open-1',
+                               'content', '{"conversation_id": "c-1", "message_id": "tt-1", "text": "سڵاو"}')),
+          '{"event_id": "dm:tt-1", "events": [{"kind": "message", "account_id": "ck-1", "external_user_id": "open-1",
+            "external_message_id": "tt-1", "occurred_at": "2025-10-18T10:00:00+00:00", "text": "سڵاو"}]}'::jsonb,
+          'TikTok: the assumed direct-message envelope (content is a JSON string)');
+select is((select jsonb_agg(app.channel_normalize_tiktok_bm((select p from app.providers p where id = 'tiktok'), null, b) -> 'events')
+             from jsonb_array_elements('[{"event": "authorization.removed", "user_openid": "o", "content": "{}"},
+                                         {"event": "direct_message.receive", "user_openid": "o", "content": "not json"},
+                                         {"event": "direct_message.receive", "user_openid": "o", "content": {"message_id": "x"}}]') b),
+          '[[], [], []]'::jsonb, 'TikTok: other events and malformed content produce nothing');
+select is(app.provider_capability('tiktok', 'outbound_text'), null, 'TikTok: outbound text is UNRESOLVED, which counts as absent');
+with x as (insert into app.connections (store_id, provider_id, external_account_id, state, is_test, connected_at)
+           values (pg_temp.id('store_a'), 'tiktok', 'ck-shop-a', 'connected', true, now()) returning id)
+insert into ids select 'tt_a', id from x;
+select internal.channel_store_events('tiktok', 'ev-tt-1', null,
+  '[{"kind": "message", "account_id": "ck-shop-a", "external_user_id": "open-1", "external_message_id": "tt-2", "text": "hi"}]', repeat('c', 64));
+select internal.channel_process_batch();
+insert into ids select 'conv_tt', id from app.conversations where connection_id = pg_temp.id('tt_a');
+select pg_temp.act_as(pg_temp.id('a'));
+select is(api.send_message(pg_temp.id('store_a'), pg_temp.id('conv_tt'), 'hello', null, null, null, gen_random_uuid()) #>> '{error,code}',
+          'CHANNEL_CAPABILITY_MISSING', 'TikTok: no send is possible, even to a test connection');
+select pg_temp.act_as_admin();
 
 select * from finish();
 rollback;

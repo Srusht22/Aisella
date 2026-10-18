@@ -6,6 +6,7 @@ import { DEFAULT_GRAPH_VERSION } from "./meta_graph.ts";
 import { InstagramAdapter } from "./instagram.ts";
 import { MessengerAdapter } from "./messenger.ts";
 import { TelegramAdapter } from "./telegram.ts";
+import { TikTokAdapter } from "./tiktok.ts";
 import { ViberAdapter } from "./viber.ts";
 import { WhatsAppAdapter } from "./whatsapp.ts";
 
@@ -17,6 +18,8 @@ export function realAdapters(env: (k: string) => string | undefined): Record<str
     new WhatsAppAdapter(graph),
     new TelegramAdapter(),
     new ViberAdapter(),
+    // Sends nothing unless an operator sets the verified endpoint path (BLOCKED, see tiktok.ts).
+    new TikTokAdapter({ sendPath: env("TIKTOK_SEND_PATH") ?? null }),
   ];
   return Object.fromEntries(list.map((a) => [a.provider, a]));
 }
