@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/l10n/l10n.dart';
 import '../../core/l10n/supported_locales.dart';
 import '../../core/settings/app_settings.dart';
+import '../../design_system/brand/app_logo.dart';
 import '../../design_system/components/app_button.dart';
 import '../../design_system/components/inputs.dart';
 import '../../design_system/components/rows.dart';
@@ -70,13 +71,19 @@ class _LanguageSelectionScreenState
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: Space.s48),
-                Text(
-                  'aisellia',
-                  style: type.titleLarge.copyWith(
-                    color: p.brandPrimary,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.24,
-                  ),
+                Row(
+                  children: [
+                    const AppLogo(size: 40, glow: true),
+                    const SizedBox(width: Space.s12),
+                    Text(
+                      'Aisellia',
+                      style: type.titleLarge.copyWith(
+                        color: p.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.24,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: Space.s24),
                 // Shown in every language: the user may not read the current one.

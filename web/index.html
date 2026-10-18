@@ -35,9 +35,9 @@
   <!-- Loading screen shown at once while the app starts; removed on the
        app's first frame. Matches the app's canvas in light and dark. -->
   <style>
-    :root { --bg: #F6F4EF; --fg: #1A1C20; --muted: #555A63; --brand: #1F3F8F; }
+    :root { --bg: #F6F4EF; --fg: #1A1C20; --muted: #555A63; --brand: #1F3F8F; --ink: #FFFFFF; }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #121417; --fg: #ECEDEF; --muted: #A9AEB8; --brand: #9DB4F2; }
+      :root { --bg: #121417; --fg: #ECEDEF; --muted: #A9AEB8; --brand: #9DB4F2; --ink: #0F1B3D; }
     }
     html, body { margin: 0; height: 100%; background: var(--bg); }
     #splash {
@@ -75,9 +75,13 @@
 <body>
   <div id="splash" aria-label="Aisellia is loading" role="status">
     <div class="mark">
-      <svg width="34" height="34" viewBox="0 0 24 24" fill="#fff" aria-hidden="true">
-        <path d="M12 2l2.2 6.3L20.5 10.5l-6.3 2.2L12 19l-2.2-6.3L3.5 10.5l6.3-2.2z"/>
-        <path d="M19 2l.8 2.2L22 5l-2.2.8L19 8l-.8-2.2L16 5l2.2-.8z"/>
+      <svg width="72" height="72" viewBox="0 0 100 100" aria-hidden="true">
+        <path d="M33 41H67L72 77H28Z" fill="var(--ink)" stroke="var(--ink)"
+              stroke-width="10" stroke-linejoin="round"/>
+        <path d="M40 40V35A10 10 0 0 1 60 35V40" fill="none" stroke="var(--ink)"
+              stroke-width="4.5" stroke-linecap="round"/>
+        <path d="M39 60L47 68L62 53" fill="none" stroke="var(--brand)"
+              stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </div>
     <div class="name">Aisellia</div>

@@ -6,11 +6,13 @@ import '../../../app/route_guard.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/l10n/supported_locales.dart';
 import '../../../core/settings/app_settings.dart';
+import '../../../design_system/brand/app_logo.dart';
 import '../../../design_system/components/inputs.dart';
 import '../../../design_system/components/overlays.dart';
 import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/layout/responsive.dart';
 import '../../../design_system/motion/motion.dart';
+import '../../../design_system/theme/accents.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../common/appearance_picker.dart';
@@ -275,22 +277,7 @@ class _HeroMark extends StatelessWidget {
                   scale: 0.6 + 0.4 * pop,
                   child: Opacity(
                     opacity: pop.clamp(0.0, 1.0),
-                    child: Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        color: p.brandPrimary,
-                        borderRadius: BorderRadius.circular(Radii.lg),
-                        boxShadow: [
-                          BoxShadow(
-                            color: p.brandPrimary.withValues(alpha: 0.35),
-                            blurRadius: 24,
-                            offset: const Offset(0, 8),
-                          ),
-                        ],
-                      ),
-                      child: Icon(icon, color: p.textOnBrand, size: 28),
-                    ),
+                    child: const AppLogo(size: 56, glow: true),
                   ),
                 ),
               ],
@@ -338,11 +325,20 @@ class AppearanceButton extends StatelessWidget {
   const AppearanceButton({super.key});
 
   @override
-  Widget build(BuildContext context) => IconButton(
-    tooltip: context.l10n.appearanceTitle,
-    icon: const Icon(AppIcons.circleHalf, size: Sizes.iconLg),
-    onPressed: () => showAppearanceSheet(context),
-  );
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return IconButton(
+      tooltip: context.l10n.appearanceTitle,
+      icon: AppearanceGlyph(
+        size: 24,
+        colors: [for (final a in AppAccent.values) accentSeeds[a]!.dark],
+        light: const Color(0xFFF6F4EF),
+        dark: const Color(0xFF1A1C20),
+      ),
+      style: IconButton.styleFrom(side: BorderSide(color: p.borderHairline)),
+      onPressed: () => showAppearanceSheet(context),
+    );
+  }
 }
 
 /// Opens the language choice. The change applies at once and is
@@ -354,29 +350,65 @@ class LanguageButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
     final current = Localizations.localeOf(context);
-    return IconButton(
-      tooltip: l10n.appLanguage,
-      icon: const Icon(AppIcons.translate, size: Sizes.iconLg),
-      onPressed: () => showAppSheet<void>(
-        context: context,
-        title: l10n.appLanguage,
-        builder: (sheetContext) => Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final l in SupportedLocales.all)
-              SelectionRow(
-                label: kLanguageNames[l.languageCode]!,
-                labelDirection: SupportedLocales.isRtl(l)
-                    ? TextDirection.rtl
-                    : TextDirection.ltr,
-                selected: current.languageCode == l.languageCode,
-                onTap: () {
-                  ref.read(settingsProvider.notifier).setLocale(l);
-                  Navigator.of(sheetContext).pop();
-                },
+    final p = context.palette;
+    final type = context.type;
+    return Tooltip(
+      message: l10n.appLanguage,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Space.s4),
+        child: Material(
+          color: p.bgSurface,
+          shape: StadiumBorder(side: BorderSide(color: p.borderHairline)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => _open(context, ref, current),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(minHeight: 40),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: Space.s12),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GlobeGlyph(size: 18, color: p.textBrand),
+                    const SizedBox(width: Space.s8),
+                    Text(
+                      _short[current.languageCode] ?? '',
+                      style: type.label.copyWith(color: p.textPrimary),
+                    ),
+                  ],
+                ),
               ),
-          ],
+            ),
+          ),
         ),
+      ),
+    );
+  }
+
+  /// Short names for the pill; the sheet shows the full native names.
+  static const _short = {'en': 'EN', 'ckb': 'کوردی', 'ar': 'عربي'};
+
+  void _open(BuildContext context, WidgetRef ref, Locale current) {
+    final l10n = context.l10n;
+    showAppSheet<void>(
+      context: context,
+      title: l10n.appLanguage,
+      builder: (sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final l in SupportedLocales.all)
+            SelectionRow(
+              label: kLanguageNames[l.languageCode]!,
+              labelDirection: SupportedLocales.isRtl(l)
+                  ? TextDirection.rtl
+                  : TextDirection.ltr,
+              selected: current.languageCode == l.languageCode,
+              onTap: () {
+                ref.read(settingsProvider.notifier).setLocale(l);
+                Navigator.of(sheetContext).pop();
+              },
+            ),
+        ],
       ),
     );
   }

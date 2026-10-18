@@ -10,6 +10,7 @@ import '../../../core/formatting/money.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../demo/demo_mode.dart';
+import '../../../design_system/brand/app_logo.dart';
 import '../../../design_system/components/app_button.dart';
 import '../../../design_system/components/pencil.dart';
 import '../../../design_system/components/status.dart';
@@ -84,14 +85,20 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     const Expanded(child: _Wordmark()),
                     const AppearanceButton(),
                     const LanguageButton(),
-                    AnimatedOpacity(
-                      opacity: last ? 0 : 1,
-                      duration: Motion.fade(context, MotionTokens.sm),
-                      child: IgnorePointer(
-                        ignoring: last,
-                        child: TextButton(
-                          onPressed: () => _goTo(_count - 1),
-                          child: Text(l10n.welcomeSkip),
+                    Flexible(
+                      child: AnimatedOpacity(
+                        opacity: last ? 0 : 1,
+                        duration: Motion.fade(context, MotionTokens.sm),
+                        child: IgnorePointer(
+                          ignoring: last,
+                          child: TextButton(
+                            onPressed: () => _goTo(_count - 1),
+                            child: Text(
+                              l10n.welcomeSkip,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -213,19 +220,7 @@ class _Wordmark extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: p.brandPrimary,
-            borderRadius: BorderRadius.circular(Radii.md),
-          ),
-          child: Icon(
-            AppIcons.sparkleFill,
-            size: Sizes.iconSm,
-            color: p.textOnBrand,
-          ),
-        ),
+        const AppLogo(size: 32),
         const SizedBox(width: Space.s8),
         Flexible(
           child: Text(
