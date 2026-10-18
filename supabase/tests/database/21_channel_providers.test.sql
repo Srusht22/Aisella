@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(19);
+select plan(24);
 
 create temp table ids (k text primary key, v uuid);
 grant all on ids to public;
@@ -101,7 +101,28 @@ select throws_ok(format('select api.check_send_dispatch(%L)', (select v from sen
 select pg_temp.act_as_admin();
 select is((select count(*)::integer from app.audit_events where action = 'message.send_authorized' and store_id = pg_temp.id('store_a')), 1,
           'the send is audited once, with the person who authorized it');
-select is((select status from app.providers where id = 'messenger'), 'planned', 'providers not yet implemented stay planned');
+
+-- ---- Messenger -------------------------------------------------------------------------------------------------
+select is((select row(webhook_scheme, payload_format, status)::text from app.providers where id = 'messenger'),
+          row('meta_sha256', 'meta_messenger', 'in_development')::text, 'Messenger: Meta signature, Page body, test connections only');
+create function pg_temp.fb(p_messaging jsonb, p_object text default 'page') returns jsonb language sql as $$
+  select pg_temp.norm('messenger', jsonb_build_object('object', p_object, 'entry',
+           jsonb_build_array(jsonb_build_object('id', '1066000000000001', 'time', 1760781600, 'messaging', p_messaging))))
+$$;
+select is(pg_temp.fb('[{"sender": {"id": "2463"}, "recipient": {"id": "1066000000000001"}, "timestamp": 1760781600000,
+                        "message": {"mid": "m_1", "text": "مرحبا"}}]') -> 0,
+          '{"kind": "message", "account_id": "1066000000000001", "external_user_id": "2463", "external_message_id": "m_1",
+            "occurred_at": "2025-10-18T10:00:00+00:00", "text": "مرحبا"}'::jsonb, 'Messenger: a text message (account = Page, user = PSID)');
+select is(pg_temp.fb('[{"sender": {"id": "2463"}, "delivery": {"mids": ["m_a", "m_b"], "watermark": 1760781600000}}]'),
+          '[{"kind": "delivery", "account_id": "1066000000000001", "provider_message_id": "m_a", "provider_event_key": "delivery:m_a"},
+            {"kind": "delivery", "account_id": "1066000000000001", "provider_message_id": "m_b", "provider_event_key": "delivery:m_b"}]'::jsonb,
+          'Messenger: a delivery receipt becomes one item per delivered message');
+select is(pg_temp.fb('[{"sender": {"id": "2463"}, "read": {"watermark": 1760781600000}}]'), '[]'::jsonb,
+          'Messenger: a watermark-only read is ignored (it names no message)');
+select is(pg_temp.fb('[{"sender": {"id": "2463"}, "message": {"mid": "m_2", "text": "x"}}]', 'instagram'), '[]'::jsonb,
+          'Messenger: an Instagram body is not a Page body');
+select is((select count(*)::integer from app.provider_capabilities where provider_id = 'messenger' and evidence = 'verified'), 0,
+          'Messenger: no capability is recorded as verified');
 
 select * from finish();
 rollback;

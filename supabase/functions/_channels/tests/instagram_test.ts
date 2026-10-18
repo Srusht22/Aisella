@@ -3,12 +3,12 @@
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1.0.13";
 import { conformanceSuite } from "../conformance.ts";
 import { InstagramAdapter } from "../providers/instagram.ts";
-import { hmacSha256Hex } from "../text.ts";
-import { inboundConformanceSuite, type InboundConnection, jsonString } from "./inbound_kit.ts";
+import { inboundConformanceSuite } from "./inbound_kit.ts";
+import { metaBody, metaSign } from "./meta_fixtures.ts";
 import { bearer, graphResponses, imitationFixture, type ImitationSpec } from "./provider_imitation.ts";
 
 const TOKEN = `EAAtest${crypto.randomUUID().replace(/-/g, "")}`;
-export const instagramSpec: ImitationSpec = {
+const instagramSpec: ImitationSpec = {
   text: (b) => b.message?.text,
   credential: bearer,
   respond: graphResponses((n) => ({ recipient_id: "1784", message_id: `aWdfZAG1faXRlbTo${n}` })),
@@ -61,20 +61,6 @@ Deno.test("instagram: no credential sends nothing; an answer without a message i
 });
 
 const appSecret = `ig-app-secret-${crypto.randomUUID()}`;
-export const metaBody =
-  (object: string) =>
-  (c: InboundConnection, o: { text: string; id: string; user: string; escaped: boolean }) =>
-    new TextEncoder().encode(
-      `{"object":"${object}","entry":[{"id":"${c.accountId}","time":${Date.now()},"messaging":[{"sender":{"id":"${o.user}"},` +
-        `"recipient":{"id":"${c.accountId}"},"timestamp":${Date.now()},"message":{"mid":"${o.id}","text":${
-          jsonString(o.text, o.escaped)
-        }}}]}]}`,
-    );
-export const metaSign =
-  (secret: string) => async (raw: Uint8Array, _c: InboundConnection, wrong?: boolean) => ({
-    "x-hub-signature-256": `sha256=${await hmacSha256Hex(wrong ? `${secret}-wrong` : secret, raw)}`,
-  });
-
 inboundConformanceSuite("instagram", {
   scheme: "meta_sha256",
   format: "meta_instagram",

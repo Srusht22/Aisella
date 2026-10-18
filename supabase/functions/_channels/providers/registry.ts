@@ -4,11 +4,13 @@
 import type { ProviderAdapter } from "../adapter.ts";
 import { DEFAULT_GRAPH_VERSION } from "./meta_graph.ts";
 import { InstagramAdapter } from "./instagram.ts";
+import { MessengerAdapter } from "./messenger.ts";
 
 export function realAdapters(env: (k: string) => string | undefined): Record<string, ProviderAdapter> {
   const graph = { version: env("META_GRAPH_VERSION")?.trim() || DEFAULT_GRAPH_VERSION };
   const list: ProviderAdapter[] = [
     new InstagramAdapter(graph),
+    new MessengerAdapter(graph),
   ];
   return Object.fromEntries(list.map((a) => [a.provider, a]));
 }
