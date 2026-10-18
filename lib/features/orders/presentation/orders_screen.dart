@@ -192,6 +192,16 @@ class _OrderList extends ConsumerWidget {
                       ),
                       const SizedBox(height: Space.s12),
                     ],
+                    // Phase 10: group ready orders for a courier.
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: AppButton(
+                        label: l10n.deliveryListsTitle,
+                        icon: AppIcons.truck,
+                        variant: AppButtonVariant.tertiary,
+                        onPressed: () => context.push(Routes.deliveryLists),
+                      ),
+                    ),
                     AppSearchField(
                       hint: l10n.searchOrdersHint,
                       clearTooltip: MaterialLocalizations.of(context)

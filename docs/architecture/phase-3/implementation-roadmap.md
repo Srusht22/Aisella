@@ -72,9 +72,9 @@ Changes to any of these require an updated ADR and owner approval before code ch
 ## 5. Progress (updated 2026-10-18)
 
 The milestones above are unchanged. Current status is kept in [project-status.md](../../implementation/project-status.md); in short:
-- **Done locally:** R1–R5, Phase 8.5 and R7 (Phase 9, six providers, local only).
-- **In progress:** R8 (Phase 10, fulfilment extensions) is the next phase.
-- **Not started:** R6, R9, R10.
+- **Done locally:** R1–R5, Phase 8.5, R7 (Phase 9, six providers) and R8 (Phase 10, fulfilment extensions). All of it is local only.
+- **Next:** R9 (Phase 11, reporting).
+- **Not started:** R6 (needs external accounts and the owner's approval), R9 and R10.
 
 **Owner decision (2026-10-18):** all real Gemini API calls, including the 35-conversation real-model evaluation and native review of real outputs, are **deferred to the final pre-publication verification** ([checklist](../../implementation/pre-publication-checklist.md)).
 

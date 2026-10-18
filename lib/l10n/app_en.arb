@@ -4025,5 +4025,329 @@
   "confirmationQueued": "Order confirmation authorized for sending.",
   "@confirmationQueued": {
     "description": "Snackbar."
+  },
+  "couriersTitle": "Couriers",
+  "@couriersTitle": {
+    "description": "Store menu row and screen title (Phase 10)."
+  },
+  "couriersEmpty": "No couriers yet. Add the people who deliver your orders.",
+  "@couriersEmpty": {
+    "description": "Empty state."
+  },
+  "addCourier": "Add courier",
+  "@addCourier": {
+    "description": "Button and sheet title."
+  },
+  "editCourier": "Edit courier",
+  "@editCourier": {
+    "description": "Sheet title."
+  },
+  "fieldCourierName": "Courier name",
+  "@fieldCourierName": {
+    "description": "Field."
+  },
+  "fieldCourierPhoneOptional": "Phone (optional)",
+  "@fieldCourierPhoneOptional": {
+    "description": "Field."
+  },
+  "courierInactive": "Inactive",
+  "@courierInactive": {
+    "description": "Badge."
+  },
+  "deactivateCourier": "Deactivate",
+  "@deactivateCourier": {
+    "description": "Button."
+  },
+  "reactivateCourier": "Reactivate",
+  "@reactivateCourier": {
+    "description": "Button."
+  },
+  "courierSaved": "Courier saved",
+  "@courierSaved": {
+    "description": "Snackbar."
+  },
+  "courierOwes": "Owes {amount} · delivered orders: {count}",
+  "@courierOwes": {
+    "description": "Cash the courier still has to hand over.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "courierOwesNothing": "Owes nothing",
+  "@courierOwesNothing": {
+    "description": "Courier balance."
+  },
+  "courierCarrying": "Out for delivery: {count} · to collect {amount}",
+  "@courierCarrying": {
+    "description": "Courier balance.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "settleCourier": "Record cash handed over",
+  "@settleCourier": {
+    "description": "Button."
+  },
+  "settleTitle": "Cash from {name}",
+  "@settleTitle": {
+    "description": "Sheet title.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settleBody": "Enter the cash the courier handed over. It is applied to their oldest delivered orders first.",
+  "@settleBody": {
+    "description": "Sheet body."
+  },
+  "settledSnack": "{count, plural, =1{Recorded for 1 order} other{Recorded for {count} orders}}",
+  "@settledSnack": {
+    "description": "Snackbar.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fieldAmount": "Amount",
+  "@fieldAmount": {
+    "description": "Field."
+  },
+  "errAmountExceeds": "This is more than what is due.",
+  "@errAmountExceeds": {
+    "description": "Field error."
+  },
+  "errCourierNameRequired": "Enter the courier's name (up to 60 characters).",
+  "@errCourierNameRequired": {
+    "description": "Field error."
+  },
+  "errCourierNameDuplicate": "You already have a courier with this name.",
+  "@errCourierNameDuplicate": {
+    "description": "Error."
+  },
+  "errCourierInvalid": "Choose an active courier.",
+  "@errCourierInvalid": {
+    "description": "Error."
+  },
+  "errChooseCourier": "Choose a courier before handing the list over.",
+  "@errChooseCourier": {
+    "description": "Error / reason."
+  },
+  "errOnAnotherList": "An order is already on another open list.",
+  "@errOnAnotherList": {
+    "description": "Error."
+  },
+  "errOrderNotReady": "This order is not ready for this step.",
+  "@errOrderNotReady": {
+    "description": "Error."
+  },
+  "errListBlocked": "These orders cannot go out: {numbers}. Remove them or complete their details. Nothing was changed.",
+  "@errListBlocked": {
+    "description": "Error.",
+    "placeholders": {
+      "numbers": {
+        "type": "String"
+      }
+    }
+  },
+  "deliveryListsTitle": "Delivery lists",
+  "@deliveryListsTitle": {
+    "description": "Screen title and entry."
+  },
+  "deliveryListTitle": "Delivery list {number}",
+  "@deliveryListTitle": {
+    "description": "Title.",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "newDeliveryList": "New delivery list",
+  "@newDeliveryList": {
+    "description": "Button and sheet title."
+  },
+  "noDeliveryLists": "No delivery lists yet.",
+  "@noDeliveryLists": {
+    "description": "Empty list."
+  },
+  "noReadyOrders": "No approved orders are waiting to go out.",
+  "@noReadyOrders": {
+    "description": "Caption."
+  },
+  "readyOrdersCount": "{count, plural, =1{1 order is ready to go} other{{count} orders are ready to go}}",
+  "@readyOrdersCount": {
+    "description": "Caption.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chooseOrders": "Choose the orders for this list",
+  "@chooseOrders": {
+    "description": "Label."
+  },
+  "noCourierYet": "Choose later",
+  "@noCourierYet": {
+    "description": "Courier picker option."
+  },
+  "noCouriersHint": "Add couriers from the store menu.",
+  "@noCouriersHint": {
+    "description": "Hint."
+  },
+  "createList": "Create list",
+  "@createList": {
+    "description": "Button."
+  },
+  "orderIncompleteShort": "Details missing",
+  "@orderIncompleteShort": {
+    "description": "Caption."
+  },
+  "listOpen": "Open",
+  "@listOpen": {
+    "description": "List status."
+  },
+  "listHandedOver": "Handed over",
+  "@listHandedOver": {
+    "description": "List status."
+  },
+  "cashToCollect": "To collect: {amount}",
+  "@cashToCollect": {
+    "description": "Stop line.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "listCashTotal": "Cash to collect: {amount}",
+  "@listCashTotal": {
+    "description": "List total.",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "copyListText": "Copy list",
+  "@copyListText": {
+    "description": "Button."
+  },
+  "listCopied": "Copied. Paste it in a message to the courier.",
+  "@listCopied": {
+    "description": "Snackbar."
+  },
+  "handOver": "Hand over to courier",
+  "@handOver": {
+    "description": "Button."
+  },
+  "handOverTitle": "Hand over list {number}?",
+  "@handOverTitle": {
+    "description": "Confirm title.",
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "handOverBody": "{count, plural, =1{The order is marked out for delivery with {courier}.} other{All {count} orders are marked out for delivery with {courier}.}} If one cannot go, none is changed.",
+  "@handOverBody": {
+    "description": "Confirm body.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "courier": {
+        "type": "String"
+      }
+    }
+  },
+  "handedOverSnack": "Handed over. The orders are out for delivery.",
+  "@handedOverSnack": {
+    "description": "Snackbar."
+  },
+  "cancelList": "Cancel list",
+  "@cancelList": {
+    "description": "Button."
+  },
+  "cancelListTitle": "Cancel this list?",
+  "@cancelListTitle": {
+    "description": "Confirm title."
+  },
+  "cancelListBody": "The orders stay as they are and can go on another list.",
+  "@cancelListBody": {
+    "description": "Confirm body."
+  },
+  "removeFromList": "Remove from list",
+  "@removeFromList": {
+    "description": "Button."
+  },
+  "changeCourier": "Change courier",
+  "@changeCourier": {
+    "description": "Button and sheet title."
+  },
+  "paidTotal": "Paid",
+  "@paidTotal": {
+    "description": "Price row."
+  },
+  "leftToPay": "Left to pay",
+  "@leftToPay": {
+    "description": "Price row."
+  },
+  "recordPayment": "Record payment",
+  "@recordPayment": {
+    "description": "Button and sheet title."
+  },
+  "recordPaymentBody": "Record a transfer or wallet payment you have received. Aisellia does not move money.",
+  "@recordPaymentBody": {
+    "description": "Sheet body."
+  },
+  "fieldPaymentChannel": "How it was paid",
+  "@fieldPaymentChannel": {
+    "description": "Label."
+  },
+  "fieldReferenceOptional": "Reference (optional)",
+  "@fieldReferenceOptional": {
+    "description": "Field."
+  },
+  "paymentRecorded": "Payment recorded",
+  "@paymentRecorded": {
+    "description": "Snackbar."
+  },
+  "channelFib": "FIB",
+  "@channelFib": {
+    "description": "Payment channel name."
+  },
+  "channelFastpay": "FastPay",
+  "@channelFastpay": {
+    "description": "Payment channel name."
+  },
+  "channelZaincash": "ZainCash",
+  "@channelZaincash": {
+    "description": "Payment channel name."
+  },
+  "channelAsiahawala": "AsiaHawala",
+  "@channelAsiahawala": {
+    "description": "Payment channel name."
+  },
+  "channelBankTransfer": "Bank transfer",
+  "@channelBankTransfer": {
+    "description": "Payment channel."
+  },
+  "channelOther": "Other",
+  "@channelOther": {
+    "description": "Payment channel."
   }
 }

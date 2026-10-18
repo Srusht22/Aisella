@@ -6,6 +6,7 @@ import 'package:aisellia/features/auth/application/auth_controller.dart';
 import 'package:aisellia/features/catalog/data/catalog_repository.dart';
 import 'package:aisellia/features/catalog/data/media_store.dart';
 import 'package:aisellia/features/channels/application/channel_providers.dart';
+import 'package:aisellia/features/fulfilment/application/fulfilment_providers.dart';
 import 'package:aisellia/features/inbox/data/conversations_repository.dart';
 import 'package:aisellia/features/orders/data/orders_repository.dart';
 import 'package:aisellia/features/store/application/workspace_controller.dart';
@@ -19,12 +20,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'catalog_fakes.dart';
 import 'channel_fakes.dart';
 import 'fakes.dart';
+import 'fulfilment_fakes.dart';
 import 'inbox_fakes.dart';
 import 'order_fakes.dart';
 
 export 'catalog_fakes.dart';
 export 'channel_fakes.dart';
 export 'fakes.dart';
+export 'fulfilment_fakes.dart';
 export 'inbox_fakes.dart';
 export 'order_fakes.dart';
 
@@ -43,6 +46,7 @@ Widget testApp({
   FakeOrdersRepository? orders,
   FakeConversationsRepository? conversations,
   FakeChannelsRepository? channels,
+  FakeFulfilmentRepository? fulfilment,
   Future<bool> Function(Uri)? openUrl,
   FakeMediaStore? media,
   FakePhotoPicker? picker,
@@ -82,6 +86,9 @@ Widget testApp({
       ),
       channelsRepositoryProvider.overrideWithValue(
         channels ?? FakeChannelsRepository(conversations: conversations),
+      ),
+      fulfilmentRepositoryProvider.overrideWithValue(
+        fulfilment ?? FakeFulfilmentRepository(orders: orders),
       ),
       // Never opens a real browser in tests.
       urlOpenerProvider.overrideWithValue(openUrl ?? (_) async => true),

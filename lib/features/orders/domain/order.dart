@@ -379,6 +379,30 @@ enum PaymentMethod {
   };
 }
 
+/// A transfer or wallet payment recorded against an order paid "other"
+/// (Phase 10, record only). [method] is the wire value (fib, zaincash, …).
+@immutable
+class OrderPayment {
+  const OrderPayment({
+    required this.method,
+    required this.amount,
+    required this.recordedAt,
+    this.reference,
+  });
+
+  factory OrderPayment.fromJson(Map<String, dynamic> j) => OrderPayment(
+    method: j['method'] as String? ?? 'other',
+    amount: (j['amount'] as num?)?.toInt() ?? 0,
+    reference: j['reference'] as String?,
+    recordedAt: DateTime.parse(j['recorded_at'] as String).toLocal(),
+  );
+
+  final String method;
+  final int amount;
+  final String? reference;
+  final DateTime recordedAt;
+}
+
 @immutable
 class Order {
   const Order({
@@ -423,6 +447,12 @@ class Order {
     this.fromAi = false,
     this.isTest = false,
     this.conversationId,
+    this.courierId,
+    this.courierName,
+    this.paidTotal = 0,
+    this.payments = const [],
+    this.deliveryListId,
+    this.deliveryListNumber,
   });
 
   factory Order.fromJson(Map<String, dynamic> j) {
@@ -469,6 +499,16 @@ class Order {
       fromAi: j['origin'] == 'ai',
       isTest: j['is_test'] == true,
       conversationId: j['conversation_id'] as String?,
+      courierId: (j['courier'] as Map?)?['id'] as String?,
+      courierName: (j['courier'] as Map?)?['name'] as String?,
+      paidTotal: (j['paid_total'] as num?)?.toInt() ?? 0,
+      payments: [
+        for (final p in j['payments'] as List? ?? [])
+          OrderPayment.fromJson((p as Map).cast<String, dynamic>()),
+      ],
+      deliveryListId: (j['delivery_list'] as Map?)?['id'] as String?,
+      deliveryListNumber: ((j['delivery_list'] as Map?)?['number'] as num?)
+          ?.toInt(),
       version: (j['version'] as num).toInt(),
       createdAt: time(j['created_at'])!,
       statusChangedAt: time(j['status_changed_at']) ?? time(j['created_at'])!,
@@ -539,6 +579,18 @@ class Order {
   final int version;
   final DateTime createdAt;
   final DateTime statusChangedAt;
+
+  /// The courier it was dispatched with (Phase 10).
+  final String? courierId;
+  final String? courierName;
+
+  /// Transfers and wallet payments recorded so far (orders paid "other").
+  final int paidTotal;
+  final List<OrderPayment> payments;
+
+  /// The delivery list it is on or was handed over with.
+  final String? deliveryListId;
+  final int? deliveryListNumber;
 
   /// Missing required fields (BR-36), computed by the server.
   final List<OrderIssue> issues;

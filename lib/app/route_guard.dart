@@ -33,6 +33,8 @@ abstract final class Routes {
   static String conversation(String id) => '/inbox/$id';
   static const orders = '/orders';
   static const orderNew = '/orders/new';
+  static const deliveryLists = '/orders/delivery-lists';
+  static String deliveryList(String id) => '/orders/delivery-lists/$id';
   static String order(String id) => '/orders/$id';
   static String orderEdit(String id) => '/orders/$id/edit';
   static String orderHistory(String id) => '/orders/$id/history';
@@ -48,6 +50,7 @@ abstract final class Routes {
   static const storeInventory = '/store/inventory';
   static const storeAi = '/store/ai';
   static const storeChannels = '/store/channels';
+  static const storeCouriers = '/store/couriers';
   static const storeAccount = '/store/account';
   static const storeDeleteAccount = '/store/account/delete';
   static const storeLanguage = '/store/language';

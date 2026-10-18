@@ -19,6 +19,8 @@ import '../features/catalog/presentation/product_list_screen.dart';
 import '../features/channels/presentation/channels_screen.dart';
 import '../features/common/deferred_feature_screen.dart';
 import '../features/common/not_found_screen.dart';
+import '../features/fulfilment/presentation/couriers_screen.dart';
+import '../features/fulfilment/presentation/delivery_lists_screen.dart';
 import '../features/inbox/inbox_screen.dart';
 import '../features/inbox/presentation/ai_settings_screen.dart';
 import '../features/inbox/presentation/conversation_screen.dart';
@@ -166,6 +168,19 @@ final routerProvider = Provider<GoRouter>((ref) {
                       child: OrderEditorScreen(),
                     ),
                   ),
+                  // Phase 10: before ':orderId', so the literal path wins.
+                  GoRoute(
+                    path: 'delivery-lists',
+                    builder: (_, _) => const DeliveryListsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: ':listId',
+                        builder: (_, s) => DeliveryListScreen(
+                          listId: s.pathParameters['listId']!,
+                        ),
+                      ),
+                    ],
+                  ),
                   GoRoute(
                     path: ':orderId',
                     builder: (_, s) => OrderDetailScreen(
@@ -259,6 +274,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(path: 'ai', builder: (_, _) => const AiSettingsScreen()),
           GoRoute(path: 'channels', builder: (_, _) => const ChannelsScreen()),
+          GoRoute(path: 'couriers', builder: (_, _) => const CouriersScreen()),
           GoRoute(
             path: 'account',
             builder: (_, _) => const AccountScreen(),

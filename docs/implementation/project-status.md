@@ -27,8 +27,8 @@ In addition:
 | 8, 8.5 | R5 Conversations and AI, then hardening | Done locally. Real-model gates open, see "Deferred" below | [phase-8](phase-8/README.md), [phase-8.5](phase-8.5/README.md) |
 | 9 | R7 Live channels (six providers) | Implemented and tested **locally only**. No provider can send (capabilities not verified); nothing deployed or connected | [phase-9 report](phase-9/integrations-report.md) |
 | (9 follow-up) | Gemini verification, requested under the name "Phase 10" | **Offline work complete; real-model evaluation deferred and incomplete** | [phase-10/gemini-readiness.md](phase-10/gemini-readiness.md) |
-| **10** | **R8 Fulfilment extensions** (courier records, delivery lists, payment recording, courier settlement) | **In progress (the next phase after Phase 9)** | [phase-10/fulfilment-extensions.md](phase-10/fulfilment-extensions.md) |
-| 11 | R9 Reporting | Not started | — |
+| **10** | **R8 Fulfilment extensions** (courier records, delivery lists, payment recording, courier settlement) | **Implemented and tested locally only** (not deployed, no hosted migration) | [phase-10/fulfilment-extensions.md](phase-10/fulfilment-extensions.md) |
+| **11** | **R9 Reporting** | **Next phase.** Not started | — |
 | 11-lite / 12-lite | R6 Pilot readiness (Sentry, backups, signing, store builds, legal texts) | Not started: needs external accounts and owner approval | — |
 | 12 | R10 Full QA and release | Not started | [pre-publication checklist](pre-publication-checklist.md) |
 

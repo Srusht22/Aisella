@@ -61,6 +61,9 @@ class FakeOrdersRepository implements OrdersRepository {
 
   Map<String, dynamic> raw(String id) => _orders[id]!;
 
+  /// Every order id, in creation order.
+  Iterable<String> get ids => _orders.keys;
+
   /// Server fields a test sets on top of an order (for example an AI draft's
   /// origin, conversation link and unresolved lines).
   final overlays = <String, Map<String, dynamic>>{};

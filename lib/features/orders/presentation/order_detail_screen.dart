@@ -7,6 +7,7 @@ import '../../../core/backend/api.dart';
 import '../../../core/backend/idempotency.dart';
 import '../../../core/formatting/bidi.dart';
 import '../../../core/formatting/dates.dart';
+import '../../../core/formatting/digits.dart';
 import '../../../core/formatting/phone.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/settings/app_settings.dart';
@@ -21,8 +22,11 @@ import '../../../design_system/layout/responsive.dart';
 import '../../../design_system/motion/motion.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
+import '../../common/fulfilment_labels.dart';
+import '../../fulfilment/domain/fulfilment.dart' show PaymentChannel;
 import '../application/order_providers.dart';
 import '../domain/order.dart';
+import 'order_payment_sheet.dart';
 import 'order_sheets.dart';
 import 'order_text.dart';
 import 'order_widgets.dart';
@@ -288,10 +292,31 @@ class _DetailBody extends ConsumerWidget {
                         : l10n.provFromSettings,
                   ),
           ),
-          if (order.courierNote != null)
+          if (order.courierName != null)
             FieldRow(
               label: l10n.fieldCourier,
+              value: Text(Bidi.auto(order.courierName!)),
+            ),
+          if (order.courierNote != null)
+            FieldRow(
+              label: order.courierName == null
+                  ? l10n.fieldCourier
+                  : l10n.fieldNote,
               value: Text(Bidi.auto(order.courierNote!)),
+            ),
+          if (order.deliveryListId != null)
+            FieldRow(
+              label: l10n.deliveryListsTitle,
+              value: Text(
+                l10n.deliveryListTitle(
+                  Bidi.ltr(
+                    Digits.display('${order.deliveryListNumber}', digits),
+                  ),
+                ),
+              ),
+              trailing: const Icon(AppIcons.caretRight),
+              onTap: () =>
+                  context.push(Routes.deliveryList(order.deliveryListId!)),
             ),
         ],
       ),
@@ -336,6 +361,26 @@ class _DetailBody extends ConsumerWidget {
               null => value(null),
             },
           ),
+          if (!review && order.paymentMethod == PaymentMethod.other) ...[
+            for (final pay in order.payments)
+              FieldRow(
+                label: paymentChannelLabel(
+                  l10n,
+                  PaymentChannel.parse(pay.method),
+                ),
+                value: Text(m(pay.amount), style: type.numericBody),
+                caption: pay.reference == null
+                    ? null
+                    : Text(Bidi.auto(pay.reference!), style: type.caption),
+              ),
+            PriceRow(label: l10n.paidTotal, amount: m(order.paidTotal)),
+            if (order.paidTotal < order.total)
+              PriceRow(
+                label: l10n.leftToPay,
+                amount: m(order.total - order.paidTotal),
+                emphasize: true,
+              ),
+          ],
           if (!review && order.paymentMethod == PaymentMethod.cod) ...[
             PriceRow(label: l10n.cashDue, amount: m(order.codDue)),
             PriceRow(label: l10n.cashCollected, amount: m(order.codCollected)),
@@ -348,6 +393,18 @@ class _DetailBody extends ConsumerWidget {
           ],
         ],
       ),
+      if (!review && canRecordPayment(order)) ...[
+        const SizedBox(height: Space.s8),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: AppButton(
+            label: l10n.recordPayment,
+            icon: AppIcons.money,
+            variant: AppButtonVariant.secondary,
+            onPressed: () => showRecordPaymentSheet(context, order),
+          ),
+        ),
+      ],
       if (order.customerNote != null || order.internalNote != null) ...[
         const SizedBox(height: Space.s24),
         SectionHeader(l10n.sectionNotes),

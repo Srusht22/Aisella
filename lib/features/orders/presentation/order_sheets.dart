@@ -21,6 +21,7 @@ import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../../l10n/gen/app_localizations.dart';
+import '../../common/courier_picker.dart';
 import '../../store/application/workspace_controller.dart';
 import '../application/order_providers.dart';
 import '../domain/order.dart';
@@ -499,6 +500,7 @@ class _DispatchSheet extends ConsumerStatefulWidget {
 
 class _DispatchSheetState extends _ActionSheetState<_DispatchSheet> {
   late final _courier = TextEditingController(text: order.courierNote ?? '');
+  late String? _courierId = order.courierId;
 
   @override
   Order get order => widget.order;
@@ -542,6 +544,12 @@ class _DispatchSheetState extends _ActionSheetState<_DispatchSheet> {
             style: type.body.copyWith(color: p.textPrimary),
           ),
           const SizedBox(height: Space.s16),
+          // Phase 10: one of the store's couriers (optional), plus a note.
+          CourierPicker(
+            selected: _courierId,
+            onChanged: busy ? null : (id) => setState(() => _courierId = id),
+          ),
+          const SizedBox(height: Space.s12),
           AppTextField(
             label: l10n.fieldCourierOptional,
             controller: _courier,
@@ -555,7 +563,7 @@ class _DispatchSheetState extends _ActionSheetState<_DispatchSheet> {
             loading: busy,
             expand: true,
             onPressed: () => submit(
-              '${order.id}:${order.version}:dispatch:$courier',
+              '${order.id}:${order.version}:dispatch:$courier:$_courierId',
               (key) async {
                 await ref
                     .read(orderActionsProvider)
@@ -564,6 +572,7 @@ class _DispatchSheetState extends _ActionSheetState<_DispatchSheet> {
                       OrderStatus.dispatched,
                       payload: {
                         if (courier.isNotEmpty) 'courier_note': courier,
+                        'courier_id': ?_courierId,
                       },
                       idempotencyKey: key,
                     );
