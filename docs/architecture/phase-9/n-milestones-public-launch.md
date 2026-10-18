@@ -77,6 +77,19 @@ This is the provider-neutral M9-1.
 
 ## MC-3. First provider integration (local)
 
+**Status (2026-10-18):** by the owner's direction, all six providers were implemented locally, with Instagram first ([integrations report](../../implementation/phase-9/integrations-report.md)). Done:
+- adapters;
+- database-side webhook verification and normalisation;
+- conformance and round-trip tests;
+- Telegram and Viber connect.
+
+Open against the criteria below:
+- criterion 1 needs fixtures checked against the official pages;
+- criterion 2 and the app screens are not built;
+- criterion 4 (platform approvals) is the owner's.
+
+TikTok is blocked.
+
 **Scope:**
 - the chosen provider's adapter (verify, route, parse, send, status if available, connect, refresh, disconnect);
 - its capability manifest with evidence;
