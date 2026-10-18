@@ -5,16 +5,21 @@
 # Set these in Vercel → Project → Settings → Environment Variables.
 # They are public values; never use a service-role or secret key.
 #   SUPABASE_URL              https://<project>.supabase.co
-#   SUPABASE_PUBLISHABLE_KEY  sb_publishable_… (or the anon key)
+#   SUPABASE_PUBLISHABLE_KEY  sb_publishable_… (or the anon key; the name
+#                             SUPABASE_ANON_KEY is also accepted)
 #   ENV_NAME                  optional, defaults to "staging"
 set -euo pipefail
 
 FLUTTER_VERSION="3.47.7"
 
+# Older docs called the publishable key SUPABASE_ANON_KEY; accept either.
+SUPABASE_PUBLISHABLE_KEY="${SUPABASE_PUBLISHABLE_KEY:-${SUPABASE_ANON_KEY:-}}"
+
 if [[ -z "${SUPABASE_URL:-}" || -z "${SUPABASE_PUBLISHABLE_KEY:-}" ]]; then
-  echo "ERROR: SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY must be set in the" >&2
-  echo "Vercel project's environment variables. Without them the app cannot" >&2
-  echo "start. See docs/implementation/web-test-deployment.md." >&2
+  echo "ERROR: SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY (or SUPABASE_ANON_KEY)" >&2
+  echo "must be set in the Vercel project's environment variables, for the" >&2
+  echo "environment being built (VERCEL_ENV=${VERCEL_ENV:-unknown}). Without them" >&2
+  echo "the app cannot start. See docs/implementation/web-test-deployment.md." >&2
   exit 1
 fi
 

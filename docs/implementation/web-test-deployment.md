@@ -23,6 +23,8 @@
 2. **Settings → Environment Variables:**
    - `SUPABASE_URL`: `https://<project>.supabase.co`;
    - `SUPABASE_PUBLISHABLE_KEY`: the **publishable** (or anon) key.
+     The name `SUPABASE_ANON_KEY` is also accepted.
+   - Tick **Preview** as well as **Production**: deployments of any branch other than the production branch are Preview deployments and only see Preview variables.
    - Optional: `ENV_NAME`, which defaults to `staging`.
    - Never use the service-role or a secret key: the app refuses to start with one.
 3. **Settings → Deployment Protection:** preview URLs require a Vercel login by default. Turn this off or share the link if testers have no Vercel access.
