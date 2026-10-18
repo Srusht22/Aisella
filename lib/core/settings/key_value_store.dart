@@ -20,6 +20,7 @@ class SharedPreferencesStore implements KeyValueStore {
     'settings.digits',
     'settings.theme',
     'settings.motion',
+    'settings.accent',
     installMarkerKey,
   };
 
