@@ -32,7 +32,8 @@ export type AiProviderName = "gemini" | "anthropic";
 
 /** Default model per provider; any other is chosen with AI_MODEL without a code change. */
 export const DEFAULT_MODELS: Record<AiProviderName, string> = {
-  gemini: "gemini-2.5-pro",
+  // gemini-2.5-pro is closed to new projects since 2026-09-18; 3.8 Flash is listed Stable (2026-10-18).
+  gemini: "gemini-3.8-flash",
   anthropic: "claude-opus-5-5",
 };
 

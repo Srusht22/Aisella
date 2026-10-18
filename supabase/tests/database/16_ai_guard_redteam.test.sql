@@ -6,7 +6,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(81);
+select plan(86);
 
 create temp table ids (k text primary key, v uuid);
 create temp table res (k text primary key, v jsonb);
@@ -298,6 +298,7 @@ select pg_temp.act_as(pg_temp.id('a'));
 select is(api.request_ai_assist(pg_temp.id('store_a'), pg_temp.id('d1'), 'reply', gen_random_uuid()) #>> '{error,details,scope}',
           'budget_total', 'when the total budget is reached, every store stops');
 select pg_temp.act_as_admin();
+update app.ai_limits set value = 20000000 where name = 'assist_daily_cost_micro_usd_total';
 update app.ai_runs set created_at = now() - interval '25 hours' where store_id = pg_temp.id('store_a');
 select pg_temp.act_as(pg_temp.id('a'));
 select is(api.request_ai_assist(pg_temp.id('store_a'), pg_temp.id('d1'), 'reply', gen_random_uuid()) #>> '{data,status}', 'queued',
@@ -305,6 +306,40 @@ select is(api.request_ai_assist(pg_temp.id('store_a'), pg_temp.id('d1'), 'reply'
 select pg_temp.act_as(pg_temp.id('a'));
 select throws_ok($$ update app.ai_limits set value = 999999999 where name = 'assist_daily_cost_micro_usd_per_store' $$, '42501', null,
                  'a seller cannot raise the budget');
+
+-- ---- 7. Costs that are not known yet still count (Gemini validation, 20261022100000) -----------------------------
+select pg_temp.act_as_admin();
+update app.ai_runs set created_at = now() - interval '25 hours' where store_id = pg_temp.id('store_a');
+select pg_temp.conv('b_x', 'Is the shoe available?');
+select pg_temp.conv('b_y', 'And the bag?');
+select pg_temp.conv('b_z', 'What about the scarf?');
+select pg_temp.act_as_admin();
+-- Room for exactly one reserve.
+update app.ai_limits set value = (select value from app.ai_limits where name = 'assist_run_reserve_micro_usd') * 3 / 2
+ where name = 'assist_daily_cost_micro_usd_per_store';
+select isnt(pg_temp.queue('b_x'), null, 'a run is accepted while its reserve fits the budget');
+select pg_temp.act_as(pg_temp.id('a'));
+select is(api.request_ai_assist(pg_temp.id('store_a'), pg_temp.id('b_y'), 'reply', gen_random_uuid()) #>> '{error,details,scope}',
+          'budget_store', 'a second run in flight is refused: its unknown cost counts at the reserve (no overshoot by parallel requests)');
+select pg_temp.act_as_admin();
+update app.ai_limits set value = 2000000 where name = 'assist_daily_cost_micro_usd_per_store';
+insert into ids select 'tmo', pg_temp.queue('b_y');
+select pg_temp.claim(pg_temp.id('tmo'));
+select pg_temp.act_as_worker();
+select api.ai_fail_run(pg_temp.id('tmo'), 'timeout', 'provider_timeout', '{"model": "gemini-3.8-flash", "usage": {}}');
+select pg_temp.act_as_admin();
+select is((pg_temp.run_row(pg_temp.id('tmo')) ->> 'cost_micro_usd')::bigint,
+          (select value from app.ai_limits where name = 'assist_run_reserve_micro_usd')::bigint,
+          'a provider timeout (no usage reported, possibly billed) is charged the reserve, not zero');
+select is(pg_temp.cost_of('{"model": "gemini-3.8-flash", "usage": {"input_tokens": 1000, "output_tokens": 500}}'), 5250,
+          'the default Gemini model is costed at its standard price (1,000 in, 500 out = USD 0.00525)');
+insert into ids select 'stale', pg_temp.queue('b_z');
+select pg_temp.act_as_admin();
+update app.ai_runs set status = 'expired', error_code = 'stale', finished_at = now() where id = pg_temp.id('stale');
+select is(app.ai_spent(pg_temp.id('store_a')) - (select coalesce(sum(cost_micro_usd), 0) from app.ai_runs
+                                                  where store_id = pg_temp.id('store_a') and created_at > now() - interval '24 hours'),
+          (select value * 2 from app.ai_limits where name = 'assist_run_reserve_micro_usd')::numeric,
+          'a run still in flight and a run that expired after it may have reached the model both count at the reserve');
 
 select * from finish();
 rollback;

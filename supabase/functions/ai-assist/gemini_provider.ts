@@ -26,9 +26,12 @@ const DEFAULT_BASE = "https://generativelanguage.googleapis.com";
 /** Finish reasons that mean the model (or Google's filters) declined to answer. */
 const REFUSALS = new Set(["SAFETY", "PROHIBITED_CONTENT", "BLOCKLIST", "SPII", "RECITATION", "IMAGE_SAFETY"]);
 
-/** Effort → thinking: a budget in tokens for 2.x models, a level for later ones. */
+/**
+ * Effort → thinking. Gemini 3.x and later take a thinking level (low / medium / high; "minimal" is
+ * never sent, gemini-4-argon rejects it); 2.x models take a token budget.
+ */
 function thinkingConfig(model: string, effort: ProviderRequest["effort"]): Record<string, unknown> {
-  if (/^gemini-[3-9]/.test(model)) return { thinkingLevel: effort === "low" ? "low" : "high" };
+  if (/^gemini-[3-9]/.test(model)) return { thinkingLevel: effort };
   return { thinkingBudget: effort === "low" ? 1024 : effort === "medium" ? 4096 : 16384 };
 }
 

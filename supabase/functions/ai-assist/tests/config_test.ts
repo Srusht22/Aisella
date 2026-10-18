@@ -14,7 +14,7 @@ Deno.test("defaults: Gemini (primary provider), its default model, low effort, n
   const c = read();
   assertEquals([c.provider, c.model, c.effort, c.maxTokens, c.geminiApiKey, c.inferenceGeo], [
     "gemini",
-    "gemini-2.5-pro",
+    "gemini-3.8-flash",
     "low",
     8000,
     null,
@@ -31,7 +31,7 @@ Deno.test("the model is configurable without a code change, but must match the p
   const a = read({ AI_PROVIDER: "anthropic" });
   assertEquals([a.model, createProvider(a).name], ["claude-opus-5-5", "anthropic"]);
   assertThrows(
-    () => read({ AI_PROVIDER: "anthropic", AI_MODEL: "gemini-2.5-pro" }),
+    () => read({ AI_PROVIDER: "anthropic", AI_MODEL: "gemini-3.8-flash" }),
     ConfigError,
     "does not match",
   );

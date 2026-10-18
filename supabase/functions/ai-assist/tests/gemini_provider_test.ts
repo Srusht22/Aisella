@@ -16,7 +16,7 @@ function stub(handler: (req: Request, body: Record<string, unknown>) => Response
   return { server, url: `http://127.0.0.1:${server.addr.port}` };
 }
 
-const request = (timeoutMs = 5000, model = "gemini-2.5-pro"): ProviderRequest => ({
+const request = (timeoutMs = 5000, model = "gemini-3.8-flash"): ProviderRequest => ({
   system: [{ text: "rules", cache: true }, { text: "store", cache: true }],
   user: "conversation",
   schema: OUTPUT_SCHEMA,
@@ -37,7 +37,7 @@ export const geminiAnswer = (text: string, finishReason = "STOP") => ({
     thoughtsTokenCount: 200,
     cachedContentTokenCount: 900,
   },
-  modelVersion: "gemini-2.5-pro",
+  modelVersion: "gemini-3.8-flash",
   responseId: "resp_abc",
 });
 
@@ -51,7 +51,7 @@ Deno.test("the request: key in a header (not the URL), system rules, JSON schema
     const out = await new GeminiProvider({ apiKey: KEY, baseURL: url, maxRetries: 0 }).generate(request());
     assertEquals(out.text, '{"ok":true}', "thought parts are never taken as the answer");
     assertEquals([out.servedModel, out.requestId, out.stopReason], [
-      "gemini-2.5-pro",
+      "gemini-3.8-flash",
       "resp_abc",
       "end_turn",
     ]);
@@ -62,7 +62,7 @@ Deno.test("the request: key in a header (not the URL), system rules, JSON schema
       cache_creation_input_tokens: 0,
     });
     const s = seen!;
-    assertEquals(new URL(s.url).pathname, "/v1beta/models/gemini-2.5-pro:generateContent");
+    assertEquals(new URL(s.url).pathname, "/v1beta/models/gemini-3.8-flash:generateContent");
     assertFalse(s.url.includes(KEY), "the key is never in the URL");
     assertEquals(s.headers.get("x-goog-api-key"), KEY);
     const system = s.body.systemInstruction as { parts: { text: string }[] };
@@ -71,13 +71,13 @@ Deno.test("the request: key in a header (not the URL), system rules, JSON schema
     assertEquals(cfg.responseMimeType, "application/json");
     assertEquals(cfg.responseJsonSchema, OUTPUT_SCHEMA);
     assertEquals(cfg.maxOutputTokens, 8000);
-    assertEquals(cfg.thinkingConfig, { thinkingBudget: 1024 });
+    assertEquals(cfg.thinkingConfig, { thinkingLevel: "low" }, "3.x and later take a thinking level");
   } finally {
     await server.shutdown();
   }
 });
 
-Deno.test("later model families get a thinking level; json_only omits the schema", async () => {
+Deno.test("2.x models get a thinking budget; json_only omits the schema", async () => {
   const bodies: Record<string, unknown>[] = [];
   const { server, url } = stub((_req, body) => {
     bodies.push(body);
@@ -85,13 +85,13 @@ Deno.test("later model families get a thinking level; json_only omits the schema
   });
   try {
     await new GeminiProvider({ apiKey: KEY, baseURL: url, maxRetries: 0 }).generate(
-      request(5000, "gemini-3-pro"),
+      request(5000, "gemini-2.5-flash"),
     );
     await new GeminiProvider({ apiKey: KEY, baseURL: url, maxRetries: 0, structuredOutput: "json_only" })
       .generate(request());
     const c0 = bodies[0].generationConfig as Record<string, unknown>;
     const c1 = bodies[1].generationConfig as Record<string, unknown>;
-    assertEquals(c0.thinkingConfig, { thinkingLevel: "low" });
+    assertEquals(c0.thinkingConfig, { thinkingBudget: 1024 }, "2.x models take a token budget");
     assertFalse("responseJsonSchema" in c1);
     assertEquals(c1.responseMimeType, "application/json");
   } finally {
@@ -209,4 +209,24 @@ Deno.test("without a configured key nothing is sent; a malformed model id is ref
   });
   await assertRejects(() => p.generate(request(5000, "../models/x?key=1")), ProviderError);
   assertFalse(called);
+});
+
+Deno.test('effort maps to a thinking level for 3.x and 4.x models; never "minimal"', async () => {
+  const bodies: Record<string, unknown>[] = [];
+  const { server, url } = stub((_req, body) => {
+    bodies.push(body);
+    return Response.json(geminiAnswer("{}"));
+  });
+  try {
+    const p = new GeminiProvider({ apiKey: KEY, baseURL: url, maxRetries: 0 });
+    for (const [model, effort] of [["gemini-3.8-flash", "medium"], ["gemini-4-argon", "high"]] as const) {
+      await p.generate({ ...request(5000, model), effort });
+    }
+    assertEquals(bodies.map((b) => (b.generationConfig as Record<string, unknown>).thinkingConfig), [
+      { thinkingLevel: "medium" },
+      { thinkingLevel: "high" },
+    ]);
+  } finally {
+    await server.shutdown();
+  }
 });
