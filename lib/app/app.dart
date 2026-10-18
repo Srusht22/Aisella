@@ -34,8 +34,18 @@ class AiselliaApp extends ConsumerWidget {
       locale: locale,
       supportedLocales: appSupportedLocales,
       localizationsDelegates: appLocalizationsDelegates,
-      theme: buildAppTheme(brightness: Brightness.light, locale: locale),
-      darkTheme: buildAppTheme(brightness: Brightness.dark, locale: locale),
+      theme: buildAppTheme(
+        brightness: Brightness.light,
+        locale: locale,
+        accent: settings.accent,
+      ),
+      darkTheme: buildAppTheme(
+        brightness: Brightness.dark,
+        locale: locale,
+        accent: settings.accent,
+      ),
+      // Switching theme colours cross-fades instead of jumping.
+      themeAnimationDuration: const Duration(milliseconds: 350),
       themeMode: switch (settings.theme) {
         ThemePreference.system => ThemeMode.system,
         ThemePreference.light => ThemeMode.light,

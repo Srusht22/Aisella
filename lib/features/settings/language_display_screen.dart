@@ -12,6 +12,7 @@ import '../../design_system/components/rows.dart';
 import '../../design_system/layout/responsive.dart';
 import '../../design_system/theme/theme_ext.dart';
 import '../../design_system/tokens/tokens.g.dart';
+import '../common/appearance_picker.dart';
 import '../onboarding/language_selection_screen.dart' show kLanguageNames;
 
 /// ST-06 Language and display. Changes apply immediately (direction flips,
@@ -94,6 +95,9 @@ class LanguageDisplayScreen extends ConsumerWidget {
                   selected: settings.theme,
                   onChanged: ctl.setTheme,
                 ),
+                const SizedBox(height: Space.s24),
+                SectionHeader(l10n.accentTitle),
+                AccentGrid(selected: settings.accent, onChanged: ctl.setAccent),
                 const SizedBox(height: Space.s24),
                 SectionHeader(l10n.motionTitle),
                 AppSegmented<MotionPreference>(

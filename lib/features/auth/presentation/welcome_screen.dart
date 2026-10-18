@@ -82,6 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: Row(
                   children: [
                     const Expanded(child: _Wordmark()),
+                    const AppearanceButton(),
                     const LanguageButton(),
                     AnimatedOpacity(
                       opacity: last ? 0 : 1,

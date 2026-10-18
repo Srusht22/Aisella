@@ -4449,5 +4449,57 @@
   "demoRibbon": "DEMO · sample data, nothing is saved",
   "@demoRibbon": {
     "description": "Ribbon shown while exploring as a guest."
+  },
+  "appearanceTitle": "Appearance",
+  "@appearanceTitle": {
+    "description": "Sheet and button: light/dark mode and colour theme."
+  },
+  "accentTitle": "Colour theme",
+  "@accentTitle": {
+    "description": "Section title for the colour themes."
+  },
+  "accentLedger": "Classic",
+  "@accentLedger": {
+    "description": "Colour theme name (indigo)."
+  },
+  "accentGold": "Royal Gold",
+  "@accentGold": {
+    "description": "Colour theme name."
+  },
+  "accentEmerald": "Emerald",
+  "@accentEmerald": {
+    "description": "Colour theme name."
+  },
+  "accentSapphire": "Sapphire",
+  "@accentSapphire": {
+    "description": "Colour theme name."
+  },
+  "accentRuby": "Ruby",
+  "@accentRuby": {
+    "description": "Colour theme name."
+  },
+  "accentAmethyst": "Amethyst",
+  "@accentAmethyst": {
+    "description": "Colour theme name."
+  },
+  "accentRose": "Rose",
+  "@accentRose": {
+    "description": "Colour theme name."
+  },
+  "accentTeal": "Teal",
+  "@accentTeal": {
+    "description": "Colour theme name."
+  },
+  "accentCopper": "Copper",
+  "@accentCopper": {
+    "description": "Colour theme name."
+  },
+  "accentOnyx": "Onyx",
+  "@accentOnyx": {
+    "description": "Colour theme name (monochrome)."
+  },
+  "modeTitle": "Mode",
+  "@modeTitle": {
+    "description": "Section title: system, light or dark mode."
   }
 }

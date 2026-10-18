@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 
+import '../../core/settings/app_settings.dart';
 import '../icons/app_icons.dart';
 import '../tokens/tokens.g.dart';
+import 'accents.dart';
 import 'typography.dart';
 
 /// Builds the Aisellia theme for a brightness and locale (Phase 2 §2–§5).
@@ -14,10 +16,9 @@ import 'typography.dart';
 ThemeData buildAppTheme({
   required Brightness brightness,
   required Locale locale,
+  AppAccent accent = AppAccent.ledger,
 }) {
-  final p = brightness == Brightness.dark
-      ? AiselliaPalette.dark
-      : AiselliaPalette.light;
+  final p = accentPalette(accent, brightness);
   final type = AppTypography.forScript(scriptFor(locale));
 
   final scheme = ColorScheme(

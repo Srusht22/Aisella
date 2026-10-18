@@ -2,7 +2,6 @@ import 'package:aisellia/app/app.dart';
 import 'package:aisellia/core/config/app_config.dart';
 import 'package:aisellia/core/settings/key_value_store.dart';
 import 'package:aisellia/demo/demo_mode.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/test_app.dart';

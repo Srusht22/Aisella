@@ -4,5 +4,11 @@
   "installCommand": "true",
   "buildCommand": "bash tool/vercel_build.sh",
   "outputDirectory": "build/web",
+  "headers": [
+    {
+      "source": "/(index.html|flutter_bootstrap.js|flutter_service_worker.js|main.dart.js|version.json|manifest.json)?",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+    }
+  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

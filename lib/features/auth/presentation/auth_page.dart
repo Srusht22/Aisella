@@ -13,6 +13,7 @@ import '../../../design_system/layout/responsive.dart';
 import '../../../design_system/motion/motion.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
+import '../../common/appearance_picker.dart';
 import '../../onboarding/language_selection_screen.dart' show kLanguageNames;
 
 /// Shared layout for sign-up and sign-in: a top bar (back, language), a hero
@@ -117,6 +118,7 @@ class _AuthPageState extends State<AuthPage>
                               : context.go(Routes.welcome),
                         ),
                         const Spacer(),
+                        const AppearanceButton(),
                         const LanguageButton(),
                       ],
                     ),
@@ -329,6 +331,18 @@ class _Card extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Opens light/dark mode and the colour themes.
+class AppearanceButton extends StatelessWidget {
+  const AppearanceButton({super.key});
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+    tooltip: context.l10n.appearanceTitle,
+    icon: const Icon(AppIcons.circleHalf, size: Sizes.iconLg),
+    onPressed: () => showAppearanceSheet(context),
+  );
 }
 
 /// Opens the language choice. The change applies at once and is

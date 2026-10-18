@@ -12,6 +12,21 @@ enum ThemePreference { system, light, dark }
 
 enum MotionPreference { system, reduce }
 
+/// Colour theme: the brand colour and the tint of the neutrals. `ledger`
+/// is the original Aisellia indigo. Each has a light and a dark version.
+enum AppAccent {
+  ledger,
+  gold,
+  emerald,
+  sapphire,
+  ruby,
+  amethyst,
+  rose,
+  teal,
+  copper,
+  onyx,
+}
+
 @immutable
 class AppSettings {
   const AppSettings({
@@ -19,6 +34,7 @@ class AppSettings {
     this.digits = DigitStyle.western,
     this.theme = ThemePreference.system,
     this.motion = MotionPreference.system,
+    this.accent = AppAccent.ledger,
   });
 
   /// `null` until the user picks a language on first launch (AU-01).
@@ -26,6 +42,7 @@ class AppSettings {
   final DigitStyle digits;
   final ThemePreference theme;
   final MotionPreference motion;
+  final AppAccent accent;
 
   bool get languageChosen => locale != null;
 
@@ -34,11 +51,13 @@ class AppSettings {
     DigitStyle? digits,
     ThemePreference? theme,
     MotionPreference? motion,
+    AppAccent? accent,
   }) => AppSettings(
     locale: locale ?? this.locale,
     digits: digits ?? this.digits,
     theme: theme ?? this.theme,
     motion: motion ?? this.motion,
+    accent: accent ?? this.accent,
   );
 
   @override
@@ -47,10 +66,11 @@ class AppSettings {
       other.locale == locale &&
       other.digits == digits &&
       other.theme == theme &&
-      other.motion == motion;
+      other.motion == motion &&
+      other.accent == accent;
 
   @override
-  int get hashCode => Object.hash(locale, digits, theme, motion);
+  int get hashCode => Object.hash(locale, digits, theme, motion, accent);
 }
 
 /// Reads and persists [AppSettings]. Unknown stored values fall back to
@@ -60,6 +80,7 @@ class SettingsController extends Notifier<AppSettings> {
   static const _kDigits = 'settings.digits';
   static const _kTheme = 'settings.theme';
   static const _kMotion = 'settings.motion';
+  static const _kAccent = 'settings.accent';
 
   KeyValueStore get _store => ref.read(keyValueStoreProvider);
 
@@ -77,6 +98,7 @@ class SettingsController extends Notifier<AppSettings> {
       digits: parse(DigitStyle.values, _kDigits, DigitStyle.western),
       theme: parse(ThemePreference.values, _kTheme, ThemePreference.system),
       motion: parse(MotionPreference.values, _kMotion, MotionPreference.system),
+      accent: parse(AppAccent.values, _kAccent, AppAccent.ledger),
     );
   }
 
@@ -95,6 +117,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setTheme(ThemePreference theme) async {
     state = state.copyWith(theme: theme);
     await _store.write(_kTheme, theme.name);
+  }
+
+  Future<void> setAccent(AppAccent accent) async {
+    state = state.copyWith(accent: accent);
+    await _store.write(_kAccent, accent.name);
   }
 
   Future<void> setMotion(MotionPreference motion) async {

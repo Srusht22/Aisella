@@ -964,6 +964,19 @@
   "passwordStrengthWeak": "لاواز",
   "passwordStrengthFair": "مامناوەند",
   "passwordStrengthStrong": "بەهێز",
-  "welcomeGuest": "وەک میوان تاقی بکەرەوە",
-  "demoRibbon": "نموونە · داتای تاقیکاری، هیچ شتێک پاشەکەوت ناکرێت"
+  "welcomeGuest": "وەک میوان",
+  "demoRibbon": "نموونە · داتای تاقیکاری، هیچ شتێک پاشەکەوت ناکرێت",
+  "appearanceTitle": "ڕووکار",
+  "accentTitle": "ڕەنگی ڕووکار",
+  "accentLedger": "کلاسیک",
+  "accentGold": "ئاڵتوونی شاهانە",
+  "accentEmerald": "زمرووتی",
+  "accentSapphire": "یاقووتی شین",
+  "accentRuby": "یاقووتی سوور",
+  "accentAmethyst": "بەنەوشەیی",
+  "accentRose": "گوڵی",
+  "accentTeal": "شینی دەریایی",
+  "accentCopper": "مسی",
+  "accentOnyx": "ڕەشی بریقەدار",
+  "modeTitle": "دۆخ"
 }

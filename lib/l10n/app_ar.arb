@@ -965,5 +965,18 @@
   "passwordStrengthFair": "متوسطة",
   "passwordStrengthStrong": "قوية",
   "welcomeGuest": "جرّب كضيف",
-  "demoRibbon": "تجربة · بيانات نموذجية، لا يُحفظ شيء"
+  "demoRibbon": "تجربة · بيانات نموذجية، لا يُحفظ شيء",
+  "appearanceTitle": "المظهر",
+  "accentTitle": "لون الواجهة",
+  "accentLedger": "كلاسيكي",
+  "accentGold": "ذهبي ملكي",
+  "accentEmerald": "زمرّدي",
+  "accentSapphire": "ياقوت أزرق",
+  "accentRuby": "ياقوت أحمر",
+  "accentAmethyst": "بنفسجي",
+  "accentRose": "وردي",
+  "accentTeal": "فيروزي",
+  "accentCopper": "نحاسي",
+  "accentOnyx": "أسود فاخر",
+  "modeTitle": "الوضع"
 }
