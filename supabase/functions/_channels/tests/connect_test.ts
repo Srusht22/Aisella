@@ -57,8 +57,8 @@ Deno.test({
         `postgresql://${role}:${encodeURIComponent(p)}@127.0.0.1:54322/postgres`;
       const db = new PostgresConnectorDb(url("aisellia_channel_connector", pw.connector));
       const ingest = new PostgresIngestDb(url("aisellia_channel_ingest", pw.ingest));
-      await admin`insert into app.providers (id, display_name, status, webhook_scheme, payload_format)
-                  values (${provider}, 'Connect fixture', 'pilot', 'telegram_token', 'telegram_bot')`;
+      await admin`insert into app.providers (id, display_name, status, webhook_scheme, payload_format, connect_method)
+                  values (${provider}, 'Connect fixture', 'pilot', 'telegram_token', 'telegram_bot', 'bot_token')`;
       await admin`insert into app.provider_capabilities (provider_id, capability, value, evidence, source_url, checked_on)
                   values (${provider}, 'reply_window_hours', 'null', 'assumption', null, null)`;
       const adapter = new TelegramAdapter({ provider, baseURL: `http://127.0.0.1:${api.addr.port}` });

@@ -4,7 +4,7 @@
 //
 // Sending is refused unless an operator configures the endpoint path explicitly (TIKTOK_SEND_PATH,
 // e.g. after reading the official reference), so a guessed URL is never called. When configured it
-// posts {"conversation_id"?, "recipient_open_id", "message": {"type": "text", "text"}} with the
+// posts {"business_id", "conversation_id", "message": {"type": "text", "text"}} with the
 // connection's access token as a Bearer header, and expects {"code": 0, "data": {"message_id"}}
 // (TikTok's usual envelope; UNRESOLVED). Error mapping follows that envelope and HTTP statuses.
 import { isSendResult, postJson, retryAfterMs, safeCode } from "../adapter.ts";

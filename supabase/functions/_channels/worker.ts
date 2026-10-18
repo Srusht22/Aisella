@@ -64,3 +64,34 @@ export async function handleWorkerRequest(
   const result = await deps.cycle();
   return Response.json({ ok: true, data: result });
 }
+
+/**
+ * Token refresh (TikTok access tokens live one day): refresh what expires within two hours. A refusal
+ * marks the connection "error" (needs_attention) so the seller reconnects; tokens are never logged.
+ */
+export async function runRefreshCycle(deps: {
+  db: WorkerDb;
+  refreshers: Record<
+    string,
+    (refreshToken: string) => Promise<{ accessToken: string; refreshToken: string | null; expiresAt: string }>
+  >;
+  log: Logger;
+}): Promise<{ refreshed: number; failed: number }> {
+  const out = { refreshed: 0, failed: 0 };
+  if (!deps.db.dueRefreshes || !deps.db.storeRefresh) return out;
+  const due = await deps.db.dueRefreshes();
+  for (const item of due.ok ? due.data?.items ?? [] : []) {
+    const refresh = deps.refreshers[item.provider];
+    if (!refresh) continue;
+    try {
+      const t = await refresh(item.refresh_token);
+      await deps.db.storeRefresh(item.connection_id, true, t.accessToken, t.refreshToken, t.expiresAt);
+      out.refreshed++;
+    } catch {
+      await deps.db.storeRefresh(item.connection_id, false, null, null, null);
+      out.failed++;
+    }
+  }
+  if (out.refreshed || out.failed) deps.log({ event: "token_refresh", ...out });
+  return out;
+}

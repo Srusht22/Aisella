@@ -100,12 +100,15 @@ select is(
     'api.catalog_summary(uuid)',
     'api.channel_claim_send(uuid)',
     'api.channel_complete_send(uuid,text,text)',
+    'api.channel_due_refreshes()',
     'api.channel_due_sends(integer)',
     'api.channel_fail_send(uuid,text,text,integer)',
     'api.channel_finish_connect(text,boolean)',
     'api.channel_ingest_raw(text,text,bytea,jsonb)',
+    'api.channel_register_account(text,text,text,text,text,text,timestamp with time zone,jsonb)',
     'api.channel_register_bot(text,text,text,text,text,text)',
     'api.channel_send_state(uuid)',
+    'api.channel_store_refresh(uuid,boolean,text,text,timestamp with time zone)',
     'api.channel_webhook_challenge(text,text)',
     'api.check_send_dispatch(uuid)',
     'api.copy_suggestion(uuid,uuid,text,uuid)',
@@ -126,6 +129,7 @@ select is(
     'api.get_product(uuid,uuid)',
     'api.import_messages(uuid,uuid,jsonb,uuid)',
     'api.list_ai_draft_grants(uuid)',
+    'api.list_channel_providers(uuid)',
     'api.list_connections(uuid)',
     'api.list_conversations(uuid,text,integer,integer)',
     'api.list_inventory_movements(uuid,uuid,uuid,integer,bigint)',
@@ -298,9 +302,10 @@ select is(
   (select array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text) from pg_proc p
      join pg_namespace n on n.oid = p.pronamespace
     where n.nspname in ('api', 'app', 'internal') and has_function_privilege('aisellia_channel_sender', p.oid, 'EXECUTE')),
-  array['api.channel_claim_send(uuid)', 'api.channel_complete_send(uuid,text,text)', 'api.channel_due_sends(integer)',
-        'api.channel_fail_send(uuid,text,text,integer)', 'api.channel_send_state(uuid)'],
-  'aisellia_channel_sender can execute exactly the five send functions (claim, complete, due, fail, state)');
+  array['api.channel_claim_send(uuid)', 'api.channel_complete_send(uuid,text,text)', 'api.channel_due_refreshes()',
+        'api.channel_due_sends(integer)', 'api.channel_fail_send(uuid,text,text,integer)', 'api.channel_send_state(uuid)',
+        'api.channel_store_refresh(uuid,boolean,text,text,timestamp with time zone)'],
+  'aisellia_channel_sender can execute exactly its send and token-refresh functions');
 select is(
   (select array_agg(format('%s:%s.%s:%s', r, n.nspname, c.relname, p.priv) order by 1) from pg_class c
      join pg_namespace n on n.oid = c.relnamespace

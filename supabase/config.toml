@@ -422,6 +422,10 @@ verify_jwt = true
 [functions.channel-worker]
 verify_jwt = false
 
+# The provider redirects the seller's browser here: no JWT; the single-use state (nonce) is the check.
+[functions.channel-oauth]
+verify_jwt = false
+
 [analytics]
 enabled = false
 port = 54327

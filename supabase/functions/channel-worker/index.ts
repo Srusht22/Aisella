@@ -4,7 +4,8 @@
 // check). Runs with the aisellia_channel_sender login role. NOT DEPLOYED.
 import { PostgresSenderDb } from "../_channels/db.ts";
 import { realAdapters } from "../_channels/providers/registry.ts";
-import { handleWorkerRequest, runWorkerCycle } from "../_channels/worker.ts";
+import { refreshTikTokToken } from "../_channels/providers/tiktok_connect.ts";
+import { handleWorkerRequest, runRefreshCycle, runWorkerCycle } from "../_channels/worker.ts";
 
 const env = (k: string) => Deno.env.get(k);
 const required = (k: string) => {
@@ -20,4 +21,21 @@ const adapters = realAdapters(env);
 const log = (event: Record<string, unknown>) =>
   console.log(JSON.stringify({ fn: "channel-worker", ts: new Date().toISOString(), ...event }));
 
-Deno.serve((req) => handleWorkerRequest(req, { secret, cycle: () => runWorkerCycle({ db, adapters, log }) }));
+// TikTok tokens live one day: refreshed here when the app credentials are configured.
+const tiktok = env("TIKTOK_CLIENT_ID") && env("TIKTOK_CLIENT_SECRET")
+  ? { clientId: env("TIKTOK_CLIENT_ID")!, clientSecret: env("TIKTOK_CLIENT_SECRET")!, authorizeUrl: null }
+  : null;
+const refreshers: Parameters<typeof runRefreshCycle>[0]["refreshers"] = tiktok
+  ? { tiktok: (t: string) => refreshTikTokToken(tiktok, t) }
+  : {};
+
+Deno.serve((req) =>
+  handleWorkerRequest(req, {
+    secret,
+    cycle: async () => {
+      const result = await runWorkerCycle({ db, adapters, log });
+      await runRefreshCycle({ db, refreshers, log });
+      return result;
+    },
+  })
+);

@@ -51,6 +51,17 @@ export interface SenderDb {
 /** The worker's extra read: which queued sends are due, chosen fairly by the database. */
 export interface WorkerDb extends SenderDb {
   dueSends(limit: number): Promise<ApiResult<{ ids: string[] }>>;
+  /** Connections whose access token expires soon and can be refreshed (TikTok). */
+  dueRefreshes?(): Promise<
+    ApiResult<{ items: { connection_id: string; provider: string; refresh_token: string }[] }>
+  >;
+  storeRefresh?(
+    connectionId: string,
+    ok: boolean,
+    accessToken: string | null,
+    refreshToken: string | null,
+    expiresAt: string | null,
+  ): Promise<ApiResult>;
 }
 
 async function call<T = Record<string, unknown>>(
@@ -88,6 +99,19 @@ export interface ConnectorDb {
     webhookSecret: string,
   ): Promise<ApiResult<{ connection_id: string }>>;
   finish(nonce: string, ok: boolean): Promise<ApiResult>;
+  /** One OAuth-granted account (Page, Instagram account, WhatsApp number, TikTok business). */
+  registerAccount?(
+    nonce: string,
+    provider: string,
+    a: {
+      accountId: string;
+      displayName: string;
+      credential: string;
+      refreshToken: string | null;
+      expiresAt: string | null;
+      meta: Record<string, string>;
+    },
+  ): Promise<ApiResult<{ connection_id: string }>>;
 }
 
 /** The aisellia_channel_connector role: it can only redeem a seller's connect nonce. */
@@ -110,6 +134,24 @@ export class PostgresConnectorDb implements ConnectorDb {
   finish(nonce: string, ok: boolean) {
     return call(this.url, "select api.channel_finish_connect($1, $2) as r", [nonce, ok]);
   }
+  registerAccount(
+    nonce: string,
+    provider: string,
+    a: {
+      accountId: string;
+      displayName: string;
+      credential: string;
+      refreshToken: string | null;
+      expiresAt: string | null;
+      meta: Record<string, string>;
+    },
+  ) {
+    return call<{ connection_id: string }>(
+      this.url,
+      "select api.channel_register_account($1, $2, $3, $4, $5, $6, $7::timestamptz, $8::jsonb) as r",
+      [nonce, provider, a.accountId, a.displayName, a.credential, a.refreshToken, a.expiresAt, a.meta],
+    );
+  }
 }
 
 export class PostgresIngestDb implements IngestDb {
@@ -131,6 +173,28 @@ export class PostgresSenderDb implements WorkerDb {
   constructor(private readonly url: string) {}
   dueSends(limit: number) {
     return call<{ ids: string[] }>(this.url, "select api.channel_due_sends($1) as r", [limit]);
+  }
+  dueRefreshes() {
+    return call<{ items: { connection_id: string; provider: string; refresh_token: string }[] }>(
+      this.url,
+      "select api.channel_due_refreshes() as r",
+      [],
+    );
+  }
+  storeRefresh(
+    id: string,
+    ok: boolean,
+    accessToken: string | null,
+    refreshToken: string | null,
+    expiresAt: string | null,
+  ) {
+    return call(this.url, "select api.channel_store_refresh($1::uuid, $2, $3, $4, $5::timestamptz) as r", [
+      id,
+      ok,
+      accessToken,
+      refreshToken,
+      expiresAt,
+    ]);
   }
   claim(id: string) {
     return call<ClaimedSend>(this.url, "select api.channel_claim_send($1::uuid) as r", [id]);

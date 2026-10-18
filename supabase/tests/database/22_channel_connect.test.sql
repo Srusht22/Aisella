@@ -38,8 +38,10 @@ select is((select row(rolcanlogin, rolinherit, rolsuper, rolbypassrls, rolcreate
           row(true, false, false, false, false, false, false)::text, 'the connector role can log in, inherits nothing, has no attributes');
 select is((select array_agg(p.oid::regprocedure::text order by p.oid::regprocedure::text) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
             where n.nspname in ('api', 'app', 'internal') and has_function_privilege('aisellia_channel_connector', p.oid, 'EXECUTE')),
-          array['api.channel_finish_connect(text,boolean)', 'api.channel_register_bot(text,text,text,text,text,text)'],
-          'the connector role can execute exactly the two nonce-redeeming functions');
+          array['api.channel_finish_connect(text,boolean)',
+                'api.channel_register_account(text,text,text,text,text,text,timestamp with time zone,jsonb)',
+                'api.channel_register_bot(text,text,text,text,text,text)'],
+          'the connector role can execute exactly the three nonce-redeeming functions');
 select is((select count(*)::integer from pg_class c join pg_namespace n on n.oid = c.relnamespace
             where c.relkind in ('r', 'v', 'm', 'p', 'f') and n.nspname not in ('pg_catalog', 'information_schema') and n.nspname not like 'pg_t%'
               and has_schema_privilege('aisellia_channel_connector', n.oid, 'USAGE')
@@ -67,8 +69,8 @@ insert into ids select 'store_b', (api.create_store('Shop B', '+9647701234567', 
 select pg_temp.act_as_admin();
 insert into app.store_members (store_id, user_id, role, status, permissions)
 values (pg_temp.id('store_a'), pg_temp.id('staff'), 'staff', 'active', '{"messages.send": true}');
-insert into app.providers (id, display_name, status, webhook_scheme, payload_format) values
-  ('fx_tg', 'Released bot fixture', 'pilot', 'telegram_token', 'telegram_bot');
+insert into app.providers (id, display_name, status, webhook_scheme, payload_format, connect_method) values
+  ('fx_tg', 'Released bot fixture', 'pilot', 'telegram_token', 'telegram_bot', 'bot_token');
 insert into app.provider_capabilities (provider_id, capability, value, evidence, source_url, checked_on) values
   ('fx_tg', 'outbound_text', 'true', 'verified', 'https://fixture.invalid', current_date),
   ('fx_tg', 'reply_window_hours', 'null', 'verified', 'https://fixture.invalid', current_date);
@@ -82,8 +84,8 @@ select is(api.begin_channel_connect(pg_temp.id('store_a'), 'fx_tg') #>> '{error,
 select pg_temp.act_as(pg_temp.id('a'));
 select is(api.begin_channel_connect(pg_temp.id('store_a'), 'telegram') #>> '{error,code}', 'CHANNEL_UNAVAILABLE',
           'a provider still in development cannot be connected by a seller');
-select is(api.begin_channel_connect(pg_temp.id('store_a'), 'instagram') #>> '{error,code}', 'VALIDATION_FAILED',
-          'OAuth providers have no bot-token connect');
+select is(api.begin_channel_connect(pg_temp.id('store_a'), 'instagram') #>> '{error,code}', 'CHANNEL_UNAVAILABLE',
+          'an OAuth provider still in development cannot be connected either');
 insert into res select 'n1', api.begin_channel_connect(pg_temp.id('store_a'), 'fx_tg');
 select ok(pg_temp.r('n1') #>> '{data,nonce}' ~ '^[0-9a-f]{64}$', 'the owner receives a one-time nonce');
 select pg_temp.act_as_admin();

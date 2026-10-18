@@ -59,15 +59,15 @@ Deno.test("tiktok: without a configured endpoint nothing is ever sent", async ()
 
 const secret = `tt-client-secret-${crypto.randomUUID()}`;
 const body = (c: InboundConnection, o: { text: string; id: string; user: string; escaped: boolean }) => {
-  const content = `{"conversation_id":"conv-${o.user}","message_id":"${o.id}","text":${
+  const content = `{"conversation_id":"${o.user}","message_id":"${o.id}","text":${
     jsonString(o.text, o.escaped)
   }}`;
   return new TextEncoder().encode(
     // A space after the first colon, as many senders write: re-serialising then changes the bytes.
-    `{"client_key": "${c.accountId}","event":"direct_message.receive","create_time":${
+    `{"client_key": "ck-app","event":"direct_message.receive","create_time":${
       Math.floor(Date.now() / 1000)
     },` +
-      `"user_openid":"${o.user}","content":${JSON.stringify(content)}}`,
+      `"user_openid":"${c.accountId}","content":${JSON.stringify(content)}}`,
   );
 };
 const sign = async (raw: Uint8Array, _c: InboundConnection, wrong?: boolean) => {

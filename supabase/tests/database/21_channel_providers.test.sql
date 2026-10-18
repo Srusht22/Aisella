@@ -257,9 +257,9 @@ select is((select row(webhook_scheme, payload_format, status)::text from app.pro
 select is(app.channel_normalize_tiktok_bm((select p from app.providers p where id = 'tiktok'), null,
             jsonb_build_object('client_key', 'ck-1', 'event', 'direct_message.receive', 'create_time', 1760781600, 'user_openid', 'open-1',
                                'content', '{"conversation_id": "c-1", "message_id": "tt-1", "text": "سڵاو"}')),
-          '{"event_id": "dm:tt-1", "events": [{"kind": "message", "account_id": "ck-1", "external_user_id": "open-1",
+          '{"event_id": "dm:tt-1", "events": [{"kind": "message", "account_id": "open-1", "external_user_id": "c-1",
             "external_message_id": "tt-1", "occurred_at": "2025-10-18T10:00:00+00:00", "text": "سڵاو"}]}'::jsonb,
-          'TikTok: the assumed direct-message envelope (content is a JSON string)');
+          'TikTok: the assumed envelope; the account is the authorizing business (user_openid), never our client key');
 select is((select jsonb_agg(app.channel_normalize_tiktok_bm((select p from app.providers p where id = 'tiktok'), null, b) -> 'events')
              from jsonb_array_elements('[{"event": "authorization.removed", "user_openid": "o", "content": "{}"},
                                          {"event": "direct_message.receive", "user_openid": "o", "content": "not json"},
@@ -270,7 +270,7 @@ with x as (insert into app.connections (store_id, provider_id, external_account_
            values (pg_temp.id('store_a'), 'tiktok', 'ck-shop-a', 'connected', true, now()) returning id)
 insert into ids select 'tt_a', id from x;
 select internal.channel_store_events('tiktok', 'ev-tt-1', null,
-  '[{"kind": "message", "account_id": "ck-shop-a", "external_user_id": "open-1", "external_message_id": "tt-2", "text": "hi"}]', repeat('c', 64));
+  '[{"kind": "message", "account_id": "ck-shop-a", "external_user_id": "conv-1", "external_message_id": "tt-2", "text": "hi"}]', repeat('c', 64));
 select internal.channel_process_batch();
 insert into ids select 'conv_tt', id from app.conversations where connection_id = pg_temp.id('tt_a');
 select pg_temp.act_as(pg_temp.id('a'));
