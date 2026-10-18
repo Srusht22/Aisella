@@ -6,7 +6,10 @@ import 'package:aisellia/features/auth/application/auth_controller.dart';
 import 'package:aisellia/features/auth/data/auth_repository.dart';
 import 'package:aisellia/features/auth/domain/auth_status.dart';
 import 'package:aisellia/features/auth/domain/credentials.dart';
+import 'package:aisellia/features/common/api_error_text.dart';
 import 'package:aisellia/features/store/domain/store_validation.dart';
+import 'package:aisellia/l10n/gen/app_localizations.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show PostgrestException;
@@ -136,6 +139,28 @@ void main() {
       expect(mapAuthErrorCode(null, '429'), AuthFailure.rateLimited);
       expect(mapAuthErrorCode('otp_expired', '403'), AuthFailure.linkInvalid);
       expect(mapAuthErrorCode('something_else', '500'), AuthFailure.unknown);
+    });
+
+    test('the provider code is shown only outside production', () {
+      final l10n = lookupAppLocalizations(const Locale('en'));
+      expect(
+        mapAuthErrorCode('email_address_not_authorized', '400'),
+        AuthFailure.emailNotSent,
+      );
+      final dev = authFailureWithDetail(
+        l10n,
+        AuthFailure.unknown,
+        isProduction: false,
+        detail: 'unexpected_failure',
+      );
+      expect(dev, endsWith('(unexpected_failure)'));
+      final prod = authFailureWithDetail(
+        l10n,
+        AuthFailure.unknown,
+        isProduction: true,
+        detail: 'unexpected_failure',
+      );
+      expect(prod, l10n.errGeneric);
     });
   });
 

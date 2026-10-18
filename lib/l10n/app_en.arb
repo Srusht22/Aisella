@@ -4385,5 +4385,9 @@
   "welcomeDemoStockEvent": "Order approved: stock updated",
   "@welcomeDemoStockEvent": {
     "description": "Line shown after the sample order is approved and stock goes down."
+  },
+  "errEmailNotSent": "We couldn't send the email to this address. Please try again later or use another address.",
+  "@errEmailNotSent": {
+    "description": "Sign-up or verification email could not be sent by the provider."
   }
 }

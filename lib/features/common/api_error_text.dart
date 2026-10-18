@@ -16,6 +16,18 @@ String apiErrorText(AppLocalizations l10n, ApiException e) => switch (e.code) {
   _ => l10n.errSaveFailed,
 };
 
+/// [authFailureText] plus the provider's error code in non-production
+/// builds, so a test deployment can be diagnosed. Production never shows it.
+String authFailureWithDetail(
+  AppLocalizations l10n,
+  AuthFailure f, {
+  required bool isProduction,
+  String? detail,
+}) {
+  final text = authFailureText(l10n, f);
+  return isProduction || detail == null ? text : '$text ($detail)';
+}
+
 /// Localized text for an auth failure. No provider wording reaches the UI.
 String authFailureText(AppLocalizations l10n, AuthFailure f) => switch (f) {
   AuthFailure.invalidCredentials => l10n.errInvalidCredentials,
@@ -27,5 +39,6 @@ String authFailureText(AppLocalizations l10n, AuthFailure f) => switch (f) {
   AuthFailure.rateLimited => l10n.errRateLimited,
   AuthFailure.network => l10n.errNetwork,
   AuthFailure.linkInvalid => l10n.errLinkInvalid,
+  AuthFailure.emailNotSent => l10n.errEmailNotSent,
   AuthFailure.unknown => l10n.errGeneric,
 };

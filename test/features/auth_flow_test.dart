@@ -34,6 +34,23 @@ void main() {
       expect(find.byType(TodayScreen), findsNothing);
     });
 
+    testWidgets('Welcome offers a language switch that applies at once', (
+      tester,
+    ) async {
+      setScreen(tester);
+      await tester.pumpWidget(testApp(signedIn: false));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('App language'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('العربية'));
+      await tester.pumpAndSettle();
+      expect(find.text('Create account'), findsNothing);
+      expect(
+        Directionality.of(tester.element(find.byType(Scaffold).first)),
+        TextDirection.rtl,
+      );
+    });
+
     testWidgets(
       'session restore shows no protected content before the workspace loads',
       (tester) async {

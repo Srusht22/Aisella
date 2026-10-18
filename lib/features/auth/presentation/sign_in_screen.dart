@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/route_guard.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../design_system/components/app_button.dart';
 import '../../../design_system/components/feedback.dart';
@@ -34,6 +35,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   bool _submitted = false;
   bool _busy = false;
   AuthFailure? _failure;
+  String? _detail;
 
   @override
   void dispose() {
@@ -58,7 +60,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           .read(authControllerProvider.notifier)
           .signIn(email: normalizeEmail(_email.text), password: _password.text);
     } on AuthError catch (e) {
-      if (mounted) setState(() => _failure = e.failure);
+      if (mounted) {
+        setState(() {
+          _failure = e.failure;
+          _detail = e.detail;
+        });
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -101,7 +108,12 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
           ),
         if (_failure != null)
           FormErrorBanner(
-            message: authFailureText(l10n, _failure!),
+            message: authFailureWithDetail(
+              l10n,
+              _failure!,
+              isProduction: ref.read(appConfigProvider).isProduction,
+              detail: _detail,
+            ),
             action: _failure == AuthFailure.emailNotConfirmed
                 ? TextButton(
                     onPressed: _openVerify,

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart' hide AuthUser;
 
 import '../domain/auth_status.dart';
@@ -9,8 +11,13 @@ import '../domain/auth_status.dart';
 /// allow-list, AndroidManifest.xml and Info.plist). Provisional scheme until
 /// AD-10 fixes the app identifier.
 abstract final class AuthLinks {
-  static const callback = 'app.aisellia://auth/callback';
-  static const passwordReset = 'app.aisellia://auth/reset';
+  // On the web the links return to the site itself; Supabase finds the code
+  // in the address when the app starts. Both URLs must be in the project's
+  // allowed redirect URLs.
+  static String get callback =>
+      kIsWeb ? '${Uri.base.origin}/' : 'app.aisellia://auth/callback';
+  static String get passwordReset =>
+      kIsWeb ? '${Uri.base.origin}/' : 'app.aisellia://auth/reset';
 }
 
 /// What changed in the provider's session.
@@ -182,7 +189,10 @@ class SupabaseAuthRepository implements AuthRepository {
     } on AuthWeakPasswordException {
       throw const AuthError(AuthFailure.weakPassword);
     } on AuthException catch (e) {
-      throw AuthError(mapAuthErrorCode(e.code, e.statusCode));
+      throw AuthError(
+        mapAuthErrorCode(e.code, e.statusCode),
+        detail: e.code ?? e.statusCode,
+      );
     } on Exception {
       // Transport failures (HTTP client, TLS): the request did not complete.
       throw const AuthError(AuthFailure.network);
@@ -207,6 +217,7 @@ AuthFailure mapAuthErrorCode(String? code, String? statusCode) =>
       'flow_state_expired' ||
       'flow_state_not_found' ||
       'bad_code_verifier' => AuthFailure.linkInvalid,
+      'email_address_not_authorized' => AuthFailure.emailNotSent,
       _ when statusCode == '429' => AuthFailure.rateLimited,
       _ => AuthFailure.unknown,
     };

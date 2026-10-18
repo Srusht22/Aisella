@@ -949,5 +949,6 @@
   "welcomeDemoReply": "نعم! سعرها {price} ومتوفر منها {count} في المخزون. هل أجهّز طلبك؟",
   "welcomeDemoProduct": "عباءة سوداء",
   "welcomeDemoOrderTitle": "مسودة طلب",
-  "welcomeDemoStockEvent": "تمت الموافقة على الطلب: تم تحديث المخزون"
+  "welcomeDemoStockEvent": "تمت الموافقة على الطلب: تم تحديث المخزون",
+  "errEmailNotSent": "تعذّر إرسال البريد إلى هذا العنوان. يُرجى المحاولة لاحقاً أو استخدام عنوان آخر."
 }

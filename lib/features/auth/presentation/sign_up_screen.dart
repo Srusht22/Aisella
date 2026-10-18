@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/route_guard.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../design_system/components/app_button.dart';
 import '../../../design_system/theme/theme_ext.dart';
@@ -29,6 +30,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   bool _submitted = false;
   bool _busy = false;
   AuthFailure? _failure;
+  String? _detail;
 
   @override
   void dispose() {
@@ -68,7 +70,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       }
       // signedIn: the router moves on as soon as the session state changes.
     } on AuthError catch (e) {
-      if (mounted) setState(() => _failure = e.failure);
+      if (mounted) {
+        setState(() {
+          _failure = e.failure;
+          _detail = e.detail;
+        });
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -95,7 +102,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       children: [
         FormHeading(title: l10n.signUpTitle),
         if (_failure != null && !emailInUse)
-          FormErrorBanner(message: authFailureText(l10n, _failure!)),
+          FormErrorBanner(
+            message: authFailureWithDetail(
+              l10n,
+              _failure!,
+              isProduction: ref.read(appConfigProvider).isProduction,
+              detail: _detail,
+            ),
+          ),
         AutofillGroup(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

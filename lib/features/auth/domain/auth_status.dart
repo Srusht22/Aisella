@@ -95,13 +95,21 @@ enum AuthFailure {
   /// The reset or verification link was used, expired or invalid.
   linkInvalid,
 
+  /// The account request was accepted but the email could not be sent
+  /// (for example, the provider's email service refused the address).
+  emailNotSent,
+
   /// Anything else; shown as a generic failure.
   unknown,
 }
 
 class AuthError implements Exception {
-  const AuthError(this.failure);
+  const AuthError(this.failure, {this.detail});
   final AuthFailure failure;
+
+  /// The provider's error code or HTTP status, for diagnosis. Never shown in
+  /// production builds.
+  final String? detail;
 
   @override
   String toString() => 'AuthError(${failure.name})';

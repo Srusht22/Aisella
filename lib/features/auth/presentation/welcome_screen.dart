@@ -1,13 +1,17 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/route_guard.dart';
 import '../../../core/formatting/money.dart';
 import '../../../core/l10n/l10n.dart';
+import '../../../core/l10n/supported_locales.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../design_system/components/app_button.dart';
+import '../../../design_system/components/inputs.dart';
+import '../../../design_system/components/overlays.dart';
 import '../../../design_system/components/pencil.dart';
 import '../../../design_system/components/status.dart';
 import '../../../design_system/icons/app_icons.dart';
@@ -16,6 +20,7 @@ import '../../../design_system/motion/motion.dart';
 import '../../../design_system/motion/primitives.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
+import '../../onboarding/language_selection_screen.dart' show kLanguageNames;
 
 /// AU-02 Welcome: three skippable panels. Each panel plays a short scene of
 /// the real product (a customer question answered from the catalog, a draft
@@ -77,8 +82,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 height: 56,
                 child: Row(
                   children: [
-                    const _Wordmark(),
-                    const Spacer(),
+                    const Expanded(child: _Wordmark()),
+                    const _LanguageButton(),
                     AnimatedOpacity(
                       opacity: last ? 0 : 1,
                       duration: Motion.fade(context, MotionTokens.sm),
@@ -168,6 +173,44 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 }
 
+/// Opens the language choice from the welcome screen, so a visitor who
+/// picked the wrong language at first launch can change it before signing
+/// up. The change applies at once and is remembered.
+class _LanguageButton extends ConsumerWidget {
+  const _LanguageButton();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final current = Localizations.localeOf(context);
+    return IconButton(
+      tooltip: l10n.appLanguage,
+      onPressed: () => showAppSheet<void>(
+        context: context,
+        title: l10n.appLanguage,
+        builder: (sheetContext) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final l in SupportedLocales.all)
+              SelectionRow(
+                label: kLanguageNames[l.languageCode]!,
+                labelDirection: SupportedLocales.isRtl(l)
+                    ? TextDirection.rtl
+                    : TextDirection.ltr,
+                selected: current.languageCode == l.languageCode,
+                onTap: () {
+                  ref.read(settingsProvider.notifier).setLocale(l);
+                  Navigator.of(sheetContext).pop();
+                },
+              ),
+          ],
+        ),
+      ),
+      icon: const Icon(AppIcons.translate, size: Sizes.iconLg),
+    );
+  }
+}
+
 /// The wordmark: the app name with a small pencil-to-ink mark.
 class _Wordmark extends StatelessWidget {
   const _Wordmark();
@@ -193,11 +236,15 @@ class _Wordmark extends StatelessWidget {
           ),
         ),
         const SizedBox(width: Space.s8),
-        Text(
-          context.l10n.appName,
-          style: type.title.copyWith(
-            color: p.textPrimary,
-            fontWeight: FontWeight.w700,
+        Flexible(
+          child: Text(
+            context.l10n.appName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: type.title.copyWith(
+              color: p.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ],
