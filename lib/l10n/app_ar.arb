@@ -942,5 +942,12 @@
   "channelZaincash": "ZainCash",
   "channelAsiahawala": "AsiaHawala",
   "channelBankTransfer": "تحويل بنكي",
-  "channelOther": "أخرى"
+  "channelOther": "أخرى",
+  "welcomeDemoCustomer": "نزار أحمد",
+  "welcomeDemoQuestion": "مرحباً! هل العباءة السوداء متوفرة؟ كم سعرها؟",
+  "welcomeDemoSuggestion": "رد مقترح",
+  "welcomeDemoReply": "نعم! سعرها {price} ومتوفر منها {count} في المخزون. هل أجهّز طلبك؟",
+  "welcomeDemoProduct": "عباءة سوداء",
+  "welcomeDemoOrderTitle": "مسودة طلب",
+  "welcomeDemoStockEvent": "تمت الموافقة على الطلب: تم تحديث المخزون"
 }

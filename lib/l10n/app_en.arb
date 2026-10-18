@@ -4349,5 +4349,41 @@
   "channelOther": "Other",
   "@channelOther": {
     "description": "Payment channel."
+  },
+  "welcomeDemoCustomer": "Nzar Ahmad",
+  "@welcomeDemoCustomer": {
+    "description": "Sample customer name in the welcome demo (synthetic)."
+  },
+  "welcomeDemoQuestion": "Hi! Is the black abaya available? How much is it?",
+  "@welcomeDemoQuestion": {
+    "description": "Sample customer message in the welcome demo."
+  },
+  "welcomeDemoSuggestion": "Suggested reply",
+  "@welcomeDemoSuggestion": {
+    "description": "Caption on an AI-suggested reply in the welcome demo."
+  },
+  "welcomeDemoReply": "Yes! It's {price} and {count} are in stock. Shall I prepare your order?",
+  "@welcomeDemoReply": {
+    "description": "Sample AI-suggested reply in the welcome demo.",
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeDemoProduct": "Black Abaya",
+  "@welcomeDemoProduct": {
+    "description": "Sample product name in the welcome demo."
+  },
+  "welcomeDemoOrderTitle": "Order draft",
+  "@welcomeDemoOrderTitle": {
+    "description": "Title of the sample order draft in the welcome demo."
+  },
+  "welcomeDemoStockEvent": "Order approved: stock updated",
+  "@welcomeDemoStockEvent": {
+    "description": "Line shown after the sample order is approved and stock goes down."
   }
 }

@@ -942,5 +942,12 @@
   "channelZaincash": "ZainCash",
   "channelAsiahawala": "AsiaHawala",
   "channelBankTransfer": "گواستنەوەی بانکی",
-  "channelOther": "تر"
+  "channelOther": "تر",
+  "welcomeDemoCustomer": "نزار ئەحمەد",
+  "welcomeDemoQuestion": "سڵاو! عەبای ڕەش هەیە؟ نرخی چەندە؟",
+  "welcomeDemoSuggestion": "وەڵامی پێشنیارکراو",
+  "welcomeDemoReply": "بەڵێ! نرخی {price}ە و {count} دانە لە کۆگا هەیە. داواکارییەکەت ئامادە بکەم؟",
+  "welcomeDemoProduct": "عەبای ڕەش",
+  "welcomeDemoOrderTitle": "ڕەشنووسی داواکاری",
+  "welcomeDemoStockEvent": "داواکاری پەسەندکرا: کۆگا نوێکرایەوە"
 }
