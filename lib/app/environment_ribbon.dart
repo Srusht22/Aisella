@@ -48,7 +48,10 @@ class EnvironmentRibbon extends StatelessWidget {
                     vertical: Space.s2,
                   ),
                   child: Text(
-                    context.l10n.envRibbon(environment.name.toUpperCase()),
+                    [
+                      context.l10n.envRibbon(environment.name.toUpperCase()),
+                      if (_buildSha.isNotEmpty) _buildSha,
+                    ].join(' · '),
                     textScaler: TextScaler.noScaling,
                     style: context.type.caption.copyWith(
                       color: p.bgSurface,
@@ -69,3 +72,7 @@ class EnvironmentRibbon extends StatelessWidget {
     );
   }
 }
+
+/// Short commit of the build, set by the web build script, so testers can
+/// tell which version a deployment serves. Empty in local builds and tests.
+const _buildSha = String.fromEnvironment('BUILD_SHA');

@@ -29,10 +29,15 @@ if [[ ! -x flutter-sdk/bin/flutter ]]; then
 fi
 export PATH="$PWD/flutter-sdk/bin:$PATH"
 
+# Vercel sets the commit; shown in the environment ribbon.
+BUILD_SHA="${VERCEL_GIT_COMMIT_SHA:-}"
+BUILD_SHA="${BUILD_SHA:0:7}"
+
 flutter config --no-analytics >/dev/null
 flutter pub get
 flutter build web --release --no-web-resources-cdn \
   --dart-define=ENV_NAME="${ENV_NAME:-staging}" \
   --dart-define=SAMPLE_DATA=false \
   --dart-define=SUPABASE_URL="$SUPABASE_URL" \
-  --dart-define=SUPABASE_PUBLISHABLE_KEY="$SUPABASE_PUBLISHABLE_KEY"
+  --dart-define=SUPABASE_PUBLISHABLE_KEY="$SUPABASE_PUBLISHABLE_KEY" \
+  --dart-define=BUILD_SHA="$BUILD_SHA"
