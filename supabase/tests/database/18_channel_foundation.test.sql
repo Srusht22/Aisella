@@ -84,18 +84,20 @@ with x as (insert into app.connections (store_id, provider_id, external_account_
   values (pg_temp.id('store_a'), 'stub_unres', 'acct-U', 'connected', true, now()) returning id) insert into ids select 'conn_u', id from x;
 
 -- ---- Registry and the capability rule ----------------------------------------------------------------------
-select is((select array_agg(id order by id) from app.providers where status = 'planned' and id !~ '^(stub|e2e_)'),
+-- Since MC-3 work the real providers may be in_development (test connections only), never further.
+select is((select array_agg(id order by id) from app.providers where status in ('planned', 'in_development') and id !~ '^(stub|e2e_|t_)'),
           array['instagram', 'messenger', 'telegram', 'tiktok', 'viber', 'whatsapp'],
-          'the target platforms are registered as planned: no real provider is usable');
+          'the target platforms are registered as planned or in development: no real provider serves real customers');
 select is((select count(*)::integer from app.provider_capabilities
-             where provider_id in ('instagram', 'messenger', 'telegram', 'tiktok', 'viber', 'whatsapp')), 0,
-          '… and none has a capability yet');
+             where provider_id in ('instagram', 'messenger', 'telegram', 'tiktok', 'viber', 'whatsapp') and evidence = 'verified'), 0,
+          '… and none has a VERIFIED capability, so none can send (the official pages were not read)');
 select is(app.provider_capability('stub_unres', 'reply_window_hours'), null, 'an UNRESOLVED capability counts as absent');
 select is(app.provider_capability('stub', 'reply_window_hours'), '24'::jsonb, 'a VERIFIED capability is used');
 select throws_ok($$ insert into app.connections (store_id, provider_id, external_account_id, state)
                     values ((select v from ids where k = 'store_b'), 'stub', 'acct-A', 'connected') $$, '23505', null,
                  'one provider account can belong to only one store at a time');
-select is(pg_temp.ingest('instagram', 'e-planned', null, pg_temp.msg('x', 'u', 'm', 'hi')) #>> '{error,code}', 'UNKNOWN_PROVIDER',
+insert into app.providers (id, display_name) values ('fx_planned', 'Planned fixture');
+select is(pg_temp.ingest('fx_planned', 'e-planned', null, pg_temp.msg('x', 'u', 'm', 'hi')) #>> '{error,code}', 'UNKNOWN_PROVIDER',
           'a planned provider cannot ingest anything');
 
 -- ---- Ingestion and deduplication ------------------------------------------------------------------------------

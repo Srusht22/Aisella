@@ -103,6 +103,7 @@ select is(
     'api.channel_ingest_raw(text,text,bytea,jsonb)',
     'api.channel_send_state(uuid)',
     'api.channel_webhook_challenge(text,text)',
+    'api.check_send_dispatch(uuid)',
     'api.copy_suggestion(uuid,uuid,text,uuid)',
     'api.create_ai_draft_grant(uuid,text,text,integer)',
     'api.create_conversation(uuid,text,text,jsonb,uuid)',

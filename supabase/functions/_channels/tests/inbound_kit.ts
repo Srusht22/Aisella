@@ -12,10 +12,12 @@
 import { assert, assertEquals, assertFalse } from "jsr:@std/assert@1.0.13";
 import postgres from "postgres";
 import type { ProviderAdapter } from "../adapter.ts";
-import { PostgresIngestDb } from "../db.ts";
+import { PostgresIngestDb, PostgresSenderDb } from "../db.ts";
 import { handleWebhook } from "../ingest.ts";
 import { SAMPLE_TEXTS } from "../conformance.ts";
-import { ADMIN_DB, assertLocal, b64, createSeller, uuid } from "../../ai-assist/tests/local_stack.ts";
+import { runSend } from "../send.ts";
+import { ADMIN_DB, assertLocal, b64, createSeller, rpc, uuid } from "../../ai-assist/tests/local_stack.ts";
+import { type ImitationSpec, startImitation } from "./provider_imitation.ts";
 
 export interface InboundConnection {
   /** The provider account id (page id, phone number id, bot id, …). */
@@ -40,6 +42,17 @@ export interface InboundFixture {
   sign(raw: Uint8Array, conn: InboundConnection, wrong?: boolean): Promise<Record<string, string>>;
   /** The external message id the database derives for message `id` from `user`. */
   messageId(id: string, user: string): string;
+  /**
+   * Full round trip: the seller replies through PostgREST, the sender role submits through the real
+   * adapter to a local imitation of the provider's API. The fixture provider gets a VERIFIED
+   * outbound_text capability for the test only (the real provider's rows stay as they are).
+   */
+  roundtrip?: {
+    spec: ImitationSpec;
+    makeAdapter(provider: string, baseURL: string): ProviderAdapter;
+    /** The recipient id the provider expects for inbound user `user` (e.g. a chat id). */
+    recipient(user: string): string;
+  };
 }
 
 export const escapeNonAscii = (s: string) =>
@@ -62,12 +75,14 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
       assertLocal();
       const admin = postgres(ADMIN_DB, { max: 1, onnotice: () => {} });
       const pw = b64(crypto.getRandomValues(new Uint8Array(24)));
+      const spw = b64(crypto.getRandomValues(new Uint8Array(24)));
       const provider = `t_${name.replace(/[^a-z]/g, "").slice(0, 12)}_${uuid().slice(0, 6)}`;
       const logs: Record<string, unknown>[] = [];
       const log = (e: Record<string, unknown>) => logs.push(e);
       const adapter = fx.makeAdapter(provider);
       try {
         await admin.unsafe(`alter role aisellia_channel_ingest password '${pw}'`);
+        await admin.unsafe(`alter role aisellia_channel_sender password '${spw}'`);
         const db = new PostgresIngestDb(
           `postgresql://aisellia_channel_ingest:${encodeURIComponent(pw)}@127.0.0.1:54322/postgres`,
         );
@@ -81,6 +96,7 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
           await admin`select vault.create_secret(${v}, ${`aisellia/provider/${provider}/${k}`})`;
         }
         const conns: string[] = [];
+        const sellers: { store: string; token: string }[] = [];
         for (const [i, c] of fx.connections.entries()) {
           const seller = await createSeller(admin, {
             tag: `in-${name}-${i}`,
@@ -96,6 +112,7 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
                     ${c.webhookSecret ? admin`vault.create_secret(${c.webhookSecret})` : null})
             returning id`;
           conns.push(row.id);
+          sellers.push(seller);
         }
         const [a] = fx.connections;
         const hintFor = (i: number) => adapter.perConnectionWebhook ? conns[i] : null;
@@ -203,12 +220,76 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
           );
         }
 
+        if (fx.roundtrip) {
+          const rt = fx.roundtrip;
+          await t.step(
+            "round trip: the seller's en / ckb / ar replies reach the provider byte-identical",
+            async () => {
+              await admin`insert into app.provider_capabilities (provider_id, capability, value, evidence, source_url, checked_on)
+                        values (${provider}, 'outbound_text', 'true', 'verified', 'https://fixture.invalid/test-only', current_date)`;
+              const imitation = startImitation(rt.spec);
+              const sender = new PostgresSenderDb(
+                `postgresql://aisellia_channel_sender:${encodeURIComponent(spw)}@127.0.0.1:54322/postgres`,
+              );
+              const outAdapter = rt.makeAdapter(provider, imitation.url);
+              try {
+                const id = `m-rt-${uuid().slice(0, 8)}`;
+                const raw = fx.body(a, { text: "I want to order", id, user: "1006", escaped: false });
+                assertEquals(await deliver(raw, await fx.sign(raw, a)), 200);
+                await process();
+                const [conv] = await admin`select conversation_id from app.messages
+                                          where connection_id = ${conns[0]} and external_message_id = ${
+                  fx.messageId(id, "1006")
+                }`;
+                for (const text of [SAMPLE_TEXTS.en, SAMPLE_TEXTS.ckb, SAMPLE_TEXTS.ar]) {
+                  const auth = await rpc("send_message", {
+                    p_store_id: sellers[0].store,
+                    p_conversation_id: conv.conversation_id,
+                    p_text: text,
+                    p_suggestion_id: null,
+                    p_kind: "reply",
+                    p_order_id: null,
+                    p_idempotency_key: uuid(),
+                  }, sellers[0].token);
+                  assert(auth.ok, JSON.stringify(auth.error));
+                  const before = imitation.received.length;
+                  const out = await runSend(auth.data.send_request_id, {
+                    db: sender,
+                    adapters: { [provider]: outAdapter },
+                    log,
+                  });
+                  assertEquals(out.state, "sent");
+                  assertEquals(
+                    imitation.textBytes(before),
+                    new TextEncoder().encode(text),
+                    "byte-identical at the provider",
+                  );
+                  const recipientSeen = JSON.stringify(
+                    JSON.parse(new TextDecoder().decode(imitation.received[before].raw)),
+                  );
+                  assert(recipientSeen.includes(rt.recipient("1006")), "addressed to the customer who wrote");
+                  if (a.credential) {
+                    assertEquals(
+                      imitation.received[before].credential,
+                      a.credential,
+                      "the connection's credential",
+                    );
+                  }
+                }
+              } finally {
+                await imitation.close();
+              }
+            },
+          );
+        }
+
         await t.step("no secret and no message text reaches the logs", () => {
           const text = JSON.stringify(logs);
           const secrets = [
             ...Object.values(fx.providerSecrets),
             ...fx.connections.flatMap((c) => [c.credential, c.webhookSecret]).filter((s): s is string => !!s),
             pw,
+            spw,
           ];
           for (const s of secrets) assertFalse(text.includes(s), "a secret reached the logs");
           for (const s of Object.values(SAMPLE_TEXTS)) assertFalse(text.includes(s.trim().slice(0, 12)));
@@ -216,6 +297,7 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
         });
       } finally {
         await admin.unsafe("alter role aisellia_channel_ingest password null").catch(() => {});
+        await admin.unsafe("alter role aisellia_channel_sender password null").catch(() => {});
         await admin`update app.providers set status = 'suspended' where id = ${provider}`.catch(() => {});
         await admin.end();
       }

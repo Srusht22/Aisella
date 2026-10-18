@@ -113,7 +113,8 @@ select is(pg_temp.raw_ingest('fx_app', null, '\xfffe7b7d'::bytea,
           'VALIDATION_FAILED', 'a signed body that is not UTF-8 JSON is refused');
 select is(pg_temp.raw_ingest('fx_none', null, pg_temp.raw('raw1'), pg_temp.sig(pg_temp.raw('raw1'), 'anything-0123456789')) #>> '{error,code}',
           'NOT_CONFIGURED', 'without a configured secret nothing is accepted (and the platform retries later)');
-select is(pg_temp.raw_ingest('instagram', null, pg_temp.raw('raw1'), '{}') #>> '{error,code}', 'UNKNOWN_PROVIDER',
+insert into app.providers (id, display_name, webhook_scheme, payload_format) values ('fx_planned', 'Planned', 'stub_sha256', 'aisellia_stub');
+select is(pg_temp.raw_ingest('fx_planned', null, pg_temp.raw('raw1'), '{}') #>> '{error,code}', 'UNKNOWN_PROVIDER',
           'a planned provider accepts nothing');
 
 -- Meta scheme and its subscription handshake.

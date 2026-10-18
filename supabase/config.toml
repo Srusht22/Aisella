@@ -406,6 +406,15 @@ deno_version = 2
 [functions.ai-assist]
 verify_jwt = true
 
+# Phase 9 channels (local only; not deployed). Webhooks come from providers, which cannot send a JWT:
+# the database verifies each one with the provider's signature (api.channel_ingest_raw). Secrets
+# (AISELLIA_CHANNEL_INGEST_DB_URL, AISELLIA_CHANNEL_SENDER_DB_URL) are set with `supabase secrets set`.
+[functions.channel-webhook]
+verify_jwt = false
+
+[functions.channel-send]
+verify_jwt = true
+
 [analytics]
 enabled = false
 port = 54327
