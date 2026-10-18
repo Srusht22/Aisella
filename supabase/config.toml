@@ -418,6 +418,10 @@ verify_jwt = true
 [functions.channel-connect]
 verify_jwt = true
 
+# Called by an external scheduler with its own secret (CHANNEL_WORKER_SECRET), not a user JWT.
+[functions.channel-worker]
+verify_jwt = false
+
 [analytics]
 enabled = false
 port = 54327

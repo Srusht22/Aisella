@@ -48,6 +48,11 @@ export interface SenderDb {
   state(sendRequestId: string): Promise<ApiResult>;
 }
 
+/** The worker's extra read: which queued sends are due, chosen fairly by the database. */
+export interface WorkerDb extends SenderDb {
+  dueSends(limit: number): Promise<ApiResult<{ ids: string[] }>>;
+}
+
 async function call<T = Record<string, unknown>>(
   url: string,
   text: string,
@@ -122,8 +127,11 @@ export class PostgresIngestDb implements IngestDb {
   }
 }
 
-export class PostgresSenderDb implements SenderDb {
+export class PostgresSenderDb implements WorkerDb {
   constructor(private readonly url: string) {}
+  dueSends(limit: number) {
+    return call<{ ids: string[] }>(this.url, "select api.channel_due_sends($1) as r", [limit]);
+  }
   claim(id: string) {
     return call<ClaimedSend>(this.url, "select api.channel_claim_send($1::uuid) as r", [id]);
   }
