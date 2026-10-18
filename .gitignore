@@ -50,3 +50,4 @@ app.*.map.json
 
 # AI evaluation reports (contain model outputs; kept locally)
 /supabase/functions/ai-assist/eval/out/
+flutter-sdk/
