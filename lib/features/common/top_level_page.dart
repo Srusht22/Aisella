@@ -10,6 +10,7 @@ import '../../design_system/motion/motion.dart';
 import '../../design_system/theme/theme_ext.dart';
 import '../../design_system/tokens/tokens.g.dart';
 import '../store/application/workspace_controller.dart';
+import 'header_controls.dart';
 
 /// Scaffold for the four tab roots: a large title that scrolls away and
 /// reappears in a compact pinned bar, with the store button at the end
@@ -103,6 +104,9 @@ class _TopLevelPageState extends ConsumerState<TopLevelPage> {
                   ),
                 ),
                 actions: [
+                  const AppearanceButton(),
+                  const LanguageButton(),
+                  const SizedBox(width: Space.s4),
                   StoreButton(
                     initials: storeName == null || storeName.isEmpty
                         ? null

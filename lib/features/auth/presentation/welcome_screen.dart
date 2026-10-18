@@ -20,7 +20,7 @@ import '../../../design_system/motion/motion.dart';
 import '../../../design_system/motion/primitives.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
-import 'auth_page.dart';
+import '../../common/header_controls.dart';
 
 /// AU-02 Welcome: three skippable panels. Each panel plays a short scene of
 /// the real product (a customer question answered from the catalog, a draft
