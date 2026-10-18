@@ -12,7 +12,6 @@ import '../../../design_system/components/overlays.dart';
 import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/layout/responsive.dart';
 import '../../../design_system/motion/motion.dart';
-import '../../../design_system/theme/accents.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../common/appearance_picker.dart';
@@ -329,11 +328,13 @@ class AppearanceButton extends StatelessWidget {
     final p = context.palette;
     return IconButton(
       tooltip: context.l10n.appearanceTitle,
-      icon: AppearanceGlyph(
-        size: 24,
-        colors: [for (final a in AppAccent.values) accentSeeds[a]!.dark],
-        light: const Color(0xFFF6F4EF),
-        dark: const Color(0xFF1A1C20),
+      // Palette icon (Freepik, Flaticon) in the theme's brand colour, so it
+      // changes with every colour theme and stays visible in light and dark.
+      icon: Image.asset(
+        'assets/icons/palette.png',
+        width: 22,
+        height: 22,
+        color: p.brandPrimary,
       ),
       style: IconButton.styleFrom(side: BorderSide(color: p.borderHairline)),
       onPressed: () => showAppearanceSheet(context),
@@ -369,7 +370,14 @@ class LanguageButton extends ConsumerWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    GlobeGlyph(size: 18, color: p.textBrand),
+                    // Language icon (Freepik, Flaticon) in the text colour:
+                    // dark in light mode, light in dark mode.
+                    Image.asset(
+                      'assets/icons/language.png',
+                      width: 18,
+                      height: 18,
+                      color: p.textPrimary,
+                    ),
                     const SizedBox(width: Space.s8),
                     Text(
                       _short[current.languageCode] ?? '',
@@ -549,6 +557,13 @@ class TermsSummary extends StatelessWidget {
               style: type.caption.copyWith(color: p.textPencil),
             ),
           ),
+        ),
+        const SizedBox(height: Space.s12),
+        // Required by the Flaticon free licence for the two header icons.
+        Text(
+          'Icons: Freepik – Flaticon (flaticon.com)',
+          textDirection: TextDirection.ltr,
+          style: type.caption.copyWith(color: p.textTertiary),
         ),
       ],
     );

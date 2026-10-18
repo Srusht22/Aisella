@@ -63,6 +63,7 @@ flutter:
         - asset: assets/fonts/phosphor/Phosphor-Fill-subset.ttf
 
   assets:
+    - assets/icons/
     - assets/fonts/inter/OFL.txt
     - assets/fonts/vazirmatn/OFL.txt
     - assets/fonts/phosphor/LICENSE.txt

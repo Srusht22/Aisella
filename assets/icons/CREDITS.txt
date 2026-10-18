@@ -1,0 +1,4 @@
+language.png: "Language" icon by Freepik, https://www.flaticon.com/free-icon/language_484633
+palette.png: "Color options" icon by Freepik, https://www.flaticon.com/free-icon/color-options_14896239
+Used under the Flaticon free licence, which requires attribution; the credit is shown
+in the app on the Terms and Privacy Policy summary.
