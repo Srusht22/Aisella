@@ -1,20 +1,23 @@
 import 'package:flutter/widgets.dart';
 
-/// Kurdish Sorani (`ckb`, primary, RTL) and English (`en`, LTR).
-/// Arabic (`ar`) is architecture-ready but not shipped in P0 (Phase 1 §9.1).
+/// Kurdish Sorani (`ckb`, primary, RTL), Arabic (`ar`, RTL; Phase 9) and
+/// English (`en`, LTR). Arabic strings are machine-drafted and pending
+/// native-speaker review, like Sorani (DD-04).
 abstract final class SupportedLocales {
   static const ckb = Locale('ckb');
+  static const ar = Locale('ar');
   static const en = Locale('en');
-  static const all = [ckb, en];
+  static const all = [ckb, ar, en];
 
   static Locale? byLanguageCode(String? code) =>
       all.where((l) => l.languageCode == code).firstOrNull;
 
-  /// Initial suggestion on first launch: Sorani when the device prefers a
-  /// Kurdish or Arabic-script locale, otherwise English.
+  /// Initial suggestion on first launch: the device's language when it is
+  /// Kurdish, Arabic or English, otherwise Sorani (the primary language).
   static Locale suggestFor(List<Locale> deviceLocales) {
     for (final l in deviceLocales) {
       if (l.languageCode == 'ckb' || l.languageCode == 'ku') return ckb;
+      if (l.languageCode == 'ar') return ar;
       if (l.languageCode == 'en') return en;
     }
     return ckb;

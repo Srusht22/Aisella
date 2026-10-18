@@ -8,8 +8,32 @@ import 'digits.dart';
 ///
 /// The `intl` package has no `ckb` date data (verified in Phase 4), so
 /// names are provided here. Sorani month names follow the KRI Gregorian
-/// usage (Syriac-derived); **pending native review (DD-09)**.
+/// usage (Syriac-derived); **pending native review (DD-09)**. Arabic uses
+/// the same Syriac month names, as written in Iraq.
 abstract final class Dates {
+  static const _arWeekdays = [
+    'الاثنين',
+    'الثلاثاء',
+    'الأربعاء',
+    'الخميس',
+    'الجمعة',
+    'السبت',
+    'الأحد',
+  ];
+  static const _arMonths = [
+    'كانون الثاني',
+    'شباط',
+    'آذار',
+    'نيسان',
+    'أيار',
+    'حزيران',
+    'تموز',
+    'آب',
+    'أيلول',
+    'تشرين الأول',
+    'تشرين الثاني',
+    'كانون الأول',
+  ];
   static const _enWeekdays = [
     'Monday',
     'Tuesday',
@@ -67,6 +91,9 @@ abstract final class Dates {
     if (locale.languageCode == 'ckb') {
       return '${_ckbWeekdays[date.weekday - 1]}، $dayی ${_ckbMonths[date.month - 1]}';
     }
+    if (locale.languageCode == 'ar') {
+      return '${_arWeekdays[date.weekday - 1]}، $day ${_arMonths[date.month - 1]}';
+    }
     return '${_enWeekdays[date.weekday - 1]}, $day ${_enMonths[date.month - 1]}';
   }
 
@@ -80,6 +107,9 @@ abstract final class Dates {
     final year = Digits.display('${date.year}', digits);
     if (locale.languageCode == 'ckb') {
       return '$dayی ${_ckbMonths[date.month - 1]}ی $year';
+    }
+    if (locale.languageCode == 'ar') {
+      return '$day ${_arMonths[date.month - 1]} $year';
     }
     return '$day ${_enMonths[date.month - 1]} $year';
   }

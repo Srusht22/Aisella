@@ -166,7 +166,7 @@ void main() {
     ) async {
       await _pump(tester, _Fake());
       expect(find.text('No conversations yet'), findsOneWidget);
-      expect(_has('no channel connected'), findsOneWidget);
+      expect(_has('you confirm every reply'), findsOneWidget);
     });
 
     testWidgets('pasting a customer message creates a conversation', (

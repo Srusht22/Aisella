@@ -15,7 +15,11 @@ import '../../design_system/tokens/tokens.g.dart';
 import '../../l10n/gen/app_localizations.dart';
 
 /// Native language names; never translated.
-const kLanguageNames = {'ckb': 'کوردی (سۆرانی)', 'en': 'English'};
+const kLanguageNames = {
+  'ckb': 'کوردی (سۆرانی)',
+  'ar': 'العربية',
+  'en': 'English',
+};
 
 /// AU-01: first-launch language choice. The layout direction previews the
 /// selection immediately (RTL for Sorani) before Continue; the choice
@@ -55,6 +59,7 @@ class _LanguageSelectionScreenState
     final type = context.type;
     final en = lookupAppLocalizations(SupportedLocales.en);
     final ckb = lookupAppLocalizations(SupportedLocales.ckb);
+    final ar = lookupAppLocalizations(SupportedLocales.ar);
     return Scaffold(
       backgroundColor: p.bgCanvas,
       body: SafeArea(
@@ -74,7 +79,7 @@ class _LanguageSelectionScreenState
                   ),
                 ),
                 const SizedBox(height: Space.s24),
-                // Shown in both languages: the user may not read the current one.
+                // Shown in every language: the user may not read the current one.
                 Semantics(
                   header: true,
                   child: Text(
@@ -82,6 +87,11 @@ class _LanguageSelectionScreenState
                     textDirection: TextDirection.rtl,
                     style: type.title.copyWith(color: p.textPrimary),
                   ),
+                ),
+                Text(
+                  ar.chooseLanguageTitle,
+                  textDirection: TextDirection.rtl,
+                  style: type.title.copyWith(color: p.textSecondary),
                 ),
                 Text(
                   en.chooseLanguageTitle,

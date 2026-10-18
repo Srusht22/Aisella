@@ -21,7 +21,7 @@ abstract final class Money {
     final number = Digits.display(Digits.group(amount), digits);
     return switch (currency) {
       Currency.iqd =>
-        '${Bidi.ltr(number)} ${locale.languageCode == 'ckb' ? 'د.ع' : 'IQD'}',
+        '${Bidi.ltr(number)} ${const {'ckb', 'ar'}.contains(locale.languageCode) ? 'د.ع' : 'IQD'}',
       Currency.usd => Bidi.ltr('\$$number'),
     };
   }

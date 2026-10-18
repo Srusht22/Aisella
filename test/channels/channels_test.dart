@@ -756,7 +756,7 @@ void main() {
       },
     );
 
-    for (final locale in ['ckb']) {
+    for (final locale in ['ckb', 'ar']) {
       testWidgets('live conversation lays out right to left in $locale', (
         tester,
       ) async {

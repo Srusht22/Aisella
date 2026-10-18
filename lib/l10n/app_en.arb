@@ -3040,7 +3040,7 @@
   "@aiManualPath": {
     "description": "Manual path after AI failure."
   },
-  "aiNeverSends": "Aisellia never sends messages to customers. You copy a reply, send it yourself, then mark it as sent.",
+  "aiNeverSends": "For pasted conversations Aisellia never sends messages: you copy a reply and send it yourself. For connected accounts, a reply is sent only after you confirm its exact text.",
   "@aiNeverSends": {
     "description": "AI settings note."
   },
@@ -3373,7 +3373,7 @@
   "@holdingUnsupportedClaim": {
     "description": "Holding reason."
   },
-  "importedNote": "Pasted manually from {source}. No channel is connected: Aisellia never sends messages.",
+  "importedNote": "Pasted manually from {source}. This conversation is not from a connected account: Aisellia does not send messages in it.",
   "@importedNote": {
     "description": "Conversation note (US-020).",
     "placeholders": {
@@ -3382,7 +3382,7 @@
       }
     }
   },
-  "inboxEmptyBody": "Paste a customer's message from Instagram, WhatsApp or another app. The assistant suggests a reply; you send it yourself.",
+  "inboxEmptyBody": "Paste a customer's message from Instagram, WhatsApp or another app, or connect an account. The assistant suggests a reply; you decide what is sent.",
   "@inboxEmptyBody": {
     "description": "Empty state."
   },
@@ -3398,7 +3398,7 @@
   "@inboxFilterOpen": {
     "description": "Inbox filter."
   },
-  "inboxSubtitle": "Pasted conversations · no channel connected",
+  "inboxSubtitle": "Conversations · you confirm every reply",
   "@inboxSubtitle": {
     "description": "Inbox subtitle."
   },
