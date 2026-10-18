@@ -73,6 +73,8 @@ This is the provider-neutral M9-1.
 - the owner's MC-1 decision;
 - **explicit authorization of MC-2**.
 
+**Status:** authorized by the owner on 2026-10-18 (provider-neutral, so ahead of the MC-1 decision) and implemented locally in `601114a` and `6021791`. All acceptance criteria are evidenced in the [MC-2 report](../../implementation/phase-9/mc-2-local-foundation.md). **Awaiting owner review.**
+
 ## MC-3. First provider integration (local)
 
 **Scope:**

@@ -3,7 +3,7 @@
 **Status:**
 - The single-channel architecture was approved in principle with conditions (below). The docs milestone at `61833a3` was provisionally accepted, subject to direct verification.
 - **Scope revised to a multi-channel public launch:** provider-neutral architecture [L](l-multichannel-architecture.md), platform matrix [M](m-platform-matrix.md), all-platform questionnaire [J](j-seller-interview-questionnaire.md), and milestones [N](n-milestones-public-launch.md). These are **proposals for review, not approved**.
-- **No platform is selected. No milestone is authorized; MC-2 (formerly M9-1) remains proposed.**
+- **No platform is selected.** MC-2 (the local provider-neutral foundation) was **authorized by the owner on 2026-10-18 and implemented locally** ([report](../../implementation/phase-9/mc-2-local-foundation.md)); it awaits review. **MC-3 and later are not authorized.**
 - No channel account is connected.
 - No webhook is configured.
 - No message has been sent.
