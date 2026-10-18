@@ -294,8 +294,10 @@ select pg_temp.act_as(pg_temp.id('a'));
 select is(api.send_message(pg_temp.id('store_a'), pg_temp.id('conv_a'), 'Your order is confirmed.', null, 'order_confirmation', pg_temp.id('order'),
                            gen_random_uuid()) #>> '{error,code}', 'ORDER_NOT_APPROVED', 'a confirmation before approval is refused');
 select api.approve_order(pg_temp.id('store_a'), pg_temp.id('order'), (select version from app.orders where id = pg_temp.id('order')), '{}', gen_random_uuid());
-select is(api.send_message(pg_temp.id('store_a'), pg_temp.id('conv_a'), 'Your order is confirmed.', null, 'order_confirmation', pg_temp.id('order'),
-                           gen_random_uuid()) #>> '{data,state}', 'queued', 'after the seller approves, the seller can send the confirmation');
+select is(api.send_message(pg_temp.id('store_a'), pg_temp.id('conv_a'),
+                           api.order_confirmation_text(pg_temp.id('store_a'), pg_temp.id('order'), 'ckb') #>> '{data,text}', null,
+                           'order_confirmation', pg_temp.id('order'), gen_random_uuid()) #>> '{data,state}', 'queued',
+          'after the seller approves, the seller can send the confirmation (the server-rendered text; suite 19)');
 select pg_temp.act_as_admin();
 select is((select count(*)::integer from app.send_requests where kind = 'order_confirmation'), 1,
           'no confirmation was created by the approval itself: only by the seller''s send');

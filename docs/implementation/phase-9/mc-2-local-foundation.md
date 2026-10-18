@@ -14,7 +14,8 @@
 |---|---|
 | `601114a` | Migration `20261020090000_channel_foundation.sql`; pgTAP suite 01 extended; new suite 18 |
 | `6021791` | `supabase/functions/_channels/`: adapter interface, ingest handler, send pipeline, DB clients, stub provider, conformance kit, tests |
-| (this commit) | This report and status updates |
+| `dc166c8` | This report and status updates |
+| (review) | [Security and acceptance review](mc-2-security-review.md): five defects fixed in `20261020100000_channel_review_fixes.sql`, suite 19 |
 
 ## 1. What was built
 
@@ -122,9 +123,9 @@
 ## 4. Limitations and remaining risks
 
 1. **No real provider exists.** Adapters, OAuth or connect flows, provider-specific signatures, token refresh, and data-deletion callbacks are MC-3. They depend on the owner's channel decision, after the seller interviews.
-2. **No server-generated order-confirmation template yet.** Confirmations are gated on order status and an explicit seller send, but the text is not yet checked against a template.
-3. **Contact anonymisation by channel id** is not yet in `anonymize_customer`. It matches by phone, and channel contacts often have none. Account deletion and conversation deletion do cover channel data.
-4. **Manual paths on live conversations** (paste-in import, copy and "I sent this") are not blocked. That keeps the fallback available, but it can mix sources in one thread. To be decided in MC-3.
+2. ~~No server-generated order-confirmation template yet.~~ **Fixed in the [security review](mc-2-security-review.md) (R3):** a confirmation must be the server-rendered text of the approved order.
+3. **Contact anonymisation by channel id** is not yet in `anonymize_customer`. It matches by phone, and channel contacts often have none. Deleting a live conversation now also erases its contact, its delivery events and the related webhook payloads ([review](mc-2-security-review.md) R4, O2).
+4. ~~Manual paths on live conversations are not blocked.~~ **Fixed in the [security review](mc-2-security-review.md) (R2):** live and pasted conversations can no longer mix message origins.
 5. **pg_cron jobs** (processor every 10 s, claim expiry every minute) also run in the local stack, where they do nothing without events. On a hosted project they will run once deployed, which is not authorized.
 6. **The capability registry is empty for real providers by design.** Filling it requires the direct verification of official sources (N MC-0 criterion 3).
 

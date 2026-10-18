@@ -127,6 +127,7 @@ select is(
     'api.list_products(uuid,text,text,text,text,integer,integer)',
     'api.mark_confirmation_sent(uuid,uuid)',
     'api.mark_message_sent(uuid,uuid)',
+    'api.order_confirmation_text(uuid,uuid,text)',
     'api.order_history(uuid,uuid)',
     'api.order_summary(uuid)',
     'api.record_cod(uuid,uuid,bigint,uuid)',
