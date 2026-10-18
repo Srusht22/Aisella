@@ -43,6 +43,11 @@ export interface InboundFixture {
   /** The external message id the database derives for message `id` from `user`. */
   messageId(id: string, user: string): string;
   /**
+   * False for schemes that authenticate the sender but do not sign the body (Telegram's secret token):
+   * a changed byte cannot be detected there (TLS protects the body in transit). Default true.
+   */
+  signsBody?: boolean;
+  /**
    * Full round trip: the seller replies through PostgREST, the sender role submits through the real
    * adapter to a local imitation of the provider's API. The fixture provider gets a VERIFIED
    * outbound_text capability for the test only (the real provider's rows stay as they are).
@@ -175,8 +180,10 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
             const good = await fx.sign(raw, a);
             assertEquals(await deliver(raw, await fx.sign(raw, a, true)), 401, "wrong secret");
             assertEquals(await deliver(raw, {}), 401, "no signature");
-            assertEquals(await deliver(tampered, good), 401, "a changed byte");
-            assertEquals(await deliver(reserialised, good), 401, "a re-serialised body");
+            if (fx.signsBody !== false) {
+              assertEquals(await deliver(tampered, good), 401, "a changed byte");
+              assertEquals(await deliver(reserialised, good), 401, "a re-serialised body");
+            }
             assertEquals(await stored(), before);
           },
         );

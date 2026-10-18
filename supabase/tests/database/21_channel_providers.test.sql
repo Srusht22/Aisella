@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(33);
+select plan(39);
 
 create temp table ids (k text primary key, v uuid);
 grant all on ids to public;
@@ -181,6 +181,40 @@ select is((select row(phone, display_name, external_user_id like 'anon:%')::text
           row(null::text, null::text, true)::text, 'WhatsApp: no number, name or wa_id is left on the contact');
 select ok(not exists (select 1 from app.messages where connection_id = pg_temp.id('wa_a') and body is not null),
           'WhatsApp: the message text is purged');
+
+-- ---- Telegram --------------------------------------------------------------------------------------------------
+select is((select row(webhook_scheme, payload_format, status)::text from app.providers where id = 'telegram'),
+          row('telegram_token', 'telegram_bot', 'in_development')::text, 'Telegram: per-bot secret token, Bot API update, test connections only');
+with x as (insert into app.connections (store_id, provider_id, external_account_id, state, is_test, connected_at)
+           values (pg_temp.id('store_a'), 'telegram', '7000000001', 'connected', true, now()) returning id)
+insert into ids select 'tg_a', id from x;
+create function pg_temp.tg(p_update jsonb) returns jsonb language plpgsql as $$
+declare c app.connections; p app.providers; v jsonb;
+begin
+  select * into c from app.connections where id = pg_temp.id('tg_a');
+  select * into p from app.providers where id = 'telegram';
+  return app.channel_normalize_telegram_bot(p, c, p_update);
+end $$;
+select is(pg_temp.tg('{"update_id": 9001, "message": {"message_id": 5, "from": {"id": 42, "is_bot": false, "first_name": "Shno", "last_name": "Ali", "username": "shno"},
+                       "chat": {"id": 42, "type": "private"}, "date": 1760781600, "text": "سڵاو"}}'),
+          '{"event_id": "9001", "events": [{"kind": "message", "account_id": "7000000001", "external_user_id": "42", "external_message_id": "42:5",
+            "display_name": "Shno Ali", "occurred_at": "2025-10-18T10:00:00+00:00", "text": "سڵاو"}]}'::jsonb,
+          'Telegram: a private message (account = the bot, id scoped to the chat, the update id as event id; no username kept)');
+select is(pg_temp.tg('{"update_id": 9002, "message": {"message_id": 6, "from": {"id": 42}, "chat": {"id": 42, "type": "private"},
+                       "contact": {"phone_number": "+9647501112233", "first_name": "Shno"}}}') #> '{events,0,attachments}',
+          '[{"kind": "contact"}]'::jsonb, 'Telegram: a shared contact is recorded as such; its phone number is not stored');
+select is(pg_temp.tg('{"update_id": 9003, "message": {"message_id": 7, "from": {"id": 42}, "chat": {"id": 42, "type": "private"},
+                       "photo": [{"file_id": "small"}, {"file_id": "large"}], "caption": "this one?"}}') #> '{events,0}',
+          '{"kind": "message", "account_id": "7000000001", "external_user_id": "42", "external_message_id": "42:7", "text": "this one?",
+            "attachments": [{"kind": "image", "ref": "large"}]}'::jsonb, 'Telegram: a photo keeps the largest size''s file id and its caption');
+select is((select jsonb_agg(pg_temp.tg(u) -> 'events') from jsonb_array_elements('[
+            {"update_id": 1, "message": {"message_id": 1, "from": {"id": 9}, "chat": {"id": -100, "type": "group"}, "text": "group"}},
+            {"update_id": 2, "message": {"message_id": 1, "from": {"id": 9, "is_bot": true}, "chat": {"id": 9, "type": "private"}, "text": "bot"}},
+            {"update_id": 3, "edited_message": {"message_id": 1, "from": {"id": 9}, "chat": {"id": 9, "type": "private"}, "text": "edit"}},
+            {"update_id": 4, "my_chat_member": {"chat": {"id": 9, "type": "private"}}}]') u),
+          '[[], [], [], []]'::jsonb, 'Telegram: groups, bots, edits and membership updates produce no messages');
+select is((select value from app.provider_capabilities where provider_id = 'telegram' and capability = 'reply_window_hours'), 'null'::jsonb,
+          'Telegram: no customer-service window (recorded as an assumption)');
 
 select * from finish();
 rollback;
