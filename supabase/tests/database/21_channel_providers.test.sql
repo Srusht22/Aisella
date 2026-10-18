@@ -4,7 +4,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 \ir _helpers.psql
-select plan(24);
+select plan(33);
 
 create temp table ids (k text primary key, v uuid);
 grant all on ids to public;
@@ -123,6 +123,64 @@ select is(pg_temp.fb('[{"sender": {"id": "2463"}, "message": {"mid": "m_2", "tex
           'Messenger: an Instagram body is not a Page body');
 select is((select count(*)::integer from app.provider_capabilities where provider_id = 'messenger' and evidence = 'verified'), 0,
           'Messenger: no capability is recorded as verified');
+
+-- ---- WhatsApp --------------------------------------------------------------------------------------------------
+select is((select row(webhook_scheme, payload_format, status)::text from app.providers where id = 'whatsapp'),
+          row('meta_sha256', 'whatsapp_cloud', 'in_development')::text, 'WhatsApp: Meta signature, Cloud API body, test connections only');
+create function pg_temp.wa(p_value jsonb, p_field text default 'messages') returns jsonb language sql as $$
+  select pg_temp.norm('whatsapp', jsonb_build_object('object', 'whatsapp_business_account', 'entry', jsonb_build_array(jsonb_build_object(
+    'id', 'WABA1', 'changes', jsonb_build_array(jsonb_build_object('field', p_field, 'value',
+      jsonb_build_object('messaging_product', 'whatsapp', 'metadata', '{"display_phone_number": "9647500000000", "phone_number_id": "106540352242922"}'::jsonb)
+      || p_value))))))
+$$;
+select is(pg_temp.wa('{"contacts": [{"profile": {"name": "Shno"}, "wa_id": "9647501112233"}],
+                       "messages": [{"from": "9647501112233", "id": "wamid.A", "timestamp": "1760781600", "type": "text", "text": {"body": "سڵاو"}}]}') -> 0,
+          '{"kind": "message", "account_id": "106540352242922", "external_user_id": "9647501112233", "phone": "+9647501112233",
+            "display_name": "Shno", "external_message_id": "wamid.A", "occurred_at": "2025-10-18T10:00:00+00:00", "text": "سڵاو"}'::jsonb,
+          'WhatsApp: a text message (account = business number id, user = wa_id, phone in E.164, name from contacts)');
+select is(pg_temp.wa('{"messages": [{"from": "9647501112233", "id": "wamid.B", "type": "image", "image": {"id": "media-1", "mime_type": "image/jpeg", "caption": "this one"}},
+                                    {"from": "9647501112233", "id": "wamid.C", "type": "audio", "audio": {"id": "media-2", "voice": true}},
+                                    {"from": "9647501112233", "id": "wamid.D", "type": "interactive", "interactive": {"button_reply": {"id": "b1", "title": "Yes"}}},
+                                    {"from": "9647501112233", "id": "wamid.E", "type": "reaction", "reaction": {"emoji": "👍"}}]}'),
+          '[{"kind": "message", "account_id": "106540352242922", "external_user_id": "9647501112233", "phone": "+9647501112233",
+             "external_message_id": "wamid.B", "text": "this one", "attachments": [{"kind": "image", "ref": "media-1", "mime_type": "image/jpeg"}]},
+            {"kind": "message", "account_id": "106540352242922", "external_user_id": "9647501112233", "phone": "+9647501112233",
+             "external_message_id": "wamid.C", "attachments": [{"kind": "voice", "ref": "media-2"}]},
+            {"kind": "message", "account_id": "106540352242922", "external_user_id": "9647501112233", "phone": "+9647501112233",
+             "external_message_id": "wamid.D", "text": "Yes"}]'::jsonb,
+          'WhatsApp: media become a media id to fetch later (never a URL), captions and button replies become text, reactions nothing');
+select is(pg_temp.wa('{"statuses": [{"id": "wamid.S", "status": "sent", "timestamp": "1760781600", "recipient_id": "9647501112233"},
+                                    {"id": "wamid.S", "status": "delivered", "timestamp": "1760781601", "recipient_id": "9647501112233"},
+                                    {"id": "wamid.S", "status": "read", "timestamp": "1760781602", "recipient_id": "9647501112233"},
+                                    {"id": "wamid.T", "status": "failed", "timestamp": "1760781603", "recipient_id": "9647501112233",
+                                     "errors": [{"code": 131047, "title": "Re-engagement message"}]}]}'),
+          '[{"kind": "delivery", "account_id": "106540352242922", "provider_message_id": "wamid.S", "provider_event_key": "delivered:wamid.S",
+             "occurred_at": "2025-10-18T10:00:01+00:00"},
+            {"kind": "read", "account_id": "106540352242922", "provider_message_id": "wamid.S", "provider_event_key": "read:wamid.S",
+             "occurred_at": "2025-10-18T10:00:02+00:00"},
+            {"kind": "failed", "account_id": "106540352242922", "provider_message_id": "wamid.T", "provider_event_key": "failed:wamid.T",
+             "provider_status": "131047", "occurred_at": "2025-10-18T10:00:03+00:00"}]'::jsonb,
+          'WhatsApp: delivered / read / failed statuses (with the error code, not its text); "sent" adds nothing');
+select is(pg_temp.wa('{"messages": [{"from": "x", "id": "wamid.F", "type": "text", "text": {"body": "x"}}]}', 'account_update'), '[]'::jsonb,
+          'WhatsApp: other webhook fields (account updates, templates) produce no messages');
+
+-- From a WhatsApp webhook to anonymisation by phone number (review O2), through the real normaliser.
+with x as (insert into app.connections (store_id, provider_id, external_account_id, state, is_test, connected_at)
+           values (pg_temp.id('store_a'), 'whatsapp', '106540352242922', 'connected', true, now()) returning id)
+insert into ids select 'wa_a', id from x;
+select internal.channel_store_events('whatsapp', 'ev-wa-1', null, pg_temp.wa('{"contacts": [{"profile": {"name": "Shno"}, "wa_id": "9647501112233"}],
+  "messages": [{"from": "9647501112233", "id": "wamid.Z1", "type": "text", "text": {"body": "I am Shno, call me on this number"}}]}'), repeat('b', 64));
+select internal.channel_process_batch();
+select is((select phone from app.contacts where connection_id = pg_temp.id('wa_a')), '+9647501112233',
+          'WhatsApp: the customer''s contact keeps their number for anonymisation');
+select pg_temp.act_as(pg_temp.id('a'));
+select is(api.anonymize_customer(pg_temp.id('store_a'), '+9647501112233', gen_random_uuid()) #>> '{data,contacts_anonymized}', '1',
+          'WhatsApp: anonymising the number reaches the WhatsApp contact');
+select pg_temp.act_as_admin();
+select is((select row(phone, display_name, external_user_id like 'anon:%')::text from app.contacts where connection_id = pg_temp.id('wa_a')),
+          row(null::text, null::text, true)::text, 'WhatsApp: no number, name or wa_id is left on the contact');
+select ok(not exists (select 1 from app.messages where connection_id = pg_temp.id('wa_a') and body is not null),
+          'WhatsApp: the message text is purged');
 
 select * from finish();
 rollback;

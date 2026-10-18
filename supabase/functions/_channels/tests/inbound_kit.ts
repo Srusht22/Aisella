@@ -145,10 +145,10 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
               }: a signed webhook becomes a live message byte for byte`,
               async () => {
                 const id = `m-${lang}-${escaped}-${uuid().slice(0, 8)}`;
-                const raw = fx.body(a, { text, id, user: "1001", escaped });
+                const raw = fx.body(a, { text, id, user: "9647501110001", escaped });
                 assertEquals(await deliver(raw, await fx.sign(raw, a)), 200);
                 await process();
-                const rows = await message(id, "1001");
+                const rows = await message(id, "9647501110001");
                 assertEquals(rows.length, 1, "one message");
                 assertEquals(rows[0].connection_id, conns[0], "it belongs to the signing connection");
                 assertEquals(new TextEncoder().encode(rows[0].body), new TextEncoder().encode(text));
@@ -164,7 +164,7 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
             const raw = fx.body(a, {
               text: SAMPLE_TEXTS.ar,
               id: `m-bad-${uuid().slice(0, 8)}`,
-              user: "1002",
+              user: "9647501110002",
               escaped: true,
             });
             const tampered = raw.slice();
@@ -183,12 +183,12 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
 
         await t.step("a redelivered webhook stores one message", async () => {
           const id = `m-dup-${uuid().slice(0, 8)}`;
-          const raw = fx.body(a, { text: SAMPLE_TEXTS.en, id, user: "1003", escaped: false });
+          const raw = fx.body(a, { text: SAMPLE_TEXTS.en, id, user: "9647501110003", escaped: false });
           const headers = await fx.sign(raw, a);
           assertEquals(await deliver(raw, headers), 200);
           assertEquals(await deliver(raw, headers), 200);
           await process();
-          assertEquals((await message(id, "1003")).length, 1);
+          assertEquals((await message(id, "9647501110003")).length, 1);
         });
 
         if (adapter.perConnectionWebhook) {
@@ -198,7 +198,7 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
               const raw = fx.body(a, {
                 text: "cross",
                 id: `m-x-${uuid().slice(0, 8)}`,
-                user: "1004",
+                user: "9647501110004",
                 escaped: false,
               });
               assertEquals(await deliver(raw, await fx.sign(raw, a), conns[1]), 401);
@@ -210,10 +210,10 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
             async () => {
               const b = fx.connections[1];
               const id = `m-b-${uuid().slice(0, 8)}`;
-              const raw = fx.body(b, { text: "for store B", id, user: "1005", escaped: false });
+              const raw = fx.body(b, { text: "for store B", id, user: "9647501110005", escaped: false });
               assertEquals(await deliver(raw, await fx.sign(raw, b)), 200);
               await process();
-              const rows = await message(id, "1005");
+              const rows = await message(id, "9647501110005");
               assertEquals(rows.length, 1);
               assertEquals(rows[0].connection_id, conns[1]);
             },
@@ -234,12 +234,17 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
               const outAdapter = rt.makeAdapter(provider, imitation.url);
               try {
                 const id = `m-rt-${uuid().slice(0, 8)}`;
-                const raw = fx.body(a, { text: "I want to order", id, user: "1006", escaped: false });
+                const raw = fx.body(a, {
+                  text: "I want to order",
+                  id,
+                  user: "9647501110006",
+                  escaped: false,
+                });
                 assertEquals(await deliver(raw, await fx.sign(raw, a)), 200);
                 await process();
                 const [conv] = await admin`select conversation_id from app.messages
                                           where connection_id = ${conns[0]} and external_message_id = ${
-                  fx.messageId(id, "1006")
+                  fx.messageId(id, "9647501110006")
                 }`;
                 for (const text of [SAMPLE_TEXTS.en, SAMPLE_TEXTS.ckb, SAMPLE_TEXTS.ar]) {
                   const auth = await rpc("send_message", {
@@ -267,7 +272,10 @@ export function inboundConformanceSuite(name: string, fx: InboundFixture) {
                   const recipientSeen = JSON.stringify(
                     JSON.parse(new TextDecoder().decode(imitation.received[before].raw)),
                   );
-                  assert(recipientSeen.includes(rt.recipient("1006")), "addressed to the customer who wrote");
+                  assert(
+                    recipientSeen.includes(rt.recipient("9647501110006")),
+                    "addressed to the customer who wrote",
+                  );
                   if (a.credential) {
                     assertEquals(
                       imitation.received[before].credential,

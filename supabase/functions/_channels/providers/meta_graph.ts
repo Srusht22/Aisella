@@ -51,9 +51,11 @@ export function mapGraphError(status: number, headers: Headers, body: Record<str
   if (code === 551 || sub === 1545041 || code === 131026 || code === 131030 || status === 403) {
     return { kind: "permanent", code: "recipient_unavailable" };
   }
-  if (code === 10 || code === 200 || code === 230 || code === 3) {
+  if (code === 10 || code === 200 || code === 230 || code === 3 || code === 131005) {
     return { kind: "permanent", code: "permission_missing" };
   }
+  // The business account is restricted or locked (policy enforcement): nothing will go through.
+  if (code === 368 || code === 131031) return { kind: "permanent", code: "account_restricted" };
   if (code === 100) return { kind: "permanent", code: safeCode("invalid_request", sub ?? code) };
   return { kind: "permanent", code: safeCode("graph_error", code ?? status) };
 }
