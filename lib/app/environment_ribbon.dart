@@ -16,14 +16,18 @@ class EnvironmentRibbon extends StatelessWidget {
     super.key,
     required this.environment,
     required this.child,
+    this.demo = false,
   });
 
   final AppEnvironment environment;
+
+  /// The guest demo (sample data, nothing saved).
+  final bool demo;
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    if (environment == AppEnvironment.prod) return child;
+    if (environment == AppEnvironment.prod && !demo) return child;
     final p = context.palette;
     final top = MediaQuery.paddingOf(context).top;
     return Stack(
@@ -48,10 +52,14 @@ class EnvironmentRibbon extends StatelessWidget {
                     vertical: Space.s2,
                   ),
                   child: Text(
-                    [
-                      context.l10n.envRibbon(environment.name.toUpperCase()),
-                      if (_buildSha.isNotEmpty) _buildSha,
-                    ].join(' · '),
+                    demo
+                        ? context.l10n.demoRibbon
+                        : [
+                            context.l10n.envRibbon(
+                              environment.name.toUpperCase(),
+                            ),
+                            if (_buildSha.isNotEmpty) _buildSha,
+                          ].join(' · '),
                     textScaler: TextScaler.noScaling,
                     style: context.type.caption.copyWith(
                       color: p.bgSurface,

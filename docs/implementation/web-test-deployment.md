@@ -50,3 +50,7 @@ Test builds (anything but `ENV_NAME=prod`) add the provider's error code to auth
 On the web, email links return to the site itself, so the site's address must be the **Site URL** and be listed under **Redirect URLs** (Authentication → URL Configuration).
 
 Store setup and every screen after sign-in also need the database migrations applied to the project (see above). Without them, sign-up can succeed but the next step fails.
+
+## Guest demo (no account, no backend)
+
+On test builds the welcome screen has **Try as a guest**. It opens the whole app on in-memory sample data (a small store with products, orders, conversations and a courier, in `lib/demo/`), with a "DEMO" ribbon. Nothing is sent to Supabase or saved; signing out, or reloading the page, returns to the real app. Production builds (`ENV_NAME=prod`) never show the button.

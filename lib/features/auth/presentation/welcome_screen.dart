@@ -1,12 +1,15 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/route_guard.dart';
+import '../../../core/config/app_config.dart';
 import '../../../core/formatting/money.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/settings/app_settings.dart';
+import '../../../demo/demo_mode.dart';
 import '../../../design_system/components/app_button.dart';
 import '../../../design_system/components/pencil.dart';
 import '../../../design_system/components/status.dart';
@@ -152,14 +155,43 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               ),
               SizedBox(
                 height: 48 + Space.s8,
-                child: last
-                    ? null
-                    : Center(
-                        child: TextButton(
-                          onPressed: () => _goTo(_index + 1),
-                          child: Text(l10n.welcomeNext),
-                        ),
-                      ),
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    // Guest demo: test builds only, never production.
+                    final guest = !ref.watch(appConfigProvider).isProduction;
+                    return Row(
+                      mainAxisAlignment: guest
+                          ? MainAxisAlignment.spaceBetween
+                          : MainAxisAlignment.center,
+                      children: [
+                        if (guest)
+                          Flexible(
+                            child: TextButton.icon(
+                              onPressed: () => demoMode.value = true,
+                              icon: const Icon(
+                                AppIcons.sparkle,
+                                size: Sizes.iconMd,
+                              ),
+                              label: Text(
+                                l10n.welcomeGuest,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        if (!last)
+                          Flexible(
+                            child: TextButton(
+                              onPressed: () => _goTo(_index + 1),
+                              child: Text(
+                                l10n.welcomeNext,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ],
           ),

@@ -4354,7 +4354,7 @@
   "@welcomeDemoCustomer": {
     "description": "Sample customer name in the welcome demo (synthetic)."
   },
-  "welcomeDemoQuestion": "Hi! Is the black abaya available? How much is it?",
+  "welcomeDemoQuestion": "Hi! Do you have the oud perfume? How much is it?",
   "@welcomeDemoQuestion": {
     "description": "Sample customer message in the welcome demo."
   },
@@ -4362,7 +4362,7 @@
   "@welcomeDemoSuggestion": {
     "description": "Caption on an AI-suggested reply in the welcome demo."
   },
-  "welcomeDemoReply": "Yes! It's {price} and {count} are in stock. Shall I prepare your order?",
+  "welcomeDemoReply": "Yes! It's {price} and we have {count} in stock. Shall I prepare your order?",
   "@welcomeDemoReply": {
     "description": "Sample AI-suggested reply in the welcome demo.",
     "placeholders": {
@@ -4374,7 +4374,7 @@
       }
     }
   },
-  "welcomeDemoProduct": "Black Abaya",
+  "welcomeDemoProduct": "Oud Perfume",
   "@welcomeDemoProduct": {
     "description": "Sample product name in the welcome demo."
   },
@@ -4441,5 +4441,13 @@
   "passwordStrengthStrong": "Strong",
   "@passwordStrengthStrong": {
     "description": "Password strength label."
+  },
+  "welcomeGuest": "Try as a guest",
+  "@welcomeGuest": {
+    "description": "Welcome button: explore the app on sample data without an account (test builds only)."
+  },
+  "demoRibbon": "DEMO · sample data, nothing is saved",
+  "@demoRibbon": {
+    "description": "Ribbon shown while exploring as a guest."
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config/app_config.dart';
 import '../core/l10n/supported_locales.dart';
 import '../core/settings/app_settings.dart';
+import '../demo/demo_mode.dart';
 import '../design_system/motion/motion.dart';
 import '../design_system/theme/app_theme.dart';
 import 'environment_ribbon.dart';
@@ -44,6 +45,7 @@ class AiselliaApp extends ConsumerWidget {
         reduce: settings.motion == MotionPreference.reduce,
         child: EnvironmentRibbon(
           environment: config.environment,
+          demo: ref.watch(isDemoProvider),
           child: child ?? const SizedBox.shrink(),
         ),
       ),
