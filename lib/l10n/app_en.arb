@@ -4653,5 +4653,99 @@
   "attnToPrepare": "To prepare",
   "@attnToPrepare": {
     "description": "Today attention row: approved orders still to prepare."
+  },
+  "connectionsTitle": "Connections",
+  "@connectionsTitle": {
+    "description": "Screen and menu: connected social accounts and drivers."
+  },
+  "connectionsBody": "Your Aisellia account is connected to these accounts. Customers who write to them appear in your inbox, and you reply from here.",
+  "@connectionsBody": {
+    "description": "Connections screen intro."
+  },
+  "connectionsSocial": "Social and messaging accounts",
+  "@connectionsSocial": {
+    "description": "Connections section."
+  },
+  "connectionsDrivers": "Drivers",
+  "@connectionsDrivers": {
+    "description": "Connections section."
+  },
+  "connectionsConnected": "Connected",
+  "@connectionsConnected": {
+    "description": "Connection state."
+  },
+  "connectionsConnectedAs": "Connected: {account}",
+  "@connectionsConnectedAs": {
+    "description": "Connection state with the account name.",
+    "placeholders": {
+      "account": {
+        "type": "String"
+      }
+    }
+  },
+  "connectionsNotConnected": "Not connected",
+  "@connectionsNotConnected": {
+    "description": "Connection state."
+  },
+  "connectionsManageSocial": "Connect or manage accounts",
+  "@connectionsManageSocial": {
+    "description": "Button to the channels screen."
+  },
+  "connectionsManageDrivers": "Add or manage drivers",
+  "@connectionsManageDrivers": {
+    "description": "Button to the drivers screen."
+  },
+  "connectionsNoDrivers": "No drivers yet.",
+  "@connectionsNoDrivers": {
+    "description": "Connections: empty drivers."
+  },
+  "connectionsUnavailable": "Could not load this right now.",
+  "@connectionsUnavailable": {
+    "description": "Connections: load error."
+  },
+  "orderChatTitle": "Customer chat",
+  "@orderChatTitle": {
+    "description": "Order detail section: the chat the order came from."
+  },
+  "orderChatCustomer": "Customer",
+  "@orderChatCustomer": {
+    "description": "Fallback name of the customer in the order chat."
+  },
+  "orderChatHint": "Write a reply…",
+  "@orderChatHint": {
+    "description": "Order chat reply box hint."
+  },
+  "orderChatSend": "Send",
+  "@orderChatSend": {
+    "description": "Order chat send button."
+  },
+  "orderChatSent": "Reply sent",
+  "@orderChatSent": {
+    "description": "Snackbar after a reply is sent from an order."
+  },
+  "orderChatSendFailed": "The reply could not be sent. Try again.",
+  "@orderChatSendFailed": {
+    "description": "Snackbar when sending fails."
+  },
+  "orderChatOpen": "Open full chat",
+  "@orderChatOpen": {
+    "description": "Button to the conversation."
+  },
+  "orderChatNotConnected": "Connect this customer's app in Connections to reply from here.",
+  "@orderChatNotConnected": {
+    "description": "Order chat: channel not connected."
+  },
+  "orderChatWindowClosed": "{provider} only allows replies for a while after the customer's last message.",
+  "@orderChatWindowClosed": {
+    "description": "Order chat: reply window closed.",
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "orderChatUnavailable": "The chat could not be loaded.",
+  "@orderChatUnavailable": {
+    "description": "Order chat: load error."
   }
 }

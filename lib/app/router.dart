@@ -33,6 +33,7 @@ import '../features/orders/presentation/order_detail_screen.dart';
 import '../features/orders/presentation/order_editor_screen.dart';
 import '../features/orders/presentation/order_history_screen.dart';
 import '../features/orders/presentation/orders_screen.dart';
+import '../features/settings/connections_screen.dart';
 import '../features/settings/language_display_screen.dart';
 import '../features/settings/store_menu_screen.dart';
 import '../features/settings/store_settings_screens.dart';
@@ -301,6 +302,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(path: 'ai', builder: (_, _) => const AiSettingsScreen()),
           GoRoute(path: 'channels', builder: (_, _) => const ChannelsScreen()),
+          GoRoute(
+            path: 'connections',
+            builder: (_, _) => const ConnectionsScreen(),
+          ),
           GoRoute(path: 'couriers', builder: (_, _) => const CouriersScreen()),
           GoRoute(
             path: 'account',

@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:aisellia/app/app.dart';
+import 'package:aisellia/app/route_guard.dart';
 import 'package:aisellia/core/config/app_config.dart';
 import 'package:aisellia/core/settings/key_value_store.dart';
 import 'package:aisellia/demo/demo_mode.dart';
+import 'package:aisellia/features/orders/presentation/order_chat.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import '../helpers/test_app.dart';
 
@@ -78,5 +84,68 @@ void main() {
     await tester.tap(find.text('Inbox').last);
     await tester.pumpAndSettle();
     expect(find.textContaining('Shilan'), findsWidgets);
+  });
+
+  Future<void> openDemo(WidgetTester tester) async {
+    setScreen(tester);
+    demoMode.value = true;
+    await tester.pumpWidget(
+      DemoSwitch(
+        realOverrides: [
+          appConfigProvider.overrideWithValue(
+            const AppConfig(
+              environment: AppEnvironment.staging,
+              sampleData: false,
+            ),
+          ),
+          keyValueStoreProvider.overrideWithValue(
+            InMemoryStore({'settings.locale': 'en'}),
+          ),
+        ],
+        child: const AiselliaApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+  }
+
+  GoRouter router(WidgetTester tester) =>
+      GoRouter.of(tester.element(find.byType(Scaffold).first));
+
+  testWidgets('an order shows its customer chat and replies from the app', (
+    tester,
+  ) async {
+    await openDemo(tester);
+    unawaited(router(tester).push(Routes.order('order-1006')));
+    await tester.pumpAndSettle();
+    final chat = find.byType(OrderChat);
+    await tester.scrollUntilVisible(
+      chat,
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(chat, findsOneWidget);
+    expect(find.textContaining('بۆنی عود'), findsWidgets);
+    final box = find.descendant(
+      of: find.byType(OrderChat),
+      matching: find.byType(TextField),
+    );
+    await tester.ensureVisible(box);
+    await tester.enterText(box, 'Yes, it is available.');
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Send'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reply sent'), findsOneWidget);
+    expect(find.textContaining('Yes, it is available.'), findsWidgets);
+  });
+
+  testWidgets('Connections shows the connected accounts and drivers', (
+    tester,
+  ) async {
+    await openDemo(tester);
+    unawaited(router(tester).push(Routes.connections));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('@shilan.boutique'), findsOneWidget);
+    expect(find.text('Not connected'), findsWidgets);
+    expect(find.textContaining('Aram'), findsOneWidget);
   });
 }

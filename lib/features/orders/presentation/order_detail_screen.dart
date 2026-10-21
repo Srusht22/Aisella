@@ -27,6 +27,7 @@ import '../../common/fulfilment_labels.dart';
 import '../../fulfilment/domain/fulfilment.dart' show PaymentChannel;
 import '../application/order_providers.dart';
 import '../domain/order.dart';
+import 'order_chat.dart';
 import 'order_payment_sheet.dart';
 import 'order_sheets.dart';
 import 'order_text.dart';
@@ -199,17 +200,10 @@ class _DetailBody extends ConsumerWidget {
             ],
           ),
         ),
-        if (order.conversationId case final conversationId?)
-          Align(
-            alignment: AlignmentDirectional.centerStart,
-            child: AppButton(
-              label: l10n.openConversation,
-              icon: AppIcons.chatsCircle,
-              variant: AppButtonVariant.tertiary,
-              onPressed: () =>
-                  context.push(Routes.conversation(conversationId)),
-            ),
-          ),
+        if (order.conversationId case final conversationId?) ...[
+          const SizedBox(height: Space.s16),
+          OrderChat(conversationId: conversationId),
+        ],
         if (order.issues.isNotEmpty) ...[
           const SizedBox(height: Space.s12),
           Semantics(

@@ -205,7 +205,11 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
 
   /// Live conversations: the reply box above the assistant's actions.
   Widget _withComposer(Conversation c, Widget actions) => !c.summary.isLive
-      ? actions
+      ? Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [const _ConnectToReply(), actions],
+        )
       : Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -784,6 +788,41 @@ class _SuggestionCardState extends ConsumerState<_SuggestionCard> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Shown on conversations that did not arrive through a connected app:
+/// replies are sent from Aisellia once the customer's app is connected.
+class _ConnectToReply extends StatelessWidget {
+  const _ConnectToReply();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final p = context.palette;
+    return Container(
+      color: p.bgSunken,
+      padding: const EdgeInsets.symmetric(
+        horizontal: Space.s16,
+        vertical: Space.s8,
+      ),
+      child: Row(
+        children: [
+          Icon(AppIcons.info, size: Sizes.iconSm, color: p.textSecondary),
+          const SizedBox(width: Space.s8),
+          Expanded(
+            child: Text(
+              l10n.orderChatNotConnected,
+              style: context.type.caption.copyWith(color: p.textSecondary),
+            ),
+          ),
+          TextButton(
+            onPressed: () => context.push(Routes.connections),
+            child: Text(l10n.connectionsTitle),
+          ),
+        ],
       ),
     );
   }

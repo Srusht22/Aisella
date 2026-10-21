@@ -56,3 +56,11 @@ In addition:
 **Translations:** the Sorani and Arabic strings are machine-drafted and await native review.
 
 **What remains mocked** (tested only against local imitations): Gemini, all six messaging-provider APIs, Meta and TikTok OAuth.
+
+## Owner decisions, 2026-10-21
+
+- **Orders stop at Preparing in the app.** `Features.deliveryTracking` (off) hides out for delivery, delivered, delivery problems, delivery lists and courier cash. The database keeps every state; switching the flag back on needs no migration.
+- **Plans: Starter $15, Pro $25, Business $49, each with a 7-day free trial.** The choice and trial start are kept on the device. **Nothing is charged**: a payment provider needs the owner's approval. Product and order limits are shown, not enforced yet.
+- **Sign-up asks** full name, store name, phone, email, password and confirmation. The profile is stored as account metadata, and store setup starts from it.
+- **Replies are sent from the app** (order chat and conversation) through a connected channel. Without a connection, the seller is pointed to **Connections** (social accounts and drivers in one screen). Real sending still needs the provider approvals in the [pre-publication checklist](pre-publication-checklist.md) (D).
+

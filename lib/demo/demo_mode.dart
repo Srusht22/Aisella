@@ -67,6 +67,11 @@ List<Override> demoOverrides({DateTime Function() now = DateTime.now}) {
   final orders = sampleOrders(catalog, now());
   // Orders stop at Preparing in the app (Features.deliveryTracking): the
   // demo has none further along.
+  // The first order came from Nzar's Instagram chat.
+  orders.overlays['order-1006'] = {
+    'conversation_id': 'demo-c1',
+    'origin': 'ai',
+  };
   if (!Features.deliveryTracking) {
     orders.raw('order-1003')['status'] = 'processing';
     orders.raw('order-1002')['status'] = 'approved';
@@ -88,7 +93,11 @@ List<Override> demoOverrides({DateTime Function() now = DateTime.now}) {
     ordersRepositoryProvider.overrideWithValue(orders),
     conversationsRepositoryProvider.overrideWithValue(conversations),
     channelsRepositoryProvider.overrideWithValue(
-      FakeChannelsRepository(conversations: conversations),
+      FakeChannelsRepository(
+        conversations: conversations,
+        providers: _demoProviders,
+        connections: _demoConnections,
+      ),
     ),
     fulfilmentRepositoryProvider.overrideWithValue(
       FakeFulfilmentRepository(
@@ -108,6 +117,59 @@ List<Override> demoOverrides({DateTime Function() now = DateTime.now}) {
     photoPickerProvider.overrideWithValue(FakePhotoPicker()),
   ];
 }
+
+const _connected = {
+  'instagram': ('Instagram', '@shilan.boutique'),
+  'whatsapp': ('WhatsApp', '+964 750 123 4567'),
+  'messenger': ('Messenger', 'Shilan Boutique'),
+};
+
+final _demoProviders = [
+  for (final (id, name) in [
+    ('instagram', 'Instagram'),
+    ('whatsapp', 'WhatsApp'),
+    ('messenger', 'Messenger'),
+    ('telegram', 'Telegram'),
+    ('viber', 'Viber'),
+    ('tiktok', 'TikTok'),
+  ])
+    {
+      'provider': id,
+      'name': name,
+      'status': 'pilot',
+      'connect_method': id == 'telegram' || id == 'viber'
+          ? 'bot_token'
+          : id == 'tiktok'
+          ? 'tiktok_oauth'
+          : 'meta_login',
+      'can_connect': true,
+      'ui_state': _connected.containsKey(id) ? 'connected' : 'disconnected',
+    },
+];
+
+final _demoConnections = [
+  for (final MapEntry(key: id, value: (name, account)) in _connected.entries)
+    {
+      'id': 'conn-$id',
+      'provider': id,
+      'provider_name': name,
+      'ui_state': 'connected',
+      'can_send': true,
+      'display_name': account,
+      'is_test': true,
+    },
+];
+
+/// A live channel on a demo conversation, so replies go out from the app.
+Map<String, dynamic> _liveChannel(String id) => {
+  'connection_id': 'conn-$id',
+  'provider': id,
+  'provider_name': _connected[id]!.$1,
+  'account_name': _connected[id]!.$2,
+  'ui_state': 'connected',
+  'can_send': true,
+  'window_open': true,
+};
 
 const demoZone = DeliveryZone(
   id: 'zone-1',
@@ -129,6 +191,7 @@ FakeConversationsRepository demoConversations() {
       fake(
         id: 'demo-c1',
         label: 'Nzar Ahmad',
+        channel: _liveChannel('instagram'),
         messages: [msg('dm1', 'سڵاو، بۆنی عود ماوە؟ نرخی چەندە؟')],
         suggestion: suggestion(
           text: 'بەڵێ، بۆنی عود بەردەستە. نرخەکەی ١٥،٠٠٠ دینارە.',
@@ -146,6 +209,7 @@ FakeConversationsRepository demoConversations() {
         id: 'demo-c2',
         label: 'Shilan',
         source: 'whatsapp',
+        channel: _liveChannel('whatsapp'),
         status: 'needs_you',
         escalation: const ['discount_request'],
         messages: [
@@ -156,6 +220,7 @@ FakeConversationsRepository demoConversations() {
         id: 'demo-c3',
         label: 'Dara Kamal',
         source: 'messenger',
+        channel: _liveChannel('messenger'),
         status: 'waiting',
         messages: [
           msg('dm3', 'Is the linen shirt available in size L?'),

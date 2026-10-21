@@ -111,11 +111,6 @@ class StoreMenuScreen extends ConsumerWidget {
                       onTap: () => context.push(Routes.storeZones),
                     ),
                     NavRow(
-                      label: l10n.couriersTitle,
-                      icon: AppIcons.users,
-                      onTap: () => context.push(Routes.storeCouriers),
-                    ),
-                    NavRow(
                       label: l10n.menuPayments,
                       icon: AppIcons.money,
                       onTap: () => context.push(Routes.storePayments),
@@ -130,10 +125,12 @@ class StoreMenuScreen extends ConsumerWidget {
                       icon: AppIcons.sparkle,
                       onTap: () => context.push(Routes.storeAi),
                     ),
+                    // Social accounts and drivers, in one place.
                     NavRow(
-                      label: l10n.channelsTitle,
+                      label: l10n.connectionsTitle,
                       icon: AppIcons.chatsCircle,
-                      onTap: () => context.push(Routes.storeChannels),
+                      iconColor: p.textBrand,
+                      onTap: () => context.push(Routes.connections),
                     ),
                   ],
                 ),

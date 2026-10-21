@@ -359,14 +359,17 @@ void main() {
       expect(_has('No account connected yet.'), findsOneWidget);
     });
 
-    testWidgets('the store menu opens connected accounts', (tester) async {
+    testWidgets('the store menu opens connections, then accounts', (tester) async {
       await _pump(
         tester,
         conversations: _Conv(),
         channels: _Ch(),
         route: Routes.store,
       );
-      await _tap(tester, _has('Connected accounts'));
+      // Connections first shows every account at a glance.
+      await _tap(tester, _has('Connections'));
+      expect(_has('Not connected'), findsWidgets);
+      await _tap(tester, _has('Connect or manage accounts'));
       // The providers the store can add are listed.
       expect(_has('Telegram'), findsOneWidget);
       expect(_has('No account connected yet.'), findsOneWidget);

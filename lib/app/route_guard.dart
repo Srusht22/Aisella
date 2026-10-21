@@ -51,6 +51,7 @@ abstract final class Routes {
   static const storeInventory = '/store/inventory';
   static const storeAi = '/store/ai';
   static const storeChannels = '/store/channels';
+  static const connections = '/store/connections';
   static const storeCouriers = '/store/couriers';
   static const storeAccount = '/store/account';
   static const storeDeleteAccount = '/store/account/delete';

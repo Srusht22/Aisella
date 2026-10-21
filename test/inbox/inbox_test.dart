@@ -444,7 +444,9 @@ void main() {
       expect(_has('the AI assistant'), findsWidgets);
       // An unresolved line is an issue, not a "no longer sold" line.
       expect(find.text('No longer sold'), findsNothing);
-      await _tap(tester, find.text('Open conversation'));
+      // The chat shows on the order; the full chat is one tap away.
+      expect(_has('Hi, how much is the beige abaya size M?'), findsWidgets);
+      await _tap(tester, find.text('Open full chat'));
       expect(find.byType(ConversationScreen), findsOneWidget);
     });
   });

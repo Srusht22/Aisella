@@ -318,7 +318,7 @@ void main() {
       skip: !Features.deliveryTracking,
     );
 
-    testWidgets('the store menu opens couriers', (tester) async {
+    testWidgets('the store menu opens connections, then drivers', (tester) async {
       final orders = _orders();
       await _pump(
         tester,
@@ -326,7 +326,9 @@ void main() {
         fulfilment: FakeFulfilmentRepository(orders: orders),
         route: Routes.store,
       );
-      await _tap(tester, _has('Couriers'));
+      await _tap(tester, _has('Connections'));
+      expect(_has('No drivers yet.'), findsOneWidget);
+      await _tap(tester, _has('Add or manage drivers'));
       expect(_has('No couriers yet.'), findsOneWidget);
     });
   });
