@@ -6,10 +6,13 @@ import '../../../app/route_guard.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../design_system/components/app_button.dart';
+import '../../../design_system/components/inputs.dart';
 import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../common/api_error_text.dart';
 import '../../common/form_widgets.dart';
+import '../../common/store_forms.dart';
+import '../../store/domain/store_validation.dart';
 import '../application/auth_controller.dart';
 import '../domain/auth_status.dart';
 import '../domain/credentials.dart';
@@ -25,8 +28,12 @@ class SignUpScreen extends ConsumerStatefulWidget {
 }
 
 class _SignUpScreenState extends ConsumerState<SignUpScreen> {
+  final _fullName = TextEditingController();
+  final _storeName = TextEditingController();
+  final _phone = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
+  final _confirm = TextEditingController();
   bool _submitted = false;
   bool _busy = false;
   AuthFailure? _failure;
@@ -34,8 +41,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   @override
   void dispose() {
-    _email.dispose();
-    _password.dispose();
+    for (final c in [
+      _fullName,
+      _storeName,
+      _phone,
+      _email,
+      _password,
+      _confirm,
+    ]) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -45,8 +60,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       _submitted = true;
       _failure = null;
     });
-    if (validateEmail(_email.text) != null ||
-        validateNewPassword(_password.text) != null) {
+    final (phone, phoneIssue) = parseContactPhone(_phone.text);
+    if (_fullNameIssue != null ||
+        validateStoreName(_storeName.text) != null ||
+        phoneIssue != null ||
+        validateEmail(_email.text) != null ||
+        validateNewPassword(_password.text) != null ||
+        _confirmIssue != null) {
       return;
     }
     setState(() => _busy = true);
@@ -58,6 +78,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
             email: email,
             password: _password.text,
             termsVersion: currentTermsVersion,
+            profile: SignUpProfile(
+              fullName: _fullName.text.trim(),
+              phone: phone!,
+              storeName: _storeName.text.trim(),
+            ),
           );
       if (!mounted) return;
       if (outcome == SignUpOutcome.verificationRequired) {
@@ -80,6 +105,20 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       if (mounted) setState(() => _busy = false);
     }
   }
+
+  static const _maxFullName = 80;
+
+  String? get _fullNameIssue {
+    final n = _fullName.text.trim();
+    if (n.isEmpty) return context.l10n.errFullNameRequired;
+    if (n.runes.length > _maxFullName) {
+      return context.l10n.errTooLongMax('$_maxFullName');
+    }
+    return null;
+  }
+
+  String? get _confirmIssue =>
+      _confirm.text == _password.text ? null : context.l10n.errPasswordsDiffer;
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +144,51 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              AppTextField(
+                label: l10n.fieldFullName,
+                controller: _fullName,
+                enabled: !_busy,
+                textInputAction: TextInputAction.next,
+                autofillHints: const [AutofillHints.name],
+                error: _submitted ? _fullNameIssue : null,
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: Space.s16),
+              AppTextField(
+                label: l10n.fieldStoreName,
+                controller: _storeName,
+                enabled: !_busy,
+                textInputAction: TextInputAction.next,
+                autofillHints: const [AutofillHints.organizationName],
+                error: _submitted
+                    ? fieldIssueText(
+                        l10n,
+                        'name',
+                        validateStoreName(_storeName.text),
+                      )
+                    : null,
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: Space.s16),
+              AppTextField(
+                label: l10n.fieldPhone,
+                controller: _phone,
+                enabled: !_busy,
+                ltr: true,
+                keyboardType: TextInputType.phone,
+                textInputAction: TextInputAction.next,
+                autofillHints: const [AutofillHints.telephoneNumber],
+                helper: l10n.phoneHelper(phoneExample),
+                error: _submitted
+                    ? fieldIssueText(
+                        l10n,
+                        'phone',
+                        parseContactPhone(_phone.text).$2,
+                      )
+                    : null,
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: Space.s16),
               EmailField(
                 controller: _email,
                 newAccount: true,
@@ -156,9 +240,19 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       )
                     : null,
                 onChanged: (_) => setState(() {}),
-                onSubmitted: (_) => _submit(),
+                textInputAction: TextInputAction.next,
               ),
               PasswordStrengthMeter(password: _password.text),
+              const SizedBox(height: Space.s16),
+              PasswordField(
+                controller: _confirm,
+                label: l10n.fieldConfirmPassword,
+                newPassword: true,
+                enabled: !_busy,
+                error: _submitted ? _confirmIssue : null,
+                onChanged: (_) => setState(() {}),
+                onSubmitted: (_) => _submit(),
+              ),
             ],
           ),
         ),

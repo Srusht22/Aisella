@@ -120,6 +120,27 @@ void main() {
       expect(guardRedirect(Routes.today, gate), Routes.signIn);
     });
 
+    test('a new seller chooses a plan before creating the store', () {
+      const noPlan = RouteGate(
+        languageChosen: true,
+        auth: SignedIn(testUser),
+        workspace: GateNoStore(),
+        planChosen: false,
+      );
+      expect(homeFor(noPlan), Routes.plans);
+      expect(guardRedirect(Routes.setupStore, noPlan), Routes.plans);
+      expect(guardRedirect(Routes.plans, noPlan), isNull);
+      const ready = RouteGate(
+        languageChosen: true,
+        auth: SignedIn(testUser),
+        workspace: GateReady(),
+      );
+      // The plans stay reachable to change plan.
+      expect(guardRedirect(Routes.plans, ready), isNull);
+      const out = RouteGate(languageChosen: true, auth: SignedOut());
+      expect(guardRedirect(Routes.plans, out), isNull);
+    });
+
     test('setup resumes at the first incomplete step', () {
       RouteGate at(WorkspaceGate w) => RouteGate(
         languageChosen: true,

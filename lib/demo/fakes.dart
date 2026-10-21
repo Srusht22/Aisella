@@ -47,6 +47,9 @@ class FakeAuthRepository implements AuthRepository {
   final accounts = <String, String>{};
   final unverified = <String>{};
 
+  /// Profiles given at sign-up, by email.
+  final profiles = <String, SignUpProfile>{};
+
   /// When set, the next call fails with it.
   AuthFailure? failNext;
 
@@ -75,8 +78,10 @@ class FakeAuthRepository implements AuthRepository {
     required String email,
     required String password,
     required String termsVersion,
+    SignUpProfile? profile,
   }) async {
     calls.add('signUp:$email:$termsVersion');
+    if (profile != null) profiles[email] = profile;
     _maybeFail();
     if (accounts.containsKey(email)) {
       throw const AuthError(AuthFailure.emailInUse);

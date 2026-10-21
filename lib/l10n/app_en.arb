@@ -616,7 +616,7 @@
   },
   "fieldConfirmPassword": "Confirm password",
   "@fieldConfirmPassword": {
-    "description": "Confirm password field label."
+    "description": "Sign-up field: the password again."
   },
   "passwordHelper": "At least 8 characters",
   "@passwordHelper": {
@@ -4509,5 +4509,142 @@
   "appearanceApplied": "Appearance updated",
   "@appearanceApplied": {
     "description": "Snackbar after Apply in the Appearance sheet."
+  },
+  "plansTitle": "Choose your plan",
+  "@plansTitle": {
+    "description": "Plans screen title."
+  },
+  "plansBody": "Every plan starts with 7 days free. You can change plan later.",
+  "@plansBody": {
+    "description": "Plans screen subtitle before a trial."
+  },
+  "plansChangeBody": "Switch plan at any time. Your free trial keeps its original end date.",
+  "@plansChangeBody": {
+    "description": "Plans screen subtitle after the trial started."
+  },
+  "plansNoCharge": "Nothing is charged now. Payment options will be added before the paid period starts.",
+  "@plansNoCharge": {
+    "description": "Note under the plans: no payment is taken."
+  },
+  "plansStartTrial": "Start 7-day free trial",
+  "@plansStartTrial": {
+    "description": "Primary button on the plans screen."
+  },
+  "plansChoose": "Switch to {plan}",
+  "@plansChoose": {
+    "description": "Button when the trial already started.",
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "plansContinueGuest": "Continue as a guest",
+  "@plansContinueGuest": {
+    "description": "Guest entry under the plans."
+  },
+  "plansPopular": "Most popular",
+  "@plansPopular": {
+    "description": "Badge on the Pro plan."
+  },
+  "plansPerMonth": "/ month",
+  "@plansPerMonth": {
+    "description": "After a plan price."
+  },
+  "plansLimits": "Includes",
+  "@plansLimits": {
+    "description": "Heading above a plan's limits."
+  },
+  "plansProducts": "{count} products",
+  "@plansProducts": {
+    "description": "Plan limit.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "plansOrders": "{count} orders a month",
+  "@plansOrders": {
+    "description": "Plan limit.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "planStarter": "Starter",
+  "@planStarter": {
+    "description": "Plan name."
+  },
+  "planStarterTag": "For small online sellers",
+  "@planStarterTag": {
+    "description": "Plan tagline."
+  },
+  "planPro": "Pro",
+  "@planPro": {
+    "description": "Plan name."
+  },
+  "planProTag": "For growing businesses",
+  "@planProTag": {
+    "description": "Plan tagline."
+  },
+  "planBusiness": "Business",
+  "@planBusiness": {
+    "description": "Plan name."
+  },
+  "planBusinessTag": "For larger sellers",
+  "@planBusinessTag": {
+    "description": "Plan tagline."
+  },
+  "planMenuTitle": "Plan",
+  "@planMenuTitle": {
+    "description": "Store menu row title."
+  },
+  "planTrialLeft": "{plan} · free trial, {days} days left",
+  "@planTrialLeft": {
+    "description": "Store menu row: plan and trial days left.",
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "planTrialEnded": "{plan} · free trial ended",
+  "@planTrialEnded": {
+    "description": "Store menu row after the trial.",
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "planNone": "No plan chosen yet",
+  "@planNone": {
+    "description": "Store menu row before a plan is chosen."
+  },
+  "planStarted": "{plan}: your 7-day free trial has started",
+  "@planStarted": {
+    "description": "Snackbar after choosing a plan.",
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldFullName": "Full name",
+  "@fieldFullName": {
+    "description": "Sign-up field: the owner's name."
+  },
+  "errFullNameRequired": "Enter your name",
+  "@errFullNameRequired": {
+    "description": "Sign-up: full name empty."
+  },
+  "errPasswordsDiffer": "The passwords do not match",
+  "@errPasswordsDiffer": {
+    "description": "Sign-up: confirm password differs."
   }
 }

@@ -9,7 +9,6 @@ import '../../../core/config/app_config.dart';
 import '../../../core/formatting/money.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/settings/app_settings.dart';
-import '../../../demo/demo_mode.dart';
 import '../../../design_system/brand/app_logo.dart';
 import '../../../design_system/components/app_button.dart';
 import '../../../design_system/components/pencil.dart';
@@ -175,7 +174,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         if (guest)
                           Flexible(
                             child: TextButton.icon(
-                              onPressed: () => demoMode.value = true,
+                              onPressed: () => context.push(Routes.plans),
                               icon: const Icon(
                                 AppIcons.sparkle,
                                 size: Sizes.iconMd,

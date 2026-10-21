@@ -54,6 +54,7 @@ Widget testApp({
   FakeStoreRepository? storeBackend,
   bool signedIn = true,
   Store? store,
+  bool planChosen = true,
 }) {
   final authRepo =
       auth ?? FakeAuthRepository(initialUser: signedIn ? testUser : null);
@@ -61,7 +62,14 @@ Widget testApp({
       storeBackend ??
       FakeStoreRepository(store: store ?? testStore(), zones: [_zone]);
   final catalogRepo = orders?.catalog ?? catalog ?? FakeCatalogRepository();
-  final prefs = InMemoryStore({'settings.locale': ?locale, ...extraPrefs});
+  final prefs = InMemoryStore({
+    'settings.locale': ?locale,
+    if (planChosen) ...{
+      'plan.tier': 'pro',
+      'plan.trialStart': testNow.toUtc().toIso8601String(),
+    },
+    ...extraPrefs,
+  });
   return ProviderScope(
     overrides: [
       clockProvider.overrideWithValue(() => testNow),

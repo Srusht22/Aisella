@@ -46,6 +46,7 @@ abstract interface class AuthRepository {
     required String email,
     required String password,
     required String termsVersion,
+    SignUpProfile? profile,
   });
 
   Future<void> signIn({required String email, required String password});
@@ -101,11 +102,12 @@ class SupabaseAuthRepository implements AuthRepository {
     required String email,
     required String password,
     required String termsVersion,
+    SignUpProfile? profile,
   }) => _guard(() async {
     final res = await _auth.signUp(
       email: email,
       password: password,
-      data: {'terms_version': termsVersion},
+      data: {'terms_version': termsVersion, ...?profile?.toMetadata()},
       emailRedirectTo: AuthLinks.callback,
     );
     // With email confirmation on, Supabase answers an existing address with
@@ -165,13 +167,21 @@ class SupabaseAuthRepository implements AuthRepository {
   Future<void> updatePassword(String newPassword) =>
       _guard(() => _auth.updateUser(UserAttributes(password: newPassword)));
 
-  static AuthUser? _toUser(User? user) => user == null
-      ? null
-      : AuthUser(
-          id: user.id,
-          email: user.email ?? '',
-          emailVerified: user.emailConfirmedAt != null,
-        );
+  static AuthUser? _toUser(User? user) {
+    if (user == null) return null;
+    String? meta(String key) => switch (user.userMetadata?[key]) {
+      final String v when v.trim().isNotEmpty => v.trim(),
+      _ => null,
+    };
+    return AuthUser(
+      id: user.id,
+      email: user.email ?? '',
+      emailVerified: user.emailConfirmedAt != null,
+      fullName: meta('full_name'),
+      phone: meta('phone'),
+      storeName: meta('store_name'),
+    );
+  }
 
   /// Runs a provider call with a timeout and maps every failure to an
   /// [AuthError] (no provider messages reach the UI).

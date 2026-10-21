@@ -22,6 +22,29 @@ Future<void> _type(WidgetTester tester, String label, String text) async {
 
 Finder _button(String label) => find.widgetWithText(GestureDetector, label);
 
+/// Fills every sign-up field; [confirm] defaults to the password.
+Future<void> _fillSignUp(
+  WidgetTester tester, {
+  required String email,
+  required String password,
+  String? confirm,
+}) async {
+  await _type(tester, 'Full name', 'Shilan Hama');
+  await _type(tester, 'Store name', 'Shilan Boutique');
+  await _type(tester, 'Phone', '0750 123 4567');
+  await _type(tester, 'Email', email);
+  await _type(tester, 'Password', password);
+  await _type(tester, 'Confirm password', confirm ?? password);
+}
+
+Future<void> _tapCreate(WidgetTester tester) async {
+  final button = find.text('Create account').last;
+  await tester.ensureVisible(button);
+  await tester.pumpAndSettle();
+  await tester.tap(button);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   group('Protected navigation', () {
     testWidgets('signed out: the app opens on Welcome, never Today', (
@@ -128,6 +151,8 @@ void main() {
       await tester.tap(find.text('Create account').first);
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).first, 'a@example.com');
+      await tester.ensureVisible(find.text('Terms and Privacy Policy'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Terms and Privacy Policy'));
       await tester.pumpAndSettle();
       expect(find.text("Your store's data is yours"), findsOneWidget);
@@ -146,14 +171,18 @@ void main() {
       await tester.tap(find.text('Create account').first);
       await tester.pumpAndSettle();
       await _type(tester, 'Email', 'not-an-email');
+      await _type(tester, 'Phone', '12345');
       await _type(tester, 'Password', 'short');
-      await tester.tap(find.text('Create account').last);
-      await tester.pumpAndSettle();
+      await _type(tester, 'Confirm password', 'different');
+      await _tapCreate(tester);
       expect(
         find.textContaining('Enter a valid email address'),
         findsOneWidget,
       );
       expect(find.text('Use at least 8 characters'), findsOneWidget);
+      expect(find.text('Enter your name'), findsOneWidget);
+      expect(find.textContaining('Iraqi mobile number'), findsWidgets);
+      expect(find.text('The passwords do not match'), findsOneWidget);
       expect(auth.calls, isEmpty);
     });
 
@@ -166,11 +195,17 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Create account').first);
         await tester.pumpAndSettle();
-        await _type(tester, 'Email', ' new@example.test ');
-        await _type(tester, 'Password', 'correct-horse');
-        await tester.tap(find.text('Create account').last);
-        await tester.pumpAndSettle();
+        await _fillSignUp(
+          tester,
+          email: ' new@example.test ',
+          password: 'correct-horse',
+        );
+        await _tapCreate(tester);
         expect(auth.calls, ['signUp:new@example.test:2026-10']);
+        final profile = auth.profiles['new@example.test']!;
+        expect(profile.fullName, 'Shilan Hama');
+        expect(profile.storeName, 'Shilan Boutique');
+        expect(profile.phone, '+9647501234567');
         expect(find.text('Check your inbox'), findsOneWidget);
         expect(find.textContaining('new@example.test'), findsWidgets);
         // The resend cooldown is visible straight away (an email was just sent).
@@ -187,10 +222,12 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text('Create account').first);
         await tester.pumpAndSettle();
-        await _type(tester, 'Email', 'taken@example.test');
-        await _type(tester, 'Password', 'correct-horse');
-        await tester.tap(find.text('Create account').last);
-        await tester.pumpAndSettle();
+        await _fillSignUp(
+          tester,
+          email: 'taken@example.test',
+          password: 'correct-horse',
+        );
+        await _tapCreate(tester);
         expect(find.text('An account exists with this email.'), findsOneWidget);
         expect(find.text('Reset password'), findsOneWidget);
         expect(auth.accounts.length, 1);

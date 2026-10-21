@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
+import '../../core/clock.dart';
 import '../../core/config/app_config.dart';
 import '../../core/l10n/l10n.dart';
 import '../../design_system/components/overlays.dart';
@@ -12,7 +13,9 @@ import '../../design_system/layout/responsive.dart';
 import '../../design_system/theme/theme_ext.dart';
 import '../../design_system/tokens/tokens.g.dart';
 import '../auth/application/auth_controller.dart';
+import '../billing/application/plan_controller.dart';
 import '../common/deferred_feature_screen.dart';
+import '../common/plan_labels.dart';
 import '../common/store_forms.dart';
 import '../store/application/workspace_controller.dart';
 
@@ -76,6 +79,20 @@ class StoreMenuScreen extends ConsumerWidget {
                                 color: p.textSecondary,
                               ),
                             ),
+                    ),
+                    NavRow(
+                      label: planStatusText(
+                        l10n,
+                        ref.watch(planProvider),
+                        ref.read(clockProvider)(),
+                      ),
+                      icon: AppIcons.sparkle,
+                      iconColor: p.textBrand,
+                      trailing: Text(
+                        l10n.planMenuTitle,
+                        style: type.caption.copyWith(color: p.textSecondary),
+                      ),
+                      onTap: () => context.push(Routes.plans),
                     ),
                   ],
                 ),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../core/config/app_config.dart';
 import '../core/settings/app_settings.dart';
+import '../demo/demo_mode.dart';
 import '../design_system/gallery/gallery_screen.dart';
 import '../features/auth/application/auth_controller.dart';
 import '../features/auth/domain/auth_status.dart';
@@ -12,6 +13,8 @@ import '../features/auth/presentation/sign_in_screen.dart';
 import '../features/auth/presentation/sign_up_screen.dart';
 import '../features/auth/presentation/terms_screen.dart';
 import '../features/auth/presentation/welcome_screen.dart';
+import '../features/billing/application/plan_controller.dart';
+import '../features/billing/presentation/plans_screen.dart';
 import '../features/catalog/presentation/inventory_history_screen.dart';
 import '../features/catalog/presentation/product_detail_screen.dart';
 import '../features/catalog/presentation/product_editor_screen.dart';
@@ -57,6 +60,7 @@ RouteGate readGate(Ref ref) {
     workspace: auth is SignedIn
         ? workspaceGateFor(ref.read(workspaceProvider), auth.user.id)
         : const GateLoading(),
+    planChosen: ref.read(planProvider).chosen,
   );
 }
 
@@ -65,6 +69,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   ref.listen(settingsProvider, (_, _) => refresh.ping());
   ref.listen(authControllerProvider, (_, _) => refresh.ping());
   ref.listen(workspaceProvider, (_, _) => refresh.ping());
+  ref.listen(planProvider, (_, _) => refresh.ping());
   ref.onDispose(refresh.dispose);
   final isProduction = ref.read(appConfigProvider).isProduction;
 
@@ -107,6 +112,28 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, s) => ForgotPasswordScreen(initialEmail: email(s)),
       ),
       GoRoute(path: Routes.terms, builder: (_, _) => const TermsScreen()),
+      GoRoute(
+        path: Routes.plans,
+        builder: (_, _) {
+          final signedOut = ref.read(authControllerProvider) is SignedOut;
+          return PlansScreen(
+            // A visitor's choice is kept for the account they create next;
+            // a seller continues to store setup (or back where they were).
+            onContinue: (context) {
+              if (signedOut) {
+                context.go(Routes.signUp);
+              } else if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go(Routes.today);
+              }
+            },
+            onGuest: signedOut && !isProduction
+                ? (_) => demoMode.value = true
+                : null,
+          );
+        },
+      ),
       // Recovery session.
       GoRoute(
         path: Routes.newPassword,

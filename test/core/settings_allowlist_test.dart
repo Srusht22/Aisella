@@ -1,5 +1,7 @@
 import 'package:aisellia/core/settings/app_settings.dart';
 import 'package:aisellia/core/settings/key_value_store.dart';
+import 'package:aisellia/features/billing/application/plan_controller.dart';
+import 'package:aisellia/features/billing/domain/plan.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,12 +36,14 @@ void main() {
     addTearDown(container.dispose);
     final ctl = container.read(settingsProvider.notifier);
     expect(container.read(settingsProvider).accent, AppAccent.ledger);
+    expect(container.read(planProvider).chosen, isFalse);
     expect(() async {
       await ctl.setLocale(const Locale('ckb'));
       await ctl.setDigits(DigitStyle.eastern);
       await ctl.setTheme(ThemePreference.dark);
       await ctl.setMotion(MotionPreference.reduce);
       await ctl.setAccent(AppAccent.gold);
+      await container.read(planProvider.notifier).choose(PlanTier.pro);
     }(), completes);
   });
 }

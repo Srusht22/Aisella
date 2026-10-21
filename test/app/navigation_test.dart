@@ -216,6 +216,8 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
     await tester.scrollUntilVisible(find.text('Legal and licences'), 100);
+    await tester.ensureVisible(find.text('Legal and licences'));
+    await tester.pump();
     await tester.tap(find.text('Legal and licences'));
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(seconds: 1)),

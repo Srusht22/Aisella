@@ -18,6 +18,7 @@ abstract final class Routes {
   static const verifyEmail = '/verify-email';
   static const forgotPassword = '/forgot-password';
   static const terms = '/terms';
+  static const plans = '/plans';
 
   // Recovery session only.
   static const newPassword = '/new-password';
@@ -66,6 +67,7 @@ const publicRoutes = {
   Routes.verifyEmail,
   Routes.forgotPassword,
   Routes.terms,
+  Routes.plans,
 };
 
 const _setupRoutes = {
@@ -146,6 +148,7 @@ class RouteGate {
     required this.languageChosen,
     required this.auth,
     this.workspace = const GateLoading(),
+    this.planChosen = true,
   });
 
   final bool languageChosen;
@@ -153,6 +156,10 @@ class RouteGate {
 
   /// Meaningful only when [auth] is [SignedIn].
   final WorkspaceGate workspace;
+
+  /// Whether a plan (and its free trial) has been chosen on this device. A
+  /// new seller sees the plans before creating the store.
+  final bool planChosen;
 }
 
 /// The single navigation guard (Phase 5 §5). Returns the location to
@@ -174,7 +181,7 @@ String homeFor(RouteGate gate) {
       GateLoading() => Routes.starting,
       GateUnavailable() => Routes.unavailable,
       GateDeletionPending() => Routes.accountClosed,
-      GateNoStore() => Routes.setupStore,
+      GateNoStore() => gate.planChosen ? Routes.setupStore : Routes.plans,
       GateOnboarding(step: OnboardingStep.payments) => Routes.setupPayments,
       GateOnboarding() => Routes.setupZones,
       GateReady() => Routes.today,
@@ -192,11 +199,13 @@ bool isAllowed(String path, RouteGate gate) {
       GateLoading() => path == Routes.starting,
       GateUnavailable() => path == Routes.unavailable,
       GateDeletionPending() => path == Routes.accountClosed,
-      GateNoStore() => path == Routes.setupStore,
+      GateNoStore() =>
+        path == Routes.plans || (gate.planChosen && path == Routes.setupStore),
       GateOnboarding(step: OnboardingStep.payments) =>
         path == Routes.setupZones || path == Routes.setupPayments,
       GateOnboarding() => path == Routes.setupZones,
-      GateReady() => !_entryRoutes.contains(path),
+      // The plans stay reachable to change plan.
+      GateReady() => path == Routes.plans || !_entryRoutes.contains(path),
     },
   };
 }

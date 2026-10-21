@@ -1,5 +1,6 @@
 import 'package:aisellia/core/backend/api.dart';
 import 'package:aisellia/design_system/components/app_button.dart';
+import 'package:aisellia/features/auth/domain/auth_status.dart';
 import 'package:aisellia/features/store/domain/store.dart';
 import 'package:aisellia/features/today/presentation/today_screen.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,45 @@ void main() {
       expect(find.text('Step 1 of 3'), findsOneWidget);
       expect(find.text('Your store'), findsOneWidget);
       expect(find.byType(TodayScreen), findsNothing);
+    });
+
+    testWidgets('setup starts from the store name and phone given at sign-up', (
+      tester,
+    ) async {
+      setScreen(tester);
+      await tester.pumpWidget(
+        testApp(
+          storeBackend: FakeStoreRepository(),
+          auth: FakeAuthRepository(
+            initialUser: const AuthUser(
+              id: '00000000-0000-4000-8000-000000000001',
+              email: 'seller@example.test',
+              emailVerified: true,
+              storeName: 'Hevi Shop',
+              phone: '+9647501112233',
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Hevi Shop'), findsOneWidget);
+      expect(find.textContaining('750 111 2233'), findsOneWidget);
+    });
+
+    testWidgets('a new seller sees the plans before store setup', (
+      tester,
+    ) async {
+      setScreen(tester);
+      await tester.pumpWidget(
+        testApp(storeBackend: FakeStoreRepository(), planChosen: false),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Choose your plan'), findsOneWidget);
+      final start = find.text('Start 7-day free trial');
+      await tester.ensureVisible(start);
+      await tester.tap(start);
+      await tester.pumpAndSettle();
+      expect(find.text('Step 1 of 3'), findsOneWidget);
     });
 
     testWidgets('missing fields block creation with field errors', (

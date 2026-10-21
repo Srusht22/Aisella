@@ -21,6 +21,8 @@ class SharedPreferencesStore implements KeyValueStore {
     'settings.theme',
     'settings.motion',
     'settings.accent',
+    'plan.tier',
+    'plan.trialStart',
     installMarkerKey,
   };
 

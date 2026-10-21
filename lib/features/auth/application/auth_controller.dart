@@ -69,10 +69,12 @@ class AuthController extends Notifier<AuthStatus> {
     required String email,
     required String password,
     required String termsVersion,
+    SignUpProfile? profile,
   }) => _repo.signUp(
     email: email,
     password: password,
     termsVersion: termsVersion,
+    profile: profile,
   );
 
   Future<void> signIn({required String email, required String password}) =>

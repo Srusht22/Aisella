@@ -14,7 +14,28 @@ void main() {
     await tester.pumpWidget(testApp(signedIn: false));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Try as a guest'));
+    await tester.pumpAndSettle();
+    // The plans come first; the guest entry is at the bottom.
+    expect(find.text('Choose your plan'), findsOneWidget);
+    expect(find.text('Business'), findsOneWidget);
+    await tester.tap(find.text('Continue as a guest'));
     expect(demoMode.value, isTrue);
+  });
+
+  testWidgets('starting the trial from the plans leads to sign-up', (
+    tester,
+  ) async {
+    setScreen(tester);
+    await tester.pumpWidget(testApp(signedIn: false, planChosen: false));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Try as a guest'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Starter'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Start 7-day free trial'));
+    await tester.pumpAndSettle();
+    expect(find.text('Create your account'), findsOneWidget);
+    expect(demoMode.value, isFalse);
   });
 
   testWidgets('production never offers the guest demo', (tester) async {

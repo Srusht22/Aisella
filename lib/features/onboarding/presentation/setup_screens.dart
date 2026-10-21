@@ -6,6 +6,7 @@ import '../../../app/route_guard.dart';
 import '../../../core/backend/api.dart';
 import '../../../core/backend/idempotency.dart';
 import '../../../core/formatting/money.dart';
+import '../../../core/formatting/phone.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/settings/app_settings.dart';
 import '../../../design_system/components/app_button.dart';
@@ -17,6 +18,8 @@ import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/motion/primitives.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
+import '../../auth/application/auth_controller.dart';
+import '../../auth/domain/auth_status.dart';
 import '../../common/api_error_text.dart';
 import '../../common/form_page.dart';
 import '../../common/form_widgets.dart';
@@ -84,11 +87,25 @@ class SetupStoreScreen extends ConsumerStatefulWidget {
 }
 
 class _SetupStoreScreenState extends ConsumerState<SetupStoreScreen> {
-  late final _values = StoreBasicsValues(
-    defaultReplyLocale: Localizations.localeOf(context).languageCode == 'en'
-        ? 'en'
-        : 'ckb',
-  );
+  late final _values = _initialValues();
+
+  /// Starts from what the seller gave at sign-up (store name, phone), so
+  /// setup only asks for what is still missing.
+  StoreBasicsValues _initialValues() {
+    final values = StoreBasicsValues(
+      defaultReplyLocale: Localizations.localeOf(context).languageCode == 'en'
+          ? 'en'
+          : 'ckb',
+    );
+    if (ref.read(authControllerProvider) case SignedIn(:final user)) {
+      if (user.storeName case final name?) values.name.text = name;
+      if (user.phone case final phone?) {
+        values.phone.text = PhoneNumbers.display(phone);
+      }
+    }
+    return values;
+  }
+
   final _intent = IntentKey();
   bool _busy = false;
   ApiException? _error;

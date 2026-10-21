@@ -8,11 +8,19 @@ class AuthUser {
     required this.id,
     required this.email,
     required this.emailVerified,
+    this.fullName,
+    this.phone,
+    this.storeName,
   });
 
   final String id;
   final String email;
   final bool emailVerified;
+
+  /// Given at sign-up (account metadata); used to prefill store setup.
+  final String? fullName;
+  final String? phone;
+  final String? storeName;
 
   @override
   bool operator ==(Object other) =>
@@ -23,6 +31,29 @@ class AuthUser {
 
   @override
   int get hashCode => Object.hash(id, email, emailVerified);
+}
+
+/// What sign-up asks besides email and password. Stored as account
+/// metadata; the store itself is created at store setup.
+@immutable
+class SignUpProfile {
+  const SignUpProfile({
+    required this.fullName,
+    required this.phone,
+    required this.storeName,
+  });
+
+  final String fullName;
+
+  /// E.164, already validated.
+  final String phone;
+  final String storeName;
+
+  Map<String, String> toMetadata() => {
+    'full_name': fullName,
+    'phone': phone,
+    'store_name': storeName,
+  };
 }
 
 /// Application-wide authentication state (Phase 5 §4). Routing decisions are
