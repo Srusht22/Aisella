@@ -637,7 +637,7 @@
   "total": "کۆی گشتی",
   "totalEstimate": "کۆی گشتی (خەمڵاندن)",
   "totalsByServer": "نرخ و کۆی گشتی لە کاتی پاشەکەوت دەپشکنرێن و هەژمار دەکرێن.",
-  "trackerStep": "هەنگاوی {step} لە 4، {name}",
+  "trackerStep": "هەنگاوی {step} لە {total}، {name}",
   "tryAgain": "هەوڵدانەوە",
   "writeOff": "لەناوچوو",
   "actorAi": "یاریدەدەری AI",
@@ -1006,5 +1006,6 @@
   "planStarted": "{plan}: 7 ڕۆژی تاقیکردنەوەی بێبەرامبەرت دەستی پێکرد",
   "fieldFullName": "ناوی تەواو",
   "errFullNameRequired": "ناوت بنووسە",
-  "errPasswordsDiffer": "وشە نهێنییەکان وەک یەک نین"
+  "errPasswordsDiffer": "وشە نهێنییەکان وەک یەک نین",
+  "attnToPrepare": "بۆ ئامادەکردن"
 }

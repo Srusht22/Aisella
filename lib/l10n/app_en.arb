@@ -2951,7 +2951,7 @@
   "@totalsByServer": {
     "description": "Editor note (BR-24)."
   },
-  "trackerStep": "Step {step} of 4, {name}",
+  "trackerStep": "Step {step} of {total}, {name}",
   "@trackerStep": {
     "description": "Tracker semantics.",
     "placeholders": {
@@ -2960,6 +2960,9 @@
       },
       "name": {
         "type": "String"
+      },
+      "total": {
+        "type": "int"
       }
     }
   },
@@ -4646,5 +4649,9 @@
   "errPasswordsDiffer": "The passwords do not match",
   "@errPasswordsDiffer": {
     "description": "Sign-up: confirm password differs."
+  },
+  "attnToPrepare": "To prepare",
+  "@attnToPrepare": {
+    "description": "Today attention row: approved orders still to prepare."
   }
 }

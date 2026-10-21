@@ -637,7 +637,7 @@
   "total": "المجموع",
   "totalEstimate": "المجموع (تقديري)",
   "totalsByServer": "تُفحص الأسعار والمجاميع وتُحسب عند الحفظ.",
-  "trackerStep": "الخطوة {step} من 4، {name}",
+  "trackerStep": "الخطوة {step} من {total}، {name}",
   "tryAgain": "حاول مرة أخرى",
   "writeOff": "شطب",
   "actorAi": "المساعد الذكي",
@@ -1006,5 +1006,6 @@
   "planStarted": "{plan}: بدأت تجربتك المجانية لمدة 7 أيام",
   "fieldFullName": "الاسم الكامل",
   "errFullNameRequired": "أدخل اسمك",
-  "errPasswordsDiffer": "كلمتا المرور غير متطابقتين"
+  "errPasswordsDiffer": "كلمتا المرور غير متطابقتين",
+  "attnToPrepare": "للتجهيز"
 }

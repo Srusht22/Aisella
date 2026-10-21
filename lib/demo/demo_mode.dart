@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 
 import '../core/clock.dart';
+import '../core/config/features.dart';
 import '../features/auth/application/auth_controller.dart';
 import '../features/catalog/data/catalog_repository.dart';
 import '../features/catalog/data/media_store.dart';
@@ -64,6 +65,12 @@ class DemoSwitch extends StatelessWidget {
 List<Override> demoOverrides({DateTime Function() now = DateTime.now}) {
   final catalog = FakeCatalogRepository(products: sampleCatalog());
   final orders = sampleOrders(catalog, now());
+  // Orders stop at Preparing in the app (Features.deliveryTracking): the
+  // demo has none further along.
+  if (!Features.deliveryTracking) {
+    orders.raw('order-1003')['status'] = 'processing';
+    orders.raw('order-1002')['status'] = 'approved';
+  }
   final conversations = demoConversations();
   return [
     isDemoProvider.overrideWithValue(true),

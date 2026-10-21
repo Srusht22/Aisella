@@ -1,5 +1,6 @@
 import 'package:aisellia/app/router.dart';
 import 'package:aisellia/core/backend/api.dart';
+import 'package:aisellia/core/config/features.dart';
 import 'package:aisellia/design_system/components/app_button.dart';
 import 'package:aisellia/features/orders/domain/order.dart';
 import 'package:aisellia/features/orders/presentation/order_detail_screen.dart';
@@ -343,6 +344,35 @@ void main() {
   });
 
   group('After approval (OR-05, OR-08, OR-09, OR-10)', () {
+    testWidgets('Preparing is the last step: no delivery actions follow', (
+      tester,
+    ) async {
+      final orders = sampleOrders();
+      await _pump(tester, orders, route: Routes.order('order-1004'));
+      expect(
+        find.bySemanticsLabel(RegExp('Step 1 of 2, Approved')),
+        findsOneWidget,
+      );
+      expect(find.text('Mark out for delivery'), findsNothing);
+      await _tap(tester, find.text('Mark as preparing'));
+      expect(find.text('Marked as preparing'), findsOneWidget);
+      expect(
+        find.bySemanticsLabel(RegExp('Step 2 of 2, Preparing')),
+        findsOneWidget,
+      );
+      expect(find.text('Mark out for delivery'), findsNothing);
+      expect(find.text('Mark delivered'), findsNothing);
+    });
+
+    testWidgets('an order already out for delivery offers no delivery steps', (
+      tester,
+    ) async {
+      final orders = sampleOrders();
+      await _pump(tester, orders, route: Routes.order('order-1003'));
+      expect(find.text('Delivery failed'), findsNothing);
+      expect(find.text('Mark delivered'), findsNothing);
+    });
+
     testWidgets(
       'prepare, dispatch, deliver with part of the cash, record the rest',
       (tester) async {
@@ -381,6 +411,8 @@ void main() {
         expect((await orders.getOrder('s', 'order-1004')).codOutstanding, 0);
         expect(find.text('Record cash'), findsNothing);
       },
+      // Delivery tracking is off (owner decision); kept for when it returns.
+      skip: !Features.deliveryTracking,
     );
 
     testWidgets('cancel restocks once and closes the order', (tester) async {
@@ -423,7 +455,7 @@ void main() {
         (await orders.getOrder('s', 'order-1003')).status,
         OrderStatus.returned,
       );
-    });
+    }, skip: !Features.deliveryTracking);
 
     testWidgets('confirmation is copied by the seller, never "sent"', (
       tester,

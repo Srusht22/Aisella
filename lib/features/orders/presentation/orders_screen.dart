@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
 import '../../../core/clock.dart';
+import '../../../core/config/features.dart';
 import '../../../core/formatting/bidi.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/formatting/digits.dart';
@@ -193,15 +194,16 @@ class _OrderList extends ConsumerWidget {
                       const SizedBox(height: Space.s12),
                     ],
                     // Phase 10: group ready orders for a courier.
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: AppButton(
-                        label: l10n.deliveryListsTitle,
-                        icon: AppIcons.truck,
-                        variant: AppButtonVariant.tertiary,
-                        onPressed: () => context.push(Routes.deliveryLists),
+                    if (Features.deliveryTracking)
+                      Align(
+                        alignment: AlignmentDirectional.centerStart,
+                        child: AppButton(
+                          label: l10n.deliveryListsTitle,
+                          icon: AppIcons.truck,
+                          variant: AppButtonVariant.tertiary,
+                          onPressed: () => context.push(Routes.deliveryLists),
+                        ),
                       ),
-                    ),
                     AppSearchField(
                       hint: l10n.searchOrdersHint,
                       clearTooltip: MaterialLocalizations.of(context)
@@ -214,17 +216,20 @@ class _OrderList extends ConsumerWidget {
                       child: Row(
                         children: [
                           for (final f in OrderFilter.values)
-                            Padding(
-                              padding: const EdgeInsetsDirectional.only(
-                                end: Space.s8,
+                            if (Features.deliveryTracking ||
+                                (f != OrderFilter.delivered &&
+                                    f != OrderFilter.problems))
+                              Padding(
+                                padding: const EdgeInsetsDirectional.only(
+                                  end: Space.s8,
+                                ),
+                                child: ChoiceChip(
+                                  label: Text(chipLabel(f)),
+                                  selected: query.filter == f,
+                                  showCheckmark: false,
+                                  onSelected: (_) => queryCtl.setFilter(f),
+                                ),
                               ),
-                              child: ChoiceChip(
-                                label: Text(chipLabel(f)),
-                                selected: query.filter == f,
-                                showCheckmark: false,
-                                onSelected: (_) => queryCtl.setFilter(f),
-                              ),
-                            ),
                         ],
                       ),
                     ),

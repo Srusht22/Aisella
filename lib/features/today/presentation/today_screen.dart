@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router.dart';
 import '../../../core/clock.dart';
+import '../../../core/config/features.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/formatting/digits.dart';
 import '../../../core/formatting/money.dart';
@@ -142,12 +143,14 @@ class _TodayContent extends ConsumerWidget {
         _AttentionRow(
           icon: AppIcons.package,
           color: p.textSecondary,
-          label: l10n.attnToDispatch,
+          label: Features.deliveryTracking
+              ? l10n.attnToDispatch
+              : l10n.attnToPrepare,
           value: s.toDispatch,
           text: count(s.toDispatch),
           onTap: openOrders,
         ),
-      if (s.deliveryProblems > 0)
+      if (Features.deliveryTracking && s.deliveryProblems > 0)
         _AttentionRow(
           icon: AppIcons.warningCircle,
           color: p.warningFg,
@@ -156,7 +159,7 @@ class _TodayContent extends ConsumerWidget {
           text: count(s.deliveryProblems),
           onTap: openOrders,
         ),
-      if (s.cashToCollect > 0)
+      if (Features.deliveryTracking && s.cashToCollect > 0)
         _AttentionRow(
           icon: AppIcons.money,
           color: p.textSecondary,
@@ -196,10 +199,11 @@ class _TodayContent extends ConsumerWidget {
               label: l10n.todayApproved,
               text: count(s.approvedToday),
             ),
-            _SummaryRow(
-              label: l10n.todayDelivered,
-              text: count(s.deliveredToday),
-            ),
+            if (Features.deliveryTracking)
+              _SummaryRow(
+                label: l10n.todayDelivered,
+                text: count(s.deliveredToday),
+              ),
             _SummaryRow(
               label: l10n.todayValueApproved,
               text: money(s.valueApprovedToday),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../app/router.dart';
 import '../../../core/backend/api.dart';
 import '../../../core/backend/idempotency.dart';
+import '../../../core/config/features.dart';
 import '../../../core/formatting/bidi.dart';
 import '../../../core/formatting/dates.dart';
 import '../../../core/formatting/digits.dart';
@@ -104,7 +105,7 @@ class _OverflowMenu extends ConsumerWidget {
         (_Menu.edit, l10n.editOrder, AppIcons.pencilSimple),
       if (s.canConfirm)
         (_Menu.confirmation, l10n.copyConfirmation, AppIcons.copy),
-      if (s == OrderStatus.dispatched)
+      if (Features.deliveryTracking && s == OrderStatus.dispatched)
         (_Menu.returned, l10n.markReturned, AppIcons.arrowUUpLeft),
       (_Menu.note, l10n.internalNote, AppIcons.chatText),
       (_Menu.history, l10n.fullHistory, AppIcons.clockCounterClockwise),
@@ -292,19 +293,19 @@ class _DetailBody extends ConsumerWidget {
                         : l10n.provFromSettings,
                   ),
           ),
-          if (order.courierName != null)
+          if (Features.deliveryTracking && order.courierName != null)
             FieldRow(
               label: l10n.fieldCourier,
               value: Text(Bidi.auto(order.courierName!)),
             ),
-          if (order.courierNote != null)
+          if (Features.deliveryTracking && order.courierNote != null)
             FieldRow(
               label: order.courierName == null
                   ? l10n.fieldCourier
                   : l10n.fieldNote,
               value: Text(Bidi.auto(order.courierNote!)),
             ),
-          if (order.deliveryListId != null)
+          if (Features.deliveryTracking && order.deliveryListId != null)
             FieldRow(
               label: l10n.deliveryListsTitle,
               value: Text(
@@ -381,7 +382,9 @@ class _DetailBody extends ConsumerWidget {
                 emphasize: true,
               ),
           ],
-          if (!review && order.paymentMethod == PaymentMethod.cod) ...[
+          if (Features.deliveryTracking &&
+              !review &&
+              order.paymentMethod == PaymentMethod.cod) ...[
             PriceRow(label: l10n.cashDue, amount: m(order.codDue)),
             PriceRow(label: l10n.cashCollected, amount: m(order.codCollected)),
             if (order.codOutstanding > 0)
@@ -498,7 +501,12 @@ class _Progress extends ConsumerWidget {
     final l10n = context.l10n;
     final p = context.palette;
     final type = context.type;
-    final step = order.status.trackerStep;
+    final raw = order.status.trackerStep;
+    // Without delivery tracking the tracker ends at Preparing; later
+    // states (from before the switch) show as complete.
+    final step = raw == null || Features.deliveryTracking
+        ? raw
+        : raw.clamp(0, 1);
     if (step == null) {
       final (icon, tone) = statusLook(order.status);
       return AppBanner(
@@ -513,11 +521,13 @@ class _Progress extends ConsumerWidget {
     final labels = [
       l10n.statusApproved,
       l10n.statusPreparing,
-      l10n.statusOutForDelivery,
-      l10n.statusDelivered,
+      if (Features.deliveryTracking) ...[
+        l10n.statusOutForDelivery,
+        l10n.statusDelivered,
+      ],
     ];
     return Semantics(
-      label: l10n.trackerStep(step + 1, labels[step]),
+      label: l10n.trackerStep(step + 1, labels[step], labels.length),
       excludeSemantics: true,
       child: Row(
         children: [
@@ -589,6 +599,18 @@ class _ActionBar extends ConsumerWidget {
             ),
           ),
         );
+      case OrderStatus.approved when !Features.deliveryTracking:
+        return StickyActionBar(
+          primary: _ImmediateTransition(
+            order: order,
+            to: OrderStatus.processing,
+            label: l10n.markPreparing,
+            done: l10n.markedPreparing,
+          ),
+        );
+      case _ when !Features.deliveryTracking:
+        // Preparing is the last step in the app.
+        return const SizedBox.shrink();
       case OrderStatus.approved:
         return StickyActionBar(
           secondary: AppButton(

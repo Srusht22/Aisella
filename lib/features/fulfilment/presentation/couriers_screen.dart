@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/backend/api.dart';
 import '../../../core/backend/idempotency.dart';
+import '../../../core/config/features.dart';
 import '../../../core/formatting/bidi.dart';
 import '../../../core/formatting/digits.dart';
 import '../../../core/formatting/money.dart';
@@ -136,18 +137,19 @@ class _CourierCard extends ConsumerWidget {
                 style: type.caption.copyWith(color: p.textSecondary),
               ),
             const SizedBox(height: Space.s8),
-            Text(
-              c.owed > 0
-                  ? l10n.courierOwes(
-                      m(c.owed),
-                      Digits.display('${c.owedOrders}', digits),
-                    )
-                  : l10n.courierOwesNothing,
-              style: type.body.copyWith(
-                color: c.owed > 0 ? p.warningFg : p.textSecondary,
+            if (Features.deliveryTracking)
+              Text(
+                c.owed > 0
+                    ? l10n.courierOwes(
+                        m(c.owed),
+                        Digits.display('${c.owedOrders}', digits),
+                      )
+                    : l10n.courierOwesNothing,
+                style: type.body.copyWith(
+                  color: c.owed > 0 ? p.warningFg : p.textSecondary,
+                ),
               ),
-            ),
-            if (c.carryingOrders > 0)
+            if (Features.deliveryTracking && c.carryingOrders > 0)
               Text(
                 l10n.courierCarrying(
                   m(c.carrying),
@@ -159,7 +161,7 @@ class _CourierCard extends ConsumerWidget {
             Wrap(
               spacing: Space.s8,
               children: [
-                if (c.owed > 0)
+                if (Features.deliveryTracking && c.owed > 0)
                   AppButton(
                     label: l10n.settleCourier,
                     icon: AppIcons.money,

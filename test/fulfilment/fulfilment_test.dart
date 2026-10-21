@@ -1,5 +1,6 @@
 import 'package:aisellia/app/router.dart';
 import 'package:aisellia/core/backend/api.dart';
+import 'package:aisellia/core/config/features.dart';
 import 'package:aisellia/design_system/components/app_button.dart';
 import 'package:aisellia/features/fulfilment/domain/fulfilment.dart';
 import 'package:aisellia/features/orders/domain/order.dart';
@@ -218,7 +219,10 @@ void main() {
         await _tap(tester, _button('Save'));
         expect(f.calls, contains('saveCourier:Karwan:+9647701234567:true'));
         expect(_has('Karwan'), findsOneWidget);
-        expect(_has('Owes nothing'), findsOneWidget);
+        expect(
+          _has('Owes nothing'),
+          findsNothing,
+        ); // cash hidden: orders stop at Preparing
 
         await _tap(tester, _button('Add courier'));
         await tester.enterText(
@@ -236,7 +240,7 @@ void main() {
       },
     );
 
-    testWidgets('cash a courier hands over is never more than owed', (
+    testWidgets('without delivery tracking a courier card shows no cash', (
       tester,
     ) async {
       final orders = _orders();
@@ -259,29 +263,60 @@ void main() {
         fulfilment: f,
         route: Routes.storeCouriers,
       );
-      expect(_has('Owes 90,000'), findsWidgets);
-      await _tap(tester, _button('Record cash handed over'));
-      await tester.enterText(
-        find.descendant(
-          of: find.byKey(const ValueKey('settle-amount')),
-          matching: find.byType(TextField),
-        ),
-        '95000',
-      );
-      await _tap(tester, _button('Record cash handed over').last);
-      expect(_has('This is more than what is due.'), findsOneWidget);
-      expect(f.calls.where((c) => c.startsWith('settle')), isEmpty);
-      await tester.enterText(
-        find.descendant(
-          of: find.byKey(const ValueKey('settle-amount')),
-          matching: find.byType(TextField),
-        ),
-        '90000',
-      );
-      await _tap(tester, _button('Record cash handed over').last);
-      expect(f.calls, contains('settle:c1:90000'));
-      expect(_has('Owes nothing'), findsOneWidget);
+      expect(_has('Karwan'), findsOneWidget);
+      expect(_has('Owes 90,000'), findsNothing);
+      expect(_button('Record cash handed over'), findsNothing);
     });
+
+    testWidgets(
+      'cash a courier hands over is never more than owed',
+      (tester) async {
+        final orders = _orders();
+        final f = FakeFulfilmentRepository(
+          orders: orders,
+          couriers: [
+            const Courier(
+              id: 'c1',
+              name: 'Karwan',
+              active: true,
+              version: 1,
+              owed: 90000,
+              owedOrders: 2,
+            ),
+          ],
+        );
+        await _pump(
+          tester,
+          orders: orders,
+          fulfilment: f,
+          route: Routes.storeCouriers,
+        );
+        expect(_has('Owes 90,000'), findsWidgets);
+        await _tap(tester, _button('Record cash handed over'));
+        await tester.enterText(
+          find.descendant(
+            of: find.byKey(const ValueKey('settle-amount')),
+            matching: find.byType(TextField),
+          ),
+          '95000',
+        );
+        await _tap(tester, _button('Record cash handed over').last);
+        expect(_has('This is more than what is due.'), findsOneWidget);
+        expect(f.calls.where((c) => c.startsWith('settle')), isEmpty);
+        await tester.enterText(
+          find.descendant(
+            of: find.byKey(const ValueKey('settle-amount')),
+            matching: find.byType(TextField),
+          ),
+          '90000',
+        );
+        await _tap(tester, _button('Record cash handed over').last);
+        expect(f.calls, contains('settle:c1:90000'));
+        expect(_has('Owes nothing'), findsOneWidget);
+      },
+      // Courier cash exists only with delivery tracking, which is off.
+      skip: !Features.deliveryTracking,
+    );
 
     testWidgets('the store menu opens couriers', (tester) async {
       final orders = _orders();
