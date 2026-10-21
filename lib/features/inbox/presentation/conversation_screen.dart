@@ -19,6 +19,7 @@ import '../../../design_system/components/status.dart';
 import '../../../design_system/icons/app_icons.dart';
 import '../../../design_system/layout/responsive.dart';
 import '../../../design_system/motion/motion.dart';
+import '../../../design_system/motion/primitives.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../common/order_labels.dart';
@@ -168,61 +169,58 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           ? null
           : _withComposer(
               value,
-              StickyActionBar(
+              _AssistBar(
                 reason: canAssist
                     ? null
-                    : Text(
-                        !value.aiEnabled
-                            ? l10n.errAiDisabled
-                            : value.summary.aiPaused
-                            ? l10n.errAiPaused
-                            : l10n.errNothingToAnswer,
-                        style: context.type.caption.copyWith(
-                          color: p.textSecondary,
-                        ),
-                      ),
-                secondary: AppButton(
-                  label: l10n.prepareDraft,
-                  variant: AppButtonVariant.secondary,
-                  icon: AppIcons.receipt,
-                  onPressed: canAssist && !_running
-                      ? () => _assist(draft: true)
-                      : null,
-                ),
-                primary: AppButton(
-                  label: value.suggestion == null
-                      ? l10n.getSuggestion
-                      : l10n.suggestAgain,
-                  icon: AppIcons.sparkle,
-                  loading: _running,
-                  loadingLabel: l10n.aiWorking,
-                  onPressed: canAssist && !_running ? _assist : null,
-                ),
+                    : !value.aiEnabled
+                    ? l10n.errAiDisabled
+                    : value.summary.aiPaused
+                    ? l10n.errAiPaused
+                    : l10n.errNothingToAnswer,
+                suggestLabel: value.suggestion == null
+                    ? l10n.getSuggestion
+                    : l10n.suggestAgain,
+                running: _running,
+                onSuggest: canAssist && !_running ? _assist : null,
+                onDraft: canAssist && !_running
+                    ? () => _assist(draft: true)
+                    : null,
               ),
             ),
     );
   }
 
   /// Live conversations: the reply box above the assistant's actions.
-  Widget _withComposer(Conversation c, Widget actions) => !c.summary.isLive
-      ? Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [const _ConnectToReply(), actions],
-        )
-      : Column(
+  /// The assistant's pills, then (live conversations) the reply field at
+  /// the very bottom, as in a chat app.
+  Widget _withComposer(Conversation c, Widget actions) => Material(
+    color: context.palette.bgSurface,
+    child: SafeArea(
+      top: false,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: context.palette.borderHairline),
+          ),
+        ),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            LiveComposer(
-              conversation: c,
-              controller: _composer,
-              suggestionId: _composerSuggestionId,
-              onSent: () => setState(() => _composerSuggestionId = null),
-            ),
+            if (!c.summary.isLive) const _ConnectToReply(),
             actions,
+            if (c.summary.isLive)
+              LiveComposer(
+                conversation: c,
+                controller: _composer,
+                suggestionId: _composerSuggestionId,
+                onSent: () => setState(() => _composerSuggestionId = null),
+              ),
           ],
-        );
+        ),
+      ),
+    ),
+  );
 }
 
 enum _MenuItem { add, reply, pause, resume, close, reopen, delete }
@@ -823,6 +821,147 @@ class _ConnectToReply extends StatelessWidget {
             child: Text(l10n.connectionsTitle),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The assistant's two actions as compact pills on one line, so they
+/// never wrap and leave the conversation visible.
+class _AssistBar extends StatelessWidget {
+  const _AssistBar({
+    required this.reason,
+    required this.suggestLabel,
+    required this.running,
+    required this.onSuggest,
+    required this.onDraft,
+  });
+
+  final String? reason;
+  final String suggestLabel;
+  final bool running;
+  final VoidCallback? onSuggest;
+  final VoidCallback? onDraft;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final p = context.palette;
+    return Padding(
+      padding: const EdgeInsetsDirectional.fromSTEB(
+        Space.s16,
+        Space.s8,
+        Space.s16,
+        0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (reason != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: Space.s4),
+              child: Text(
+                reason!,
+                style: context.type.caption.copyWith(color: p.textSecondary),
+              ),
+            ),
+          Row(
+            children: [
+              Expanded(
+                child: _Pill(
+                  label: running ? l10n.aiWorking : suggestLabel,
+                  icon: AppIcons.sparkle,
+                  primary: true,
+                  busy: running,
+                  onPressed: onSuggest,
+                ),
+              ),
+              const SizedBox(width: Space.s8),
+              Expanded(
+                child: _Pill(
+                  label: l10n.prepareDraft,
+                  icon: AppIcons.receipt,
+                  onPressed: onDraft,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: Space.s8),
+        ],
+      ),
+    );
+  }
+}
+
+class _Pill extends StatelessWidget {
+  const _Pill({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+    this.primary = false,
+    this.busy = false,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback? onPressed;
+  final bool primary;
+  final bool busy;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final enabled = onPressed != null;
+    final bg = primary ? p.bgBrandWeak : p.bgSunken;
+    final fg = enabled
+        ? (primary ? p.textBrand : p.textPrimary)
+        : p.textDisabled;
+    return PressScale(
+      enabled: enabled,
+      child: Material(
+        color: bg,
+        shape: StadiumBorder(
+          side: BorderSide(
+            color: primary && enabled ? p.brandPrimary : p.borderHairline,
+          ),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onPressed,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 40),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: Space.s12),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (busy)
+                    SizedBox.square(
+                      dimension: Sizes.iconSm,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: fg,
+                      ),
+                    )
+                  else
+                    Icon(icon, size: Sizes.iconSm, color: fg),
+                  const SizedBox(width: Space.s8),
+                  // Shrinks slightly rather than wrap or cut the label.
+                  Flexible(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        style: context.type.label.copyWith(color: fg),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

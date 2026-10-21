@@ -359,7 +359,9 @@ void main() {
       expect(_has('No account connected yet.'), findsOneWidget);
     });
 
-    testWidgets('the store menu opens connections, then accounts', (tester) async {
+    testWidgets('the store menu opens connections, then accounts', (
+      tester,
+    ) async {
       await _pump(
         tester,
         conversations: _Conv(),
@@ -404,7 +406,7 @@ void main() {
 
         // The seller edits, then backs out of the confirmation.
         await tester.enterText(box, '$_reply Delivery tomorrow.');
-        await _tap(tester, find.widgetWithText(AppButton, 'Send'));
+        await _tap(tester, find.byKey(const ValueKey('composer-send')));
         expect(_has('Send this message?'), findsOneWidget);
         expect(
           tester
@@ -417,7 +419,7 @@ void main() {
         await _tap(tester, find.widgetWithText(AppButton, 'Cancel'));
         expect(ch.sentTexts, isEmpty);
 
-        await _tap(tester, find.widgetWithText(AppButton, 'Send'));
+        await _tap(tester, find.byKey(const ValueKey('composer-send')));
         await _tap(
           tester,
           find.descendant(
@@ -451,7 +453,7 @@ void main() {
         ),
         'Your order is on its way.',
       );
-      await _tap(tester, find.widgetWithText(AppButton, 'Send'));
+      await _tap(tester, find.byKey(const ValueKey('composer-send')));
       await _tap(
         tester,
         find.descendant(
@@ -493,7 +495,7 @@ void main() {
         ),
         'Your order is on its way.',
       );
-      await _tap(tester, find.widgetWithText(AppButton, 'Send'));
+      await _tap(tester, find.byKey(const ValueKey('composer-send')));
       await _tap(
         tester,
         find.descendant(

@@ -318,7 +318,9 @@ void main() {
       skip: !Features.deliveryTracking,
     );
 
-    testWidgets('the store menu opens connections, then drivers', (tester) async {
+    testWidgets('the store menu opens connections, then drivers', (
+      tester,
+    ) async {
       final orders = _orders();
       await _pump(
         tester,

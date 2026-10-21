@@ -11,6 +11,7 @@ import '../../../design_system/components/inputs.dart';
 import '../../../design_system/components/overlays.dart';
 import '../../../design_system/components/status.dart';
 import '../../../design_system/icons/app_icons.dart';
+import '../../../design_system/motion/motion.dart';
 import '../../../design_system/theme/theme_ext.dart';
 import '../../../design_system/tokens/tokens.g.dart';
 import '../../channels/application/channel_providers.dart';
@@ -410,22 +411,71 @@ class _LiveComposerState extends ConsumerState<LiveComposer> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
-                      child: AppTextField(
+                      child: KeyedSubtree(
                         key: const ValueKey('live-composer'),
-                        label: l10n.composerLabel,
-                        controller: widget.controller,
-                        maxLines: 4,
-                        enabled: !_sending,
-                        keyboardType: TextInputType.multiline,
+                        child: TextField(
+                          controller: widget.controller,
+                          enabled: !_sending,
+                          minLines: 1,
+                          maxLines: 4,
+                          keyboardType: TextInputType.multiline,
+                          onChanged: (_) => setState(() {}),
+                          decoration: InputDecoration(
+                            hintText: l10n.composerLabel,
+                            filled: true,
+                            fillColor: p.bgSunken,
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: Space.s16,
+                              vertical: Space.s12,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(Radii.full),
+                              borderSide: BorderSide.none,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(Radii.full),
+                              borderSide: BorderSide.none,
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(Radii.full),
+                              borderSide: BorderSide(
+                                color: p.borderFocus,
+                                width: Strokes.focus,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: Space.s8),
-                    AppButton(
-                      label: l10n.sendAction,
-                      icon: AppIcons.arrowRight,
-                      loading: _sending,
-                      loadingLabel: l10n.deliverySending,
-                      onPressed: _sending ? null : _send,
+                    // Round send button: grows in when there is text.
+                    AnimatedScale(
+                      scale: widget.controller.text.trim().isEmpty ? 0.86 : 1,
+                      duration: Motion.spatial(context, MotionTokens.sm),
+                      curve: Curves.easeOutBack,
+                      child: IconButton.filled(
+                        key: const ValueKey('composer-send'),
+                        tooltip: l10n.sendAction,
+                        style: IconButton.styleFrom(
+                          backgroundColor: p.brandPrimary,
+                          foregroundColor: p.textOnBrand,
+                          minimumSize: const Size.square(48),
+                        ),
+                        onPressed: _sending ? null : _send,
+                        icon: _sending
+                            ? SizedBox.square(
+                                dimension: Sizes.iconMd,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: p.textOnBrand,
+                                ),
+                              )
+                            : const Icon(
+                                AppIcons.arrowRight,
+                                size: Sizes.iconMd,
+                              ),
+                      ),
                     ),
                   ],
                 )
